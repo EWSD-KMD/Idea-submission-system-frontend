@@ -1,0 +1,21 @@
+<svg width="1440" height="81" viewBox="0 0 1440 81" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_40002138_490)">
+<rect width="1535.38" height="124.749" transform="translate(-48.2511 -22.1589)" fill="url(#paint0_linear_40002138_490)" style=""/>
+<path d="M837.645 63.5556C1311.2 89.6642 1496.36 -23.5211 1572.59 -89.5854L1611.58 238.35L228.656 377.69L213.253 135.793C258.973 105.317 445.605 41.9411 837.645 63.5556Z" fill="#0074F2" style="fill:#0074F2;fill:color(display-p3 0.0000 0.4564 0.9500);fill-opacity:1;"/>
+<path d="M536.54 34.0521C1011.33 163.013 1386.85 137.489 1511.51 118.865L1401.46 419.458L-345.725 142.989L-259.72 -91.9451C-190.75 -107.442 61.7541 -94.9091 536.54 34.0521Z" fill="#0C7EFA" style="fill:#0C7EFA;fill:color(display-p3 0.0453 0.4931 0.9797);fill-opacity:1;"/>
+<path d="M618.294 60.9771C1139.84 131.568 1416.76 86.9875 1548.89 20.6057L1517.43 358.67L-394.526 284.145L-470.483 108.211C-399.949 84.9927 -203.25 -50.2188 618.294 60.9771Z" fill="url(#paint1_linear_40002138_490)" style=""/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_40002138_490" x1="783.282" y1="-36.8308" x2="896.557" y2="301.676" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0D82FF" style="stop-color:#0D82FF;stop-color:color(display-p3 0.0500 0.5082 1.0000);stop-opacity:1;"/>
+<stop offset="1" stop-color="#0060C8" style="stop-color:#0060C8;stop-color:color(display-p3 0.0000 0.3778 0.7833);stop-opacity:1;"/>
+</linearGradient>
+<linearGradient id="paint1_linear_40002138_490" x1="599.928" y1="-3.13201" x2="391.298" y2="464.955" gradientUnits="userSpaceOnUse">
+<stop stop-color="#006EE6" style="stop-color:#006EE6;stop-color:color(display-p3 0.0000 0.4324 0.9000);stop-opacity:1;"/>
+<stop offset="1" stop-color="#0980FF" style="stop-color:#0980FF;stop-color:color(display-p3 0.0333 0.5030 1.0000);stop-opacity:1;"/>
+</linearGradient>
+<clipPath id="clip0_40002138_490">
+<rect width="1535.38" height="124.749" fill="white" style="fill:white;fill-opacity:1;" transform="translate(-48.2511 -22.1589)"/>
+</clipPath>
+</defs>
+</svg>
