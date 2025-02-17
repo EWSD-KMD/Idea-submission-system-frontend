@@ -1,12 +1,18 @@
-import { Button as AntButton } from "antd";
-import type { ButtonProps as AntButtonProps } from "antd";
+"use client";
+import dynamic from "next/dynamic";
+import { ButtonProps as AntButtonProps } from "antd";
 import { ReactNode } from "react";
+import { getIcon, IconName } from "./Icon";
 
 interface ButtonProps extends AntButtonProps {
   label?: string;
-  icon?: ReactNode;
+  icon?: IconName | ReactNode;
   rounded?: boolean;
 }
+
+const AntButton = dynamic(() => import("antd").then((mod) => mod.Button), {
+  ssr: false,
+});
 
 const Button = ({
   label,
@@ -15,9 +21,11 @@ const Button = ({
   className = "",
   ...props
 }: ButtonProps) => {
+  const buttonIcon = typeof icon === "string" ? getIcon(icon as IconName) : "";
+
   return (
     <AntButton
-      icon={icon}
+      icon={buttonIcon}
       className={`${rounded ? "rounded-full" : "rounded-lg"} ${className}`}
       {...props}
     >
