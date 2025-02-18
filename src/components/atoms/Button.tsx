@@ -21,7 +21,8 @@ const Button = ({
   className = "",
   ...props
 }: ButtonProps) => {
-  const buttonIcon = typeof icon === "string" ? getIcon(icon as IconName) : "";
+  const buttonIcon =
+    typeof icon === "string" ? getIcon(icon as IconName) : icon;
 
   return (
     <AntButton
@@ -29,7 +30,10 @@ const Button = ({
       className={`${rounded ? "rounded-full" : "rounded-lg"} ${className}`}
       {...props}
     >
-      {label}
+      {label && (
+        // The label is hidden on extra-small screens and shown on sm and above.
+        <span className="hidden sm:inline">{label}</span>
+      )}
     </AntButton>
   );
 };

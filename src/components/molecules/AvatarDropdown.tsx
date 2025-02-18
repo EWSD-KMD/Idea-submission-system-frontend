@@ -3,18 +3,22 @@ import { Dropdown, MenuProps, Switch } from "antd";
 import Avatar from "../atoms/Avatar";
 import { getIcon } from "../atoms/Icon";
 
+const renderProfileItem = () => {
+  return (
+    <div className="flex items-center gap-2">
+      <Avatar size={32}>U</Avatar>
+      <div className="flex flex-col">
+        <span className="font-medium">Username</span>
+        <span className="text-xs text-gray-500">Department Name</span>
+      </div>
+    </div>
+  );
+};
+
 const getDropdownItems = (): MenuProps["items"] => [
   {
     key: "profile",
-    label: (
-      <div className="flex items-center gap-2">
-        <Avatar size={32}>U</Avatar>
-        <div className="flex flex-col">
-          <span className="font-medium">Username</span>
-          <span className="text-xs text-gray-500">Department Name</span>
-        </div>
-      </div>
-    ),
+    label: renderProfileItem(),
   },
   {
     type: "divider",
@@ -23,24 +27,6 @@ const getDropdownItems = (): MenuProps["items"] => [
     key: "changePassword",
     label: "Change Password",
     icon: getIcon("key"),
-  },
-  {
-    type: "divider",
-  },
-  {
-    key: "theme",
-    label: (
-      <div className="flex items-center justify-between">
-        <span>Dark Mode</span>
-        {/* <Switch
-          size="small"
-          checked={isDarkMode}
-          onChange={onThemeChange}
-          className="ml-2"
-        /> */}
-      </div>
-    ),
-    // icon: <BulbOutlined />,
   },
   {
     type: "divider",
@@ -71,6 +57,7 @@ const AvatarDropdown = () => {
     <Dropdown
       menu={{
         items: getDropdownItems(),
+        onClick: handleMenuClick,
       }}
       placement="bottomRight"
       arrow
