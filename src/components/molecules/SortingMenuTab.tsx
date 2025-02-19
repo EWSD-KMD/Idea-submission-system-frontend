@@ -49,7 +49,7 @@ const SortingMenuTab = ({
       defaultOpenKeys={defaultOpen}
       items={menuItems}
       onClick={handleClick}
-      className={`w-full  ${className}`}
+      className={`${className}`}
     />
   );
 };

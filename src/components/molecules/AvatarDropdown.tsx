@@ -1,5 +1,5 @@
 "use client";
-import { Dropdown, MenuProps, Switch } from "antd";
+import { Dropdown, MenuProps } from "antd";
 import Avatar from "../atoms/Avatar";
 import { getIcon } from "../atoms/Icon";
 
@@ -63,8 +63,11 @@ const AvatarDropdown = () => {
       arrow
       trigger={["click"]}
     >
-      <div className="cursor-pointer">
+      <div className="relative cursor-pointer">
         <Avatar>U</Avatar>
+        <div className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-white">
+          <div>{getIcon("chevronDown")}</div>
+        </div>
       </div>
     </Dropdown>
   );

@@ -1,7 +1,19 @@
 "use client";
+import Image from "@/components/atoms/Image";
+import Tag from "@/components/atoms/Tag";
 import SortingMenuTab from "@/components/molecules/SortingMenuTab";
 import NavBar from "@/components/organisms/NavBar";
 import UploadPostIdeaBox from "@/components/organisms/UploadPostIdeaBox";
+import DepartmentCard from "@/components/organisms/DepartmentCard";
+import dynamic from "next/dynamic";
+
+const Row = dynamic(() => import("antd").then((mod) => mod.Row), {
+  ssr: false,
+});
+
+const Col = dynamic(() => import("antd").then((mod) => mod.Col), {
+  ssr: false,
+});
 
 const menuItems = [
   {
@@ -32,18 +44,32 @@ const menuItems = [
     ],
   },
 ];
-
 const Test = () => {
   return (
     <div>
       <NavBar />
-      <SortingMenuTab
-        items={menuItems}
-        defaultSelected={["latest"]}
-        defaultOpen={["sort"]}
-        onChange={(key) => console.log(`Selected: ${key}`)}
-      />
-      <UploadPostIdeaBox />
+
+      {/* Main content with Ant Design Grid */}
+      <div className="mx-auto py-4 px-4 lg:px-20 xl:px-40">
+        <Row gutter={24}>
+          <Col span={4}>
+            <SortingMenuTab
+              items={menuItems}
+              defaultSelected={["latest"]}
+              defaultOpen={["sort"]}
+              onChange={(key) => console.log(`Selected: ${key}`)}
+            />
+          </Col>
+
+          <Col span={16}>
+            <UploadPostIdeaBox />
+          </Col>
+
+          <Col span={4}>
+            <DepartmentCard />
+          </Col>
+        </Row>
+      </div>
     </div>
   );
 };

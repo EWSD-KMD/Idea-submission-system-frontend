@@ -17,9 +17,17 @@ const NavBar = () => {
         backgroundPosition: "center",
         height: "80px",
       }}
-      className="flex justify-between px-4 sm:px-6 md:px-8 lg:px-20 xl:px-40"
+      className="flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-20 xl:px-40"
     >
-      <Image src={logo} alt="logo" width={191} height={44} />
+      <div className="relative w-[191px] h-[44px]">
+        <Image
+          src={logo}
+          alt="logo"
+          fill
+          style={{ objectFit: "contain" }}
+          priority
+        />
+      </div>
       <div className="flex gap-3 items-center">
         {/* Mobile version - icon only */}
         <div className="block sm:hidden">

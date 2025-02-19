@@ -1,17 +1,75 @@
 "use client";
-import { plusIcon, bellIcon, keyIcon, logoutIcon } from "../../assets/icons";
+import {
+  plusIcon,
+  bellIcon,
+  keyIcon,
+  logoutIcon,
+  wrapperIcon,
+  paperclipIcon,
+  chveronDownIcon,
+} from "../../assets/icons";
 import { ReactNode } from "react";
 import Image from "next/image";
 
-export type IconName = "plus" | "bell" | "key" | "logout";
+export type IconName =
+  | "plus"
+  | "bell"
+  | "key"
+  | "logout"
+  | "wrapper"
+  | "paperclip"
+  | "chevronDown";
 
-const iconMap: Record<IconName, ReactNode> = {
-  plus: <Image src={plusIcon} alt="plus icon" width={24} height={24} />,
-  bell: <Image src={bellIcon} alt="bell icon" width={24} height={24} />,
-  key: <Image src={keyIcon} alt="key icon" width={24} height={24} />,
-  logout: <Image src={logoutIcon} alt="logout icon" width={24} height={24} />,
+interface IconConfig {
+  src: string;
+  alt: string;
+  size: number;
+}
+
+interface IconComponentProps extends IconConfig {
+  className?: string;
+}
+
+const iconConfig: Record<IconName, IconConfig> = {
+  plus: { src: plusIcon, alt: "plus icon", size: 24 },
+  bell: { src: bellIcon, alt: "bell icon", size: 24 },
+  key: { src: keyIcon, alt: "key icon", size: 24 },
+  logout: { src: logoutIcon, alt: "logout icon", size: 24 },
+  wrapper: { src: wrapperIcon, alt: "wrapper icon", size: 20 },
+  paperclip: { src: paperclipIcon, alt: "paperclip icon", size: 20 },
+  chevronDown: { src: chveronDownIcon, alt: "chveron down icon", size: 18 },
 };
 
-export const getIcon = (name: IconName): ReactNode => {
-  return iconMap[name];
-};
+const IconComponent = ({
+  src,
+  alt,
+  size,
+  className = "",
+}: IconComponentProps) => (
+  <div
+    className={`items-center justify-center ${className}`}
+    style={{ width: `${size}px`, height: `${size}px` }}
+  >
+    <Image
+      src={src}
+      alt={alt}
+      width={size}
+      height={size}
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "contain",
+      }}
+    />
+  </div>
+);
+
+const iconMap: Record<IconName, ReactNode> = Object.entries(iconConfig).reduce(
+  (acc, [key, config]) => ({
+    ...acc,
+    [key]: <IconComponent {...config} />,
+  }),
+  {} as Record<IconName, ReactNode>
+);
+
+export const getIcon = (name: IconName): ReactNode => iconMap[name];

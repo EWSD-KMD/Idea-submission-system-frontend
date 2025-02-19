@@ -1,5 +1,10 @@
-import { Avatar as AntAvatar } from "antd";
+"use client";
 import { AvatarProps } from "antd";
+import dynamic from "next/dynamic";
+
+const AntAvatar = dynamic(() => import("antd").then((mod) => mod.Avatar), {
+  ssr: false,
+});
 
 interface CustomAvatarProps extends AvatarProps {
   src?: string;

@@ -1,39 +1,53 @@
 "use client";
 
-import { Card } from "antd";
+import dynamic from "next/dynamic";
 import Avatar from "../atoms/Avatar";
+import Button from "../atoms/Button";
 
-// Example "PostBox" component
+const AntCard = dynamic(() => import("antd").then((mod) => mod.Card), {
+  ssr: false,
+});
+
 const PostBox = () => {
+  const handleCardClick = () => {
+    alert("Opening post modal");
+  };
+
+  const handleMediaUpload = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click event
+    alert("Opening media upload");
+  };
+
+  const handleAttachment = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click event
+    alert("Opening attachment");
+  };
+
   return (
-    <Card
-      style={{
-        display: "flex",
-        alignItems: "center",
-        backgroundColor: "#fff",
-        borderRadius: 16,
-        // boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-      }}
+    <AntCard
+      onClick={handleCardClick}
+      className="cursor-pointer rounded-2xl shadow-[0px_5px_24px_0px_#0000000D]"
     >
-      {/* Avatar */}
-      <Avatar size={48}>U</Avatar>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Avatar size={40}>U</Avatar>
+          <span className="text-body-xl opacity-50">
+            What do you want to share?
+          </span>
+        </div>
 
-      {/* <Input
-        placeholder="What do you want to share?"
-        bordered={false}
-        style={{ flex: 1, marginRight: 12 }}
-      />
-
-      <Button
-        icon={<UploadOutlined />}
-        shape="round"
-        style={{ marginRight: 8 }}
-      >
-        Upload Media
-      </Button>
-
-      <Button icon={<EditOutlined />} shape="circle" type="text" /> */}
-    </Card>
+        <div className="flex gap-2">
+          <Button
+            icon="wrapper"
+            label="Upload Media"
+            rounded
+            className="text-primary"
+            onClick={handleMediaUpload}
+          />
+          <Button icon="paperclip" rounded onClick={handleAttachment} />
+        </div>
+      </div>
+    </AntCard>
   );
 };
 
