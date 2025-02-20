@@ -37,7 +37,7 @@ const iconConfig: Record<IconName, IconConfig> = {
   logout: { src: logoutIcon, alt: "logout icon", size: 24 },
   wrapper: { src: wrapperIcon, alt: "wrapper icon", size: 20 },
   paperclip: { src: paperclipIcon, alt: "paperclip icon", size: 20 },
-  chevronDown: { src: chveronDownIcon, alt: "chveron down icon", size: 18 },
+  chevronDown: { src: chveronDownIcon, alt: "chveron down icon", size: 16 },
 };
 
 const IconComponent = ({

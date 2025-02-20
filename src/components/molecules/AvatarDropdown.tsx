@@ -1,7 +1,16 @@
 "use client";
-import { Dropdown, MenuProps } from "antd";
+import { Badge, Dropdown, MenuProps } from "antd";
 import Avatar from "../atoms/Avatar";
 import { getIcon } from "../atoms/Icon";
+import dynamic from "next/dynamic";
+
+const AntBadge = dynamic(() => import("antd").then((mod) => mod.Badge), {
+  ssr: false,
+});
+
+const AntDropdown = dynamic(() => import("antd").then((mod) => mod.Dropdown), {
+  ssr: false,
+});
 
 const renderProfileItem = () => {
   return (
@@ -54,7 +63,7 @@ const AvatarDropdown = () => {
   };
 
   return (
-    <Dropdown
+    <AntDropdown
       menu={{
         items: getDropdownItems(),
         onClick: handleMenuClick,
@@ -64,12 +73,24 @@ const AvatarDropdown = () => {
       trigger={["click"]}
     >
       <div className="relative cursor-pointer">
-        <Avatar>U</Avatar>
-        <div className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-white">
-          <div>{getIcon("chevronDown")}</div>
-        </div>
+        <AntBadge
+          size="small"
+          offset={[-8, 32]}
+          count={
+            <div
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: "100%",
+              }}
+            >
+              {getIcon("chevronDown")}
+            </div>
+          }
+        >
+          <Avatar>U</Avatar>
+        </AntBadge>
       </div>
-    </Dropdown>
+    </AntDropdown>
   );
 };
 

@@ -4,15 +4,15 @@ import { ButtonProps as AntButtonProps } from "antd";
 import { ReactNode } from "react";
 import { getIcon, IconName } from "./Icon";
 
+const AntButton = dynamic(() => import("antd").then((mod) => mod.Button), {
+  ssr: false,
+});
+
 interface ButtonProps extends AntButtonProps {
   label?: string;
   icon?: IconName | ReactNode;
   rounded?: boolean;
 }
-
-const AntButton = dynamic(() => import("antd").then((mod) => mod.Button), {
-  ssr: false,
-});
 
 const Button = ({
   label,
