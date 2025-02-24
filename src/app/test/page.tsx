@@ -6,6 +6,11 @@ import NavBar from "@/components/organisms/NavBar";
 import UploadPostIdeaBox from "@/components/organisms/UploadPostIdeaBox";
 import DepartmentCard from "@/components/organisms/DepartmentCard";
 import dynamic from "next/dynamic";
+import TwoStepModal from "@/components/organisms/TwoStepModal";
+import MultiStepModal from "@/components/organisms/TwoStepModal";
+import { useState } from "react";
+import { Button } from "antd";
+import AnonymousDropdown from "@/components/molecules/AnonymousDropdown";
 
 const Row = dynamic(() => import("antd").then((mod) => mod.Row), {
   ssr: false,
@@ -45,6 +50,16 @@ const menuItems = [
   },
 ];
 const Test = () => {
+  const [showModal, setShowModal] = useState(false);
+
+  const handleOpen = () => setShowModal(true);
+  const handleClose = () => setShowModal(false);
+  const handlePost = (data: { title: string; body: string }) => {
+    console.log("Posting data:", data);
+    // Do your post logic (e.g., API call)
+    setShowModal(false);
+  };
+
   return (
     <div>
       <NavBar />
@@ -63,6 +78,10 @@ const Test = () => {
 
           <Col span={16}>
             <UploadPostIdeaBox />
+            <Button onClick={() => setShowModal(true)}>Open Modal</Button>
+            <MultiStepModal visible={showModal} onCancel={handleClose} />
+            <AnonymousDropdown name="Kira" />
+            <AnonymousDropdown name="Kira" showName />
           </Col>
 
           <Col span={4}>
