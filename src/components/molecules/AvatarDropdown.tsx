@@ -1,5 +1,5 @@
 "use client";
-import { Badge, Dropdown, MenuProps } from "antd";
+import { MenuProps } from "antd";
 import Avatar from "../atoms/Avatar";
 import { getIcon } from "../atoms/Icon";
 import dynamic from "next/dynamic";

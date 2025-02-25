@@ -1,22 +1,22 @@
 "use client";
 import { useState } from "react";
-import dynamic from "next/dynamic";
 import { MenuProps } from "antd";
 import DropDown from "../atoms/DropDown";
 import Avatar from "../atoms/Avatar";
 import { getIcon } from "../atoms/Icon";
-import Image from "../atoms/Image";
 
 interface AnonymousDropdownProps {
   name: string;
   showName?: boolean;
+  photo?: string;
 }
 
 const AnonymousDropdown = ({
   name,
   showName = false,
+  photo,
 }: AnonymousDropdownProps) => {
-  const [isAnonymous, setIsAnonymous] = useState(true);
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   const handleMenuClick = (key: string) => {
     switch (key) {
@@ -31,14 +31,59 @@ const AnonymousDropdown = ({
     }
   };
 
+  const displayName = isAnonymous ? "Anonymous" : name;
+
+  const renderAvatar = () => {
+    if (isAnonymous) {
+      return (
+        <Avatar
+          icon={getIcon("anonymous")}
+          style={{ backgroundColor: "#E6ECFF" }}
+        />
+      );
+    }
+    return (
+      <Avatar src={photo} style={{ backgroundColor: "#E6ECFF" }}>
+        U
+      </Avatar>
+    );
+  };
+
   const menuItems: MenuProps["items"] = [
     {
       key: "name",
-      label: `${name}`,
+      label: (
+        <div className="flex items-center justify-between">
+          <div>
+            <Avatar
+              size={30}
+              src={photo}
+              style={{ backgroundColor: "#E6ECFF" }}
+            />
+            <span className="ml-2 text-black">{name}</span>
+          </div>
+          <div>{isAnonymous ? getIcon("unchecked") : getIcon("checked")}</div>
+        </div>
+      ),
+    },
+    {
+      type: "divider",
     },
     {
       key: "anonymous",
-      label: "Anonymous",
+      label: (
+        <div className="flex items-center justify-between">
+          <div>
+            <Avatar
+              size={30}
+              icon={getIcon("anonymous", 20)}
+              style={{ backgroundColor: "#E6ECFF" }}
+            />
+            <span className="ml-2 text-black">Anonymous</span>
+          </div>
+          <div>{isAnonymous ? getIcon("unchecked") : getIcon("checked")}</div>
+        </div>
+      ),
     },
   ];
 
@@ -49,17 +94,14 @@ const AnonymousDropdown = ({
       placement="bottomRight"
       trigger={["click"]}
     >
-      <div className="flex items-center cursor-pointer">
-        <Avatar>{isAnonymous ? "A" : name.charAt(0)}</Avatar>
-        {showName && !isAnonymous && (
-          <div className="flex items-center gap-1">
-            <span className="ml-2 text-black">{name}</span>
-            <div>{getIcon("chevronDown")}</div>
+      <div className="cursor-pointer">
+        {renderAvatar()}
+        {showName && (
+          <div className="inline-flex items-center gap-1">
+            <span className="ml-2 text-black">{displayName}</span>
+            <div className="w-4 h-4">{getIcon("chevronDown")}</div>
           </div>
         )}
-        {/* <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm transition-all group-hover:bg-gray-50">
-          {getIcon("chevronDown")}
-        </div> */}
       </div>
     </DropDown>
   );

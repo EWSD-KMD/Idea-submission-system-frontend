@@ -22,12 +22,13 @@ const DropDown = ({
       menu={{
         items: menuItems,
         onClick: ({ key }) => onMenuClick(key),
+        style: { minWidth: "180px" },
       }}
       placement={placement}
       trigger={trigger}
       arrow
     >
-      {children}
+      <div className="inline-flex">{children}</div>
     </Dropdown>
   );
 };

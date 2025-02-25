@@ -7,6 +7,9 @@ import {
   wrapperIcon,
   paperclipIcon,
   chveronDownIcon,
+  anonymousIcon,
+  checkedIcon,
+  uncheckedIcon,
 } from "../../assets/icons";
 import { ReactNode } from "react";
 import Image from "next/image";
@@ -18,12 +21,21 @@ export type IconName =
   | "logout"
   | "wrapper"
   | "paperclip"
-  | "chevronDown";
+  | "chevronDown"
+  | "anonymous"
+  | "checked"
+  | "unchecked";
 
 interface IconConfig {
   src: string;
   alt: string;
   size: number;
+}
+
+interface IconProps {
+  name: IconName;
+  size?: number;
+  className?: string;
 }
 
 interface IconComponentProps extends IconConfig {
@@ -38,6 +50,9 @@ const iconConfig: Record<IconName, IconConfig> = {
   wrapper: { src: wrapperIcon, alt: "wrapper icon", size: 20 },
   paperclip: { src: paperclipIcon, alt: "paperclip icon", size: 20 },
   chevronDown: { src: chveronDownIcon, alt: "chveron down icon", size: 16 },
+  anonymous: { src: anonymousIcon, alt: "anonymous icon", size: 24 },
+  checked: { src: checkedIcon, alt: "checked icon", size: 20 },
+  unchecked: { src: uncheckedIcon, alt: "unchecked icon", size: 20 },
 };
 
 const IconComponent = ({
@@ -45,7 +60,7 @@ const IconComponent = ({
   alt,
   size,
   className = "",
-}: IconComponentProps) => (
+}: IconConfig & { className?: string }) => (
   <div
     className={`items-center justify-center ${className}`}
     style={{ width: `${size}px`, height: `${size}px` }}
@@ -72,4 +87,7 @@ const iconMap: Record<IconName, ReactNode> = Object.entries(iconConfig).reduce(
   {} as Record<IconName, ReactNode>
 );
 
-export const getIcon = (name: IconName): ReactNode => iconMap[name];
+export const getIcon = (name: IconName, customSize?: number): ReactNode => {
+  const config = iconConfig[name];
+  return <IconComponent {...config} size={customSize || config.size} />;
+};
