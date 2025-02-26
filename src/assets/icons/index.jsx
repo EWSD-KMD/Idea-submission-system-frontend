@@ -8,6 +8,8 @@ import chveronDownIcon from "./general/chevron-down.svg";
 import anonymousIcon from "./general/anonymous.svg";
 import checkedIcon from "./general/checked.svg";
 import uncheckedIcon from "./general/unchecked.svg";
+import layoutListIcon from "./general/layout-list.svg";
+import chveronLeftIcon from "./general/chevron-left.svg";
 
 export {
   plusIcon,
@@ -20,4 +22,6 @@ export {
   anonymousIcon,
   checkedIcon,
   uncheckedIcon,
+  layoutListIcon,
+  chveronLeftIcon,
 };

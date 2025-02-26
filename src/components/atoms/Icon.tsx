@@ -10,6 +10,8 @@ import {
   anonymousIcon,
   checkedIcon,
   uncheckedIcon,
+  layoutListIcon,
+  chveronLeftIcon,
 } from "../../assets/icons";
 import { ReactNode } from "react";
 import Image from "next/image";
@@ -24,22 +26,14 @@ export type IconName =
   | "chevronDown"
   | "anonymous"
   | "checked"
-  | "unchecked";
+  | "unchecked"
+  | "layoutList"
+  | "chevronLeft";
 
 interface IconConfig {
   src: string;
   alt: string;
   size: number;
-}
-
-interface IconProps {
-  name: IconName;
-  size?: number;
-  className?: string;
-}
-
-interface IconComponentProps extends IconConfig {
-  className?: string;
 }
 
 const iconConfig: Record<IconName, IconConfig> = {
@@ -53,6 +47,8 @@ const iconConfig: Record<IconName, IconConfig> = {
   anonymous: { src: anonymousIcon, alt: "anonymous icon", size: 24 },
   checked: { src: checkedIcon, alt: "checked icon", size: 20 },
   unchecked: { src: uncheckedIcon, alt: "unchecked icon", size: 20 },
+  layoutList: { src: layoutListIcon, alt: "layout list icon", size: 20 },
+  chevronLeft: { src: chveronLeftIcon, alt: "chveron left icon", size: 20 },
 };
 
 const IconComponent = ({
@@ -77,14 +73,6 @@ const IconComponent = ({
       }}
     />
   </div>
-);
-
-const iconMap: Record<IconName, ReactNode> = Object.entries(iconConfig).reduce(
-  (acc, [key, config]) => ({
-    ...acc,
-    [key]: <IconComponent {...config} />,
-  }),
-  {} as Record<IconName, ReactNode>
 );
 
 export const getIcon = (name: IconName, customSize?: number): ReactNode => {

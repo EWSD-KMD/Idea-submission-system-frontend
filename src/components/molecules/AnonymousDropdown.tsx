@@ -81,7 +81,7 @@ const AnonymousDropdown = ({
             />
             <span className="ml-2 text-black">Anonymous</span>
           </div>
-          <div>{isAnonymous ? getIcon("unchecked") : getIcon("checked")}</div>
+          <div>{!isAnonymous ? getIcon("unchecked") : getIcon("checked")}</div>
         </div>
       ),
     },
@@ -91,7 +91,6 @@ const AnonymousDropdown = ({
     <DropDown
       menuItems={menuItems}
       onMenuClick={handleMenuClick}
-      placement="bottomRight"
       trigger={["click"]}
     >
       <div className="cursor-pointer">

@@ -6,7 +6,13 @@ interface DropDownProps {
   menuItems: MenuProps["items"];
   onMenuClick: (key: string) => void;
   children: ReactNode;
-  placement?: "bottomLeft" | "bottomRight" | "topLeft" | "topRight";
+  placement?:
+    | "bottomLeft"
+    | "bottomRight"
+    | "topLeft"
+    | "topRight"
+    | "bottom"
+    | "top";
   trigger?: ("click" | "hover" | "contextMenu")[];
 }
 
@@ -14,7 +20,7 @@ const DropDown = ({
   menuItems,
   onMenuClick,
   children,
-  placement = "bottomRight",
+  placement = "bottom",
   trigger = ["click"],
 }: DropDownProps) => {
   return (
@@ -22,7 +28,7 @@ const DropDown = ({
       menu={{
         items: menuItems,
         onClick: ({ key }) => onMenuClick(key),
-        style: { minWidth: "180px" },
+        style: { minWidth: "200px" },
       }}
       placement={placement}
       trigger={trigger}
