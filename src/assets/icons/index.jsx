@@ -10,6 +10,12 @@ import checkedIcon from "./general/checked.svg";
 import uncheckedIcon from "./general/unchecked.svg";
 import layoutListIcon from "./general/layout-list.svg";
 import chveronLeftIcon from "./general/chevron-left.svg";
+import messageCircleMoreIcon from "./general/message-circle-more.svg";
+import thumbsUpIcon from "./general/thumbs-up.svg";
+import thumbsDownIcon from "./general/thumbs-down.svg";
+import eyeIcon from "./general/eye.svg";
+import userRoundIcon from "./general/user-round.svg";
+import lockKeyHoleIcon from "./general/lock-keyhole.svg";
 
 export {
   plusIcon,
@@ -24,4 +30,10 @@ export {
   uncheckedIcon,
   layoutListIcon,
   chveronLeftIcon,
+  messageCircleMoreIcon,
+  thumbsUpIcon,
+  thumbsDownIcon,
+  eyeIcon,
+  userRoundIcon,
+  lockKeyHoleIcon,
 };

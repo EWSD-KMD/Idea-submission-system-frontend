@@ -11,6 +11,11 @@ import MultiStepModal from "@/components/organisms/TwoStepModal";
 import { useState } from "react";
 import { Button } from "antd";
 import AnonymousDropdown from "@/components/molecules/AnonymousDropdown";
+import AvatarWithNameAndDept from "@/components/molecules/AvatarWithNameAndDept";
+import PostCard from "@/components/organisms/PostCard";
+import CommentButton from "@/components/molecules/CommentButton";
+import LikeAndDislikeButton from "@/components/molecules/LikeAndDislikeButton";
+import ViewCount from "@/components/molecules/ViewCount";
 
 const Row = dynamic(() => import("antd").then((mod) => mod.Row), {
   ssr: false,
@@ -82,6 +87,7 @@ const Test = () => {
             <MultiStepModal visible={showModal} onCancel={handleClose} />
             <AnonymousDropdown name="Kira" />
             <AnonymousDropdown name="Kira" showName />
+            <PostCard />
           </Col>
 
           <Col span={4}>

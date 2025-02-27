@@ -12,6 +12,12 @@ import {
   uncheckedIcon,
   layoutListIcon,
   chveronLeftIcon,
+  messageCircleMoreIcon,
+  thumbsUpIcon,
+  thumbsDownIcon,
+  eyeIcon,
+  userRoundIcon,
+  lockKeyHoleIcon,
 } from "../../assets/icons";
 import { ReactNode } from "react";
 import Image from "next/image";
@@ -28,7 +34,13 @@ export type IconName =
   | "checked"
   | "unchecked"
   | "layoutList"
-  | "chevronLeft";
+  | "chevronLeft"
+  | "messageCircleMore"
+  | "thumbsUp"
+  | "thumbsDown"
+  | "eye"
+  | "userRound"
+  | "lockKeyHole";
 
 interface IconConfig {
   src: string;
@@ -49,6 +61,16 @@ const iconConfig: Record<IconName, IconConfig> = {
   unchecked: { src: uncheckedIcon, alt: "unchecked icon", size: 20 },
   layoutList: { src: layoutListIcon, alt: "layout list icon", size: 20 },
   chevronLeft: { src: chveronLeftIcon, alt: "chveron left icon", size: 20 },
+  messageCircleMore: {
+    src: messageCircleMoreIcon,
+    alt: "message circle more icon",
+    size: 20,
+  },
+  thumbsUp: { src: thumbsUpIcon, alt: "thumbs up icon", size: 20 },
+  thumbsDown: { src: thumbsDownIcon, alt: "thumbs down icon", size: 20 },
+  eye: { src: eyeIcon, alt: "eye icon", size: 20 },
+  userRound: { src: userRoundIcon, alt: "user round icon", size: 18 },
+  lockKeyHole: { src: lockKeyHoleIcon, alt: "lock key hole icon", size: 18 },
 };
 
 const IconComponent = ({
