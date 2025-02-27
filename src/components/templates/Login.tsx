@@ -1,13 +1,16 @@
 "use client";
 import dynamic from "next/dynamic";
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Form } from "antd";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
+import { useRouter } from "next/navigation";
 
-const Input = dynamic(() => import("antd").then((mod) => mod.Input), {
-  ssr: false,
-});
+const Input = dynamic(
+  () => import("antd/es/input").then((mod) => mod.default),
+  {
+    ssr: false,
+  }
+);
 
 const Password = dynamic(
   () => import("antd/es/input/Password").then((mod) => mod.default),
@@ -22,6 +25,8 @@ export interface LoginFormValues {
 }
 
 const Login = () => {
+  const router = useRouter();
+
   const onFinish = (values: LoginFormValues) => {
     console.log("Success:", values);
   };
@@ -29,7 +34,7 @@ const Login = () => {
   return (
     <>
       <div className="min-h-screen flex items-center justify-center h-screen bg-gray-50">
-        <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-lg">
+        <div className="max-w-lg w-full space-y-8 p-8 bg-white rounded-lg shadow-lg">
           <div className="text-center">
             <p className="font-bold text-2xl mb-4">Welcome Back</p>
             <p className=" text-body-xl text-gray-500">
@@ -42,6 +47,7 @@ const Login = () => {
             onFinish={onFinish}
             layout="vertical"
             size="large"
+            className="flex flex-col gap-2"
           >
             <Form.Item
               name="username"
@@ -63,7 +69,14 @@ const Login = () => {
               />
             </Form.Item>
             <Form.Item>
-              <Button label="Forgot Password?" type="link" className="p-0" />
+              <Button
+                label="Forgot Password?"
+                type="link"
+                className="p-0"
+                onClick={() => {
+                  router.push("/forgot-password");
+                }}
+              />
             </Form.Item>
             <Form.Item>
               <Button

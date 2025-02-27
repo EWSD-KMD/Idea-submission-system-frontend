@@ -16,6 +16,7 @@ import thumbsDownIcon from "./general/thumbs-down.svg";
 import eyeIcon from "./general/eye.svg";
 import userRoundIcon from "./general/user-round.svg";
 import lockKeyHoleIcon from "./general/lock-keyhole.svg";
+import mailIcon from "./general/mail.svg";
 
 export {
   plusIcon,
@@ -36,4 +37,5 @@ export {
   eyeIcon,
   userRoundIcon,
   lockKeyHoleIcon,
+  mailIcon,
 };
