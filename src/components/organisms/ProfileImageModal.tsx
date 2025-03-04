@@ -74,6 +74,11 @@ const ProfileImageModal = ({
     onCancel();
   };
 
+  const handleCancel = () => {
+    setImage(currentImage);
+    onCancel();
+  };
+
   const uploadProps = {
     name: "file",
     multiple: false,
@@ -100,7 +105,7 @@ const ProfileImageModal = ({
           label="Cancel"
           key="cancel"
           rounded
-          onClick={onCancel}
+          onClick={handleCancel}
           className="mr-2 text-blue-600"
         />,
         <Button
@@ -117,7 +122,7 @@ const ProfileImageModal = ({
     >
       <Divider />
       <div className="flex flex-col items-center gap-3 p-3">
-        <Avatar size={140} src={currentImage} className="mb-3" />
+        <Avatar size={140} src={image ? (typeof image === "string" ? image : URL.createObjectURL(image)) : currentImage} className="mb-3" />
         <p className="text-center text-sm">
           Upload a clear and high-quality image to personalize your profile.
         </p>
