@@ -17,6 +17,9 @@ import eyeIcon from "./general/eye.svg";
 import userRoundIcon from "./general/user-round.svg";
 import lockKeyHoleIcon from "./general/lock-keyhole.svg";
 import mailIcon from "./general/mail.svg";
+import pencilIcon from "./general/pencil.svg";
+import trashIcon from "./general/trash-2.svg";
+import refreshIcon from "./general/refresh-ccw.svg";
 
 export {
   plusIcon,
@@ -38,4 +41,7 @@ export {
   userRoundIcon,
   lockKeyHoleIcon,
   mailIcon,
+  pencilIcon,
+  trashIcon,
+  refreshIcon,
 };

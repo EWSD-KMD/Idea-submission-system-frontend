@@ -19,6 +19,9 @@ import {
   userRoundIcon,
   lockKeyHoleIcon,
   mailIcon,
+  pencilIcon,
+  trashIcon,
+  refreshIcon,
 } from "../../assets/icons";
 import { ReactNode } from "react";
 import Image from "next/image";
@@ -42,7 +45,10 @@ export type IconName =
   | "eye"
   | "userRound"
   | "lockKeyHole"
-  | "mail";
+  | "mail"
+  | "pencil"
+  | "trash"
+  | "refresh";
 
 interface IconConfig {
   src: string;
@@ -74,6 +80,9 @@ const iconConfig: Record<IconName, IconConfig> = {
   userRound: { src: userRoundIcon, alt: "user round icon", size: 18 },
   lockKeyHole: { src: lockKeyHoleIcon, alt: "lock key hole icon", size: 18 },
   mail: { src: mailIcon, alt: "mail icon", size: 18 },
+  pencil: { src: pencilIcon, alt: "pencil icon", size: 16},
+  trash: {src: trashIcon, alt: "trash icon", size: 20},
+  refresh: {src: refreshIcon, alt: "refresh icon", size: 20},
 };
 
 const IconComponent = ({
