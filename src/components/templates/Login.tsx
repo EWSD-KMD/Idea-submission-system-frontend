@@ -29,7 +29,6 @@ const Login = () => {
 
   const onFinish = (values: LoginFormValues) => {
     console.log("Success:", values);
-    router.push("/forgot-password");
   };
 
   return (
@@ -70,7 +69,11 @@ const Login = () => {
               />
             </Form.Item>
             <Form.Item>
-              <Button label="Forgot Password?" type="link" />
+              <Button
+                label="Forgot Password?"
+                type="link"
+                onClick={() => router.push("/forgot-password")}
+              />
             </Form.Item>
             <Form.Item>
               <Button

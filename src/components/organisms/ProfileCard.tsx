@@ -1,6 +1,5 @@
 "use client";
 import dynamic from "next/dynamic";
-import Image from "../atoms/Image";
 import Tag from "../atoms/Tag";
 import Avatar from "../atoms/Avatar";
 import Button from "../atoms/Button";
@@ -46,7 +45,7 @@ const ProfileCard = ({
     } else if (newImage === null) {
       setCurrentImage("/default.png");
     } else {
-      setCurrentImage(currentImage); 
+      setCurrentImage(currentImage);
     }
   };
 
@@ -87,7 +86,6 @@ const ProfileCard = ({
         onSave={handleSave}
         currentImage={currentImage}
       />
-
     </AntCard>
   );
 };
