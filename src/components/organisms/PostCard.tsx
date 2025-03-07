@@ -1,11 +1,19 @@
-import { Card } from "antd";
+import { Card, message } from "antd";
 import Image from "../atoms/Image";
 import AvatarWithNameAndDept from "../molecules/AvatarWithNameAndDept";
 import LikeAndDislikeButton from "../molecules/LikeAndDislikeButton";
 import CommentButton from "../molecules/CommentButton";
 import ViewCount from "../molecules/ViewCount";
+import { useState } from "react";
+import CommentSection from "./CommentSection";
 
 const PostCard = () => {
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+
+  const handleCardClick = () => {
+    setIsCommentsOpen((prev) => !prev); // Toggle comments visibility
+  };
+
   return (
     <Card>
       <AvatarWithNameAndDept
@@ -15,7 +23,7 @@ const PostCard = () => {
         time="1hr"
         avatarSrc="Media.jpg"
       />
-      <p className="my-4">
+      <p onClick={handleCardClick} className="cursor-pointer my-4">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
         veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
@@ -30,10 +38,11 @@ const PostCard = () => {
       <div className="flex justify-between items-center">
         <div className="flex gap-2">
           <LikeAndDislikeButton likeCount="1.2K" dislikeCount="350" />
-          <CommentButton commentCount="500K" />
+          <CommentButton commentCount="500K" onClick={handleCardClick} />
         </div>
         <ViewCount viewCount="2K" />
       </div>
+      {isCommentsOpen && <CommentSection postId="123" isOpen={isCommentsOpen} />}
     </Card>
   );
 };

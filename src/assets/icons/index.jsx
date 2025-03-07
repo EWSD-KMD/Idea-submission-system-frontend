@@ -20,6 +20,8 @@ import mailIcon from "./general/mail.svg";
 import pencilIcon from "./general/pencil.svg";
 import trashIcon from "./general/trash-2.svg";
 import refreshIcon from "./general/refresh-ccw.svg";
+import ellipsisIcon from "./general/ellipsis.svg";
+import alertIcon from "./general/circle-alert.svg";
 
 export {
   plusIcon,
@@ -44,4 +46,6 @@ export {
   pencilIcon,
   trashIcon,
   refreshIcon,
+  ellipsisIcon,
+  alertIcon,
 };
