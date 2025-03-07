@@ -9,12 +9,14 @@ interface AnonymousDropdownProps {
   name: string;
   showName?: boolean;
   photo?: string;
+  size?: number;
 }
 
 const AnonymousDropdown = ({
   name,
   showName = false,
   photo,
+  size,
 }: AnonymousDropdownProps) => {
   const [isAnonymous, setIsAnonymous] = useState(false);
 
@@ -39,11 +41,12 @@ const AnonymousDropdown = ({
         <Avatar
           icon={getIcon("anonymous")}
           style={{ backgroundColor: "#E6ECFF" }}
+          size={size}
         />
       );
     }
     return (
-      <Avatar src={photo} style={{ backgroundColor: "#E6ECFF" }}>
+      <Avatar src={photo} style={{ backgroundColor: "#E6ECFF" }} size={size}>
         U
       </Avatar>
     );
@@ -56,7 +59,7 @@ const AnonymousDropdown = ({
         <div className="flex items-center justify-between">
           <div>
             <Avatar
-              size={30}
+              size={size || 30}
               src={photo}
               style={{ backgroundColor: "#E6ECFF" }}
             />
@@ -75,7 +78,7 @@ const AnonymousDropdown = ({
         <div className="flex items-center justify-between">
           <div>
             <Avatar
-              size={30}
+              size={size || 30}
               icon={getIcon("anonymous", 20)}
               style={{ backgroundColor: "#E6ECFF" }}
             />
