@@ -65,7 +65,7 @@ const ProfileImageModal = ({
 
   const handleDelete = () => {
     setImage(null);
-    message.warning("Image deleted");
+    message.success("Image deleted");
   };
 
   const handleSave = () => {
