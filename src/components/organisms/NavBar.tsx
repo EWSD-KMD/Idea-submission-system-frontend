@@ -3,6 +3,7 @@ import Image from "next/image";
 import { logo, navigationBackground } from "../../assets/images";
 import Button from "../atoms/Button";
 import AvatarDropdown from "../molecules/AvatarDropdown";
+import Notification from "../molecules/Notification";
 
 const handleCLick = () => {
   alert("Clicked!");
@@ -43,7 +44,7 @@ const NavBar = () => {
             onClick={handleCLick}
           />
         </div>
-        <Button type="primary" icon="bell" rounded />
+        <Notification />
         <AvatarDropdown />
       </div>
     </div>
