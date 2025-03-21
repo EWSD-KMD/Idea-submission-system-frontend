@@ -56,7 +56,7 @@ const ProfileCard = ({
           <div className="flex flex-col items-center mb-3">
             <Avatar size={120} src={image} className="z-10" />
             <Button
-              icon={getIcon("pencil")}
+              icon={getIcon("pencil", 16)}
               size="small"
               rounded={true}
               className="bg-white-200 p-2 rounded-full hover:bg-gray-200 shadow-md transition -mt-6 ml-16 z-20"
