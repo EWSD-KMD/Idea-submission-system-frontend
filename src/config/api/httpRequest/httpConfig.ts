@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -26,7 +26,7 @@ export const fetchRequest = async <TResponse, TRequest = unknown>(
   };
 
   try {
-    const response = await fetch(`${BASE_URL}${url}`, config);
+    const response = await fetch(`${API_URL}${url}`, config);
 
     if (!response.ok) {
       const errorResponse: ErrorType = {

@@ -17,7 +17,7 @@ const renderProfileItem = () => {
     <div className="flex items-center gap-2">
       <Avatar size={32}>U</Avatar>
       <div className="flex flex-col">
-        <span className="font-medium">Username</span>
+        <span className="font-medium">Email</span>
         <span className="text-xs text-gray-500">Department Name</span>
       </div>
     </div>
