@@ -9,6 +9,11 @@ interface LoginResponse {
   };
 }
 
+interface ForgotPasswordResponse {
+  err: number;
+  message: string;
+}
+
 export async function login(
   email: string,
   password: string
@@ -97,4 +102,21 @@ export async function logout(refreshToken: string): Promise<void> {
       "X-Refresh-Token": refreshToken,
     },
   });
+}
+
+export async function forgotPassword(email: string): Promise<void> {
+  const res = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Forgot password request failed");
+  }
+
+  const response: ForgotPasswordResponse = await res.json();
+  if (response.err !== 0) {
+    throw new Error(response.message || "Forgot password failed");
+  }
 }

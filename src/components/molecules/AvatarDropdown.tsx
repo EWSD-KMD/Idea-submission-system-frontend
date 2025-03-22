@@ -3,6 +3,8 @@ import { MenuProps } from "antd";
 import Avatar from "../atoms/Avatar";
 import { getIcon } from "../atoms/Icon";
 import dynamic from "next/dynamic";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 const AntBadge = dynamic(() => import("antd").then((mod) => mod.Badge), {
   ssr: false,
@@ -44,18 +46,23 @@ const getDropdownItems = (): MenuProps["items"] => [
     key: "logout",
     label: "Logout",
     icon: getIcon("logout"),
-    danger: true,
   },
 ];
 
 const AvatarDropdown = () => {
+  const { logoutUser } = useAuth();
+  const router = useRouter();
   const handleMenuClick = ({ key }: { key: string }) => {
     switch (key) {
+      case "profile":
+        router.push("/profile-page");
+        break;
       case "changePassword":
         console.log("Change password clicked");
         break;
       case "logout":
-        console.log("Logout clicked");
+        logoutUser();
+        router.push("/login");
         break;
       default:
         break;

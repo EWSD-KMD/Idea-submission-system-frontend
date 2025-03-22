@@ -7,7 +7,7 @@ import React, {
   ReactNode,
 } from "react";
 import Cookies from "js-cookie";
-import { login, logout, authFetch } from "../lib/auth";
+import { login, logout, authFetch, forgotPassword } from "../lib/auth";
 
 interface AuthContextType {
   accessToken: string | null;
@@ -15,6 +15,7 @@ interface AuthContextType {
   loginUser: (email: string, password: string) => Promise<void>;
   logoutUser: () => Promise<void>;
   fetchWithAuth: (url: string, options?: RequestInit) => Promise<Response>;
+  forgotPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -73,6 +74,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const handleForgotPassword = async (email: string) => {
+    await forgotPassword(email);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -81,6 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginUser,
         logoutUser,
         fetchWithAuth,
+        forgotPassword: handleForgotPassword,
       }}
     >
       {children}

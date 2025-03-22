@@ -1,14 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import UploadPostIdeaBox from "../organisms/UploadPostIdeaBox";
+import { useState, forwardRef, useImperativeHandle } from "react";
 import TwoStepModal from "../organisms/TwoStepModal";
+import UploadPostIdeaBox from "../organisms/UploadPostIdeaBox";
 
-const CreatePostIdea = () => {
+export interface CreatePostIdeaRef {
+  openModal: () => void;
+}
+
+const CreatePostIdea = forwardRef<CreatePostIdeaRef>((props, ref) => {
   const [showModal, setShowModal] = useState(false);
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+
+  useImperativeHandle(ref, () => ({
+    openModal: handleOpenModal,
+  }));
 
   return (
     <div>
@@ -16,6 +24,8 @@ const CreatePostIdea = () => {
       <TwoStepModal visible={showModal} onCancel={handleCloseModal} />
     </div>
   );
-};
+});
+
+CreatePostIdea.displayName = "CreatePostIdea";
 
 export default CreatePostIdea;
