@@ -8,9 +8,13 @@ const AntCard = dynamic(() => import("antd").then((mod) => mod.Card), {
   ssr: false,
 });
 
-const PostBox = () => {
+interface PostBoxProps {
+  onOpenModal: () => void;
+}
+
+const PostBox = ({ onOpenModal }: PostBoxProps) => {
   const handleCardClick = () => {
-    alert("Opening post modal");
+    onOpenModal(); // Trigger modal opening
   };
 
   const handleMediaUpload = (e: React.MouseEvent) => {

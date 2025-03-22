@@ -1,4 +1,5 @@
-import { Card, message } from "antd";
+"use client";
+import { Card } from "antd";
 import Image from "../atoms/Image";
 import AvatarWithNameAndDept from "../molecules/AvatarWithNameAndDept";
 import LikeAndDislikeButton from "../molecules/LikeAndDislikeButton";
@@ -42,7 +43,9 @@ const PostCard = () => {
         </div>
         <ViewCount viewCount="2K" />
       </div>
-      {isCommentsOpen && <CommentSection postId="123" isOpen={isCommentsOpen} />}
+      {isCommentsOpen && (
+        <CommentSection postId="123" isOpen={isCommentsOpen} />
+      )}
     </Card>
   );
 };
