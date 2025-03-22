@@ -1,10 +1,16 @@
-import { Button as AntButton } from "antd";
-import type { ButtonProps as AntButtonProps } from "antd";
+"use client";
+import dynamic from "next/dynamic";
+import { ButtonProps as AntButtonProps } from "antd";
 import { ReactNode } from "react";
+import { getIcon, IconName } from "./Icon";
+
+const AntButton = dynamic(() => import("antd").then((mod) => mod.Button), {
+  ssr: false,
+});
 
 interface ButtonProps extends AntButtonProps {
   label?: string;
-  icon?: ReactNode;
+  icon?: IconName | ReactNode;
   rounded?: boolean;
 }
 
@@ -15,13 +21,19 @@ const Button = ({
   className = "",
   ...props
 }: ButtonProps) => {
+  const buttonIcon =
+    typeof icon === "string" ? getIcon(icon as IconName) : icon;
+
   return (
     <AntButton
-      icon={icon}
+      icon={buttonIcon}
       className={`${rounded ? "rounded-full" : "rounded-lg"} ${className}`}
       {...props}
     >
-      {label}
+      {label && (
+        // The label is hidden on extra-small screens and shown on sm and above.
+        <span className="hidden sm:inline">{label}</span>
+      )}
     </AntButton>
   );
 };

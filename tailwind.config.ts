@@ -26,6 +26,9 @@ export default {
         "body-xs": ["10px", { lineHeight: "16px" }],
         "body-2xs": ["8px", { lineHeight: "14px" }],
       },
+      spacing: {
+        '13': '3.25rem',
+      },
     },
   },
   plugins: [],
