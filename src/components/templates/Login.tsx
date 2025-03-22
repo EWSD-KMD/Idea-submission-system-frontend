@@ -4,6 +4,8 @@ import { Form } from "antd";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Input = dynamic(
   () => import("antd/es/input").then((mod) => mod.default),
@@ -20,15 +22,28 @@ const Password = dynamic(
 );
 
 export interface LoginFormValues {
-  username: string;
+  email: string;
   password: string;
 }
 
 const Login = () => {
+  const [email, setemail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { loginUser } = useAuth();
   const router = useRouter();
 
-  const onFinish = (values: LoginFormValues) => {
-    console.log("Success:", values);
+  const onFinish = async (values: LoginFormValues) => {
+    const { email, password } = values;
+    setemail(email);
+    setPassword(password);
+    setError("");
+    try {
+      await loginUser(email, password);
+      router.push("/");
+    } catch (err) {
+      setError("Invalid credentials or server error.");
+    }
   };
 
   return (
@@ -50,12 +65,10 @@ const Login = () => {
             className="flex flex-col gap-2"
           >
             <Form.Item
-              name="username"
-              rules={[
-                { required: true, message: "Please input your username!" },
-              ]}
+              name="email"
+              rules={[{ required: true, message: "Please input your email!" }]}
             >
-              <Input prefix={getIcon("userRound")} placeholder="Username" />
+              <Input prefix={getIcon("userRound")} placeholder="email" />
             </Form.Item>
             <Form.Item
               name="password"

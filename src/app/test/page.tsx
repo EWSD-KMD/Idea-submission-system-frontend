@@ -1,21 +1,14 @@
 "use client";
-import Image from "@/components/atoms/Image";
-import Tag from "@/components/atoms/Tag";
 import SortingMenuTab from "@/components/molecules/SortingMenuTab";
 import NavBar from "@/components/organisms/NavBar";
 import UploadPostIdeaBox from "@/components/organisms/UploadPostIdeaBox";
 import DepartmentCard from "@/components/organisms/DepartmentCard";
 import dynamic from "next/dynamic";
-import TwoStepModal from "@/components/organisms/TwoStepModal";
 import MultiStepModal from "@/components/organisms/TwoStepModal";
 import { useState } from "react";
 import { Button } from "antd";
 import AnonymousDropdown from "@/components/molecules/AnonymousDropdown";
-import AvatarWithNameAndDept from "@/components/molecules/AvatarWithNameAndDept";
 import PostCard from "@/components/organisms/PostCard";
-import CommentButton from "@/components/molecules/CommentButton";
-import LikeAndDislikeButton from "@/components/molecules/LikeAndDislikeButton";
-import ViewCount from "@/components/molecules/ViewCount";
 
 const Row = dynamic(() => import("antd").then((mod) => mod.Row), {
   ssr: false,
@@ -69,7 +62,6 @@ const Test = () => {
     <div>
       <NavBar />
 
-      {/* Main content with Ant Design Grid */}
       <div className="mx-auto py-4 px-4 lg:px-20 xl:px-40">
         <Row gutter={24}>
           <Col span={4}>
