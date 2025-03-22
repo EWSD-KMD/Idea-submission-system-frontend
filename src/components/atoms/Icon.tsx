@@ -24,6 +24,9 @@ import {
   refreshIcon,
   ellipsisIcon,
   alertIcon,
+  fileTextIcon,
+  trashWhiteIcon,
+  fileTextBlueIcon,
 } from "../../assets/icons";
 import { ReactNode } from "react";
 import Image from "next/image";
@@ -52,7 +55,10 @@ export type IconName =
   | "trash"
   | "refresh"
   | "ellipsis"
-  | "alert";
+  | "alert"
+  | "fileText"
+  | "trashWhite"
+  | "fileTextBlue";
 
 interface IconConfig {
   src: string;
@@ -89,6 +95,9 @@ const iconConfig: Record<IconName, IconConfig> = {
   refresh: {src: refreshIcon, alt: "refresh icon", size: 20},
   ellipsis: {src: ellipsisIcon, alt: "ellipsis icon", size: 20},
   alert: {src: alertIcon, alt: "alert icon", size: 20},
+  fileText: {src: fileTextIcon, alt: "fileText icon", size: 20},
+  trashWhite: {src: trashWhiteIcon, alt: "trash icon", size: 20},
+  fileTextBlue: {src: fileTextBlueIcon, alt: "fileText icon", size: 20}
 };
 
 const IconComponent = ({

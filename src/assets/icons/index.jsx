@@ -22,6 +22,9 @@ import trashIcon from "./general/trash-2.svg";
 import refreshIcon from "./general/refresh-ccw.svg";
 import ellipsisIcon from "./general/ellipsis.svg";
 import alertIcon from "./general/circle-alert.svg";
+import fileTextIcon from "./general/file-text.svg";
+import trashWhiteIcon from "./general/trash-white.svg";
+import fileTextBlueIcon from "./general/file-text-blue.svg";
 
 export {
   plusIcon,
@@ -48,4 +51,7 @@ export {
   refreshIcon,
   ellipsisIcon,
   alertIcon,
+  fileTextIcon,
+  trashWhiteIcon,
+  fileTextBlueIcon
 };
