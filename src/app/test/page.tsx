@@ -74,7 +74,6 @@ const Test = () => {
           </Col>
 
           <Col span={16}>
-            <UploadPostIdeaBox />
             <Button onClick={() => setShowModal(true)}>Open Modal</Button>
             <MultiStepModal visible={showModal} onCancel={handleClose} />
             <AnonymousDropdown name="Kira" />

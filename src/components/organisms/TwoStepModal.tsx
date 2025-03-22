@@ -15,7 +15,6 @@ interface TwoStepModalProps {
 const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
   const [title, setTitle] = React.useState("");
   const [body, setBody] = React.useState("");
-  const [agree, setAgree] = React.useState(false);
   const [currentStep, setCurrentStep] = React.useState<number>(0);
 
   const nextStep = () => setCurrentStep(currentStep + 1);

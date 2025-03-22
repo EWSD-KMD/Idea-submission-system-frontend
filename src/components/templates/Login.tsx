@@ -27,16 +27,12 @@ export interface LoginFormValues {
 }
 
 const Login = () => {
-  const [email, setemail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { loginUser } = useAuth();
   const router = useRouter();
 
   const onFinish = async (values: LoginFormValues) => {
     const { email, password } = values;
-    setemail(email);
-    setPassword(password);
     setError("");
     try {
       await loginUser(email, password);
