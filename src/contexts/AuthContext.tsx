@@ -7,11 +7,19 @@ import React, {
   ReactNode,
 } from "react";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 import { login, logout, authFetch, forgotPassword } from "../lib/auth";
+
+interface JwtPayload {
+  userId: number;
+  email: string;
+  type: string;
+}
 
 interface AuthContextType {
   accessToken: string | null;
   refreshToken: string | null;
+  userId: number | null;
   loginUser: (email: string, password: string) => Promise<void>;
   logoutUser: () => Promise<void>;
   fetchWithAuth: (url: string, options?: RequestInit) => Promise<Response>;
@@ -23,6 +31,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     const storedAccessToken = Cookies.get("accessToken");
@@ -48,6 +57,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sameSite: "strict",
       expires: 7,
     });
+    try {
+      const decoded: JwtPayload = jwtDecode(newAccessToken);
+      setUserId(decoded.userId);
+    } catch (error) {
+      console.error("Failed to decode token after login:", error);
+    }
   };
 
   const logoutUser = async () => {
@@ -56,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     setAccessToken(null);
     setRefreshToken(null);
+    setUserId(null);
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
   };
@@ -71,6 +87,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         sameSite: "strict",
         expires: 1 / 24,
       });
+      try {
+        const decoded: JwtPayload = jwtDecode(newToken);
+        setUserId(decoded.userId);
+      } catch (error) {
+        console.error("Failed to decode refreshed token:", error);
+      }
     });
   };
 
@@ -83,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         accessToken,
         refreshToken,
+        userId,
         loginUser,
         logoutUser,
         fetchWithAuth,

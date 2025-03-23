@@ -1,10 +1,11 @@
 "use client";
+import { formatCount } from "@/utils/format";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
 
 interface LikeAndDislikeButtonProps {
-  likeCount: string;
-  dislikeCount: string;
+  likeCount: number;
+  dislikeCount: number;
 }
 
 const LikeAndDislikeButton = ({
@@ -14,14 +15,14 @@ const LikeAndDislikeButton = ({
   return (
     <div className="inline-flex items-center bg-[#E6EFFD] rounded-full">
       <Button
-        label={likeCount}
+        label={formatCount(likeCount)}
         icon={getIcon("thumbsUp")}
         type="text"
         className="text-primary font-bold"
       />
       <span className="opacity-30">|</span>
       <Button
-        label={dislikeCount}
+        label={formatCount(dislikeCount)}
         icon={getIcon("thumbsDown")}
         type="text"
         className="text-primary font-bold"

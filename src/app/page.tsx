@@ -3,12 +3,12 @@
 import { useRef } from "react";
 import DepartmentCard from "@/components/organisms/DepartmentCard";
 import NavBar from "@/components/organisms/NavBar";
-import PostCard from "@/components/organisms/PostCard";
 import CreatePostIdea, {
   CreatePostIdeaRef,
 } from "@/components/templates/CreatePostIdea";
 import SortingMenu from "@/components/templates/SortingMenu";
 import { Col, Row } from "antd";
+import PostCardIdeaList from "@/components/templates/PostCardIdeaList";
 
 export default function Home() {
   const createPostIdeaRef = useRef<CreatePostIdeaRef>(null);
@@ -23,7 +23,7 @@ export default function Home() {
           </Col>
           <Col span={16}>
             <CreatePostIdea ref={createPostIdeaRef} />
-            <PostCard />
+            <PostCardIdeaList />
           </Col>
           <Col span={4}>
             <DepartmentCard />

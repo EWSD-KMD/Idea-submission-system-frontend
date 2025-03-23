@@ -3,16 +3,16 @@ import { NextRequest, NextResponse } from "next/server";
 export async function middleware(req: NextRequest) {
   const accessToken = req.cookies.get("accessToken")?.value;
   const refreshToken = req.cookies.get("refreshToken")?.value;
-  const resetFlow = req.cookies.get("resetFlow")?.value; // Client-side flow indicator
-  const { pathname } = req.nextUrl;
+  const { pathname, searchParams } = req.nextUrl;
 
   const publicRoutes = ["/login", "/forgot-password"];
   if (publicRoutes.includes(pathname)) {
     return NextResponse.next();
   }
 
-  if (pathname === "/reset-password") {
-    if (!resetFlow) {
+  if (pathname === "/users/forget-password") {
+    const token = searchParams.get("token");
+    if (!token) {
       return NextResponse.redirect(new URL("/forgot-password", req.url));
     }
     return NextResponse.next();
