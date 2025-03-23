@@ -1,13 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
-import { Divider, Input, Modal, Upload } from "antd";
+import React, { useState, useEffect } from "react";
+import { Divider, Input, Modal, Upload, message } from "antd";
 import AnonymousDropdown from "../molecules/AnonymousDropdown";
 import TextArea from "antd/es/input/TextArea";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
-import CategoryModal from "../molecules/CategoryModal";
+import CategoryModal, { Category } from "../molecules/CategoryModal";
 import Image from "../atoms/Image";
+import { useAuth } from "@/contexts/AuthContext";
+import { getUserById } from "@/lib/user";
+
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 interface TwoStepModalProps {
   visible: boolean;
@@ -18,27 +22,39 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [category, setCategory] = useState<string>("Add Category");
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
-  const [fileList, setFileList] = useState<any[]>([]); // State to store uploaded file (only one)
+  const [fileList, setFileList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState<string>("");
 
   const nextStep = () => setCurrentStep(currentStep + 1);
   const prevStep = () => setCurrentStep(currentStep - 1);
 
-  const categories = [
-    "Technology",
-    "Design",
-    "Marketing",
-    "Health",
-    "Finance",
-    "Education",
-  ];
+  const { fetchWithAuth, userId } = useAuth();
+  const { confirm } = Modal;
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      if (userId) {
+        try {
+          const user = await getUserById(userId);
+          setUsername(user.name);
+        } catch (error: any) {
+          console.error("Error fetching username:", error);
+          message.error("Failed to fetch username");
+        }
+      }
+    };
+    fetchUsername();
+  }, [userId]);
 
   const handleUpload = ({ file, onSuccess }: any) => {
     if (fileList.length > 0 && fileList[0].url) {
       URL.revokeObjectURL(fileList[0].url);
     }
-
     const url = URL.createObjectURL(file);
     file.url = url;
     setFileList([file]);
@@ -52,27 +68,93 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
     }
   };
 
-  const handleCategorySelect = (selectedCategory: string) => {
-    setCategory(selectedCategory);
+  const handleCategorySelect = (category: Category) => {
+    setSelectedCategory(category);
     setCategoryModalOpen(false);
   };
 
-  const isImageFile = (file: any) => {
-    return file.type.startsWith("image/");
+  const isImageFile = (file: any) => file.type.startsWith("image/");
+
+  const handleSubmitIdea = async () => {
+    if (!title.trim() || !body.trim() || !selectedCategory) {
+      message.error("Please complete all required fields.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await fetchWithAuth(`${API_URL}/ideas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          description: body,
+          categoryId: selectedCategory.id,
+          departmentId: 1,
+          userId: userId,
+        }),
+      });
+
+      if (!response.ok) {
+        const resData = await response.json();
+        throw new Error(resData.message || "Failed to post idea");
+      }
+      message.success("Idea posted successfully!");
+      resetForm();
+    } catch (error: any) {
+      message.error(error.message || "Failed to post idea");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleModalClose = () => {
+    if (title || body || selectedCategory) {
+      confirm({
+        title: "Save this idea?",
+        icon: null,
+        content: "This will save the idea as draft.",
+        okText: "Save",
+        cancelText: "Discard",
+        okButtonProps: {
+          className: "rounded-full",
+        },
+        cancelButtonProps: {
+          className: "rounded-full",
+        },
+        centered: true,
+        onOk() {
+          onCancel();
+        },
+        onCancel() {
+          resetForm();
+        },
+      });
+    } else {
+      resetForm();
+    }
+  };
+
+  const resetForm = () => {
+    setTitle("");
+    setBody("");
+    setSelectedCategory(null);
+    setFileList([]);
+    setCurrentStep(0);
+    onCancel();
   };
 
   return (
     <>
       <Modal
         open={visible}
-        onCancel={onCancel}
+        onCancel={handleModalClose}
         width={600}
         footer={null}
         title={null}
       >
         {currentStep === 0 ? (
           <div className="flex flex-col">
-            <AnonymousDropdown name="KSH" showName />
+            <AnonymousDropdown name={username} showName />
             <Divider className="w-full my-3" />
             <span className="text-body-xl font-bold mb-4">
               What do you want to share?
@@ -89,7 +171,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
               value={body}
               onChange={(e) => setBody(e.target.value)}
             />
-            {/* Display uploaded file below the TextArea */}
+            {/* Display uploaded file preview */}
             {fileList.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
                 {fileList.map((file) => (
@@ -110,7 +192,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
                         />
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between p-2 border-none bg-gray-100 rounded">
+                      <div className="flex items-center justify-between p-2 bg-gray-100 rounded">
                         <div className="flex items-center gap-2">
                           <span>{getIcon("fileTextBlue")}</span>
                           <span className="text-gray-700 text-sm">
@@ -135,7 +217,9 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
               <div className="flex gap-2">
                 <Button
                   icon={getIcon("layoutList")}
-                  label={category}
+                  label={
+                    selectedCategory ? selectedCategory.name : "Add Category"
+                  }
                   rounded
                   className="text-primary"
                   onClick={() => setCategoryModalOpen(true)}
@@ -192,11 +276,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
                 rounded
                 type="primary"
                 onClick={nextStep}
-                disabled={
-                  title.trim() === "" ||
-                  body.trim() === "" ||
-                  category === "Add Category"
-                }
+                disabled={!title || !body || !selectedCategory}
               />
             </div>
           </div>
@@ -217,10 +297,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
               enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
+              nisi ut aliquip ex ea commodo consequat.
             </span>
             <Divider className="my-4" />
             <div className="flex justify-between">
@@ -233,11 +310,12 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
                 <span className="text-body-md">Don't show this again</span>
               </div>
               <div className="flex gap-2">
-                <Button label="Decline" onClick={onCancel} rounded />
+                <Button label="Decline" onClick={resetForm} rounded />
                 <Button
                   type="primary"
                   label="Agree"
-                  onClick={() => {}}
+                  onClick={handleSubmitIdea}
+                  loading={loading}
                   rounded
                 />
               </div>
@@ -248,8 +326,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
 
       <CategoryModal
         open={categoryModalOpen}
-        categories={categories}
-        selectedCategory={category}
+        selectedCategoryId={selectedCategory?.id || null}
         onSelect={handleCategorySelect}
         onCancel={() => setCategoryModalOpen(false)}
       />
