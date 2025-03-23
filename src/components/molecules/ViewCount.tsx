@@ -1,15 +1,16 @@
+import { formatCount } from "@/utils/format";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
 
 interface ViewCountProps {
-  viewCount: string;
+  viewCount: number;
 }
 
 const ViewCount = ({ viewCount }: ViewCountProps) => {
   return (
     <>
       <Button
-        label={viewCount}
+        label={formatCount(viewCount)}
         icon={getIcon("eye")}
         rounded
         className="font-bold"

@@ -1,4 +1,5 @@
 "use client";
+
 import { Card } from "antd";
 import Image from "../atoms/Image";
 import AvatarWithNameAndDept from "../molecules/AvatarWithNameAndDept";
@@ -7,44 +8,74 @@ import CommentButton from "../molecules/CommentButton";
 import ViewCount from "../molecules/ViewCount";
 import { useState } from "react";
 import CommentSection from "./CommentSection";
+import { formatDistanceToNow } from "date-fns";
 
-const PostCard = () => {
+interface PostCardProps {
+  id: number;
+  title: string;
+  description: string;
+  userName: string;
+  departmentName: string;
+  createdAt: string;
+  likes: number;
+  dislikes: number;
+  views: number;
+  imageSrc?: string;
+  commentsCount: number;
+}
+
+const PostCard = ({
+  id,
+  title,
+  description,
+  userName,
+  departmentName,
+  createdAt,
+  likes,
+  dislikes,
+  views,
+  imageSrc,
+  commentsCount,
+}: PostCardProps) => {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 
   const handleCardClick = () => {
-    setIsCommentsOpen((prev) => !prev); // Toggle comments visibility
+    setIsCommentsOpen((prev) => !prev);
   };
+
+  const timeAgo = (date: string) =>
+    formatDistanceToNow(new Date(date), { addSuffix: true });
 
   return (
     <Card>
       <AvatarWithNameAndDept
-        name="Dianne Russell"
-        department="Department"
+        name={userName}
+        department={departmentName}
         classroom="Classroom"
-        time="1hr"
+        time={timeAgo(createdAt)}
         avatarSrc="Media.jpg"
       />
+      <h2 className="text-lg font-semibold my-2">{title}</h2>
       <p onClick={handleCardClick} className="cursor-pointer my-4">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-        velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-        mollit anim id est laborum.
+        {description}
       </p>
-      <div className="mb-4">
-        <Image src="university.jpg" />
-      </div>
+      {imageSrc && (
+        <div className="mb-4">
+          <Image src={imageSrc} />
+        </div>
+      )}
       <div className="flex justify-between items-center">
         <div className="flex gap-2">
-          <LikeAndDislikeButton likeCount="1.2K" dislikeCount="350" />
-          <CommentButton commentCount="500K" onClick={handleCardClick} />
+          <LikeAndDislikeButton likeCount={likes} dislikeCount={dislikes} />
+          <CommentButton
+            commentCount={commentsCount}
+            onClick={handleCardClick}
+          />
         </div>
-        <ViewCount viewCount="2K" />
+        <ViewCount viewCount={views} />
       </div>
       {isCommentsOpen && (
-        <CommentSection postId="123" isOpen={isCommentsOpen} />
+        <CommentSection postId={id.toString()} isOpen={isCommentsOpen} />
       )}
     </Card>
   );

@@ -78,7 +78,7 @@ const Test = () => {
             <MultiStepModal visible={showModal} onCancel={handleClose} />
             <AnonymousDropdown name="Kira" />
             <AnonymousDropdown name="Kira" showName />
-            <PostCard />
+            {/* <PostCard /> */}
           </Col>
 
           <Col span={4}>

@@ -30,10 +30,7 @@ const Button = ({
       className={`${rounded ? "rounded-full" : "rounded-lg"} ${className}`}
       {...props}
     >
-      {label && (
-        // The label is hidden on extra-small screens and shown on sm and above.
-        <span className="hidden sm:inline">{label}</span>
-      )}
+      {label && <span>{label}</span>}
     </AntButton>
   );
 };
