@@ -46,9 +46,12 @@ const AnonymousDropdown = ({
       );
     }
     return (
-      <Avatar src={photo} style={{ backgroundColor: "#E6ECFF" }} size={size}>
-        U
-      </Avatar>
+      <Avatar
+        src={photo}
+        style={{ backgroundColor: "#E6ECFF" }}
+        size={size}
+        label={name}
+      />
     );
   };
 
@@ -57,12 +60,8 @@ const AnonymousDropdown = ({
       key: "name",
       label: (
         <div className="flex items-center justify-between">
-          <div>
-            <Avatar
-              size={size || 30}
-              src={photo}
-              style={{ backgroundColor: "#E6ECFF" }}
-            />
+          <div className="flex items-center ">
+            <Avatar size={size || 30} src={photo} label={name} />
             <span className="ml-2 text-black">{name}</span>
           </div>
           <div>{isAnonymous ? getIcon("unchecked") : getIcon("checked")}</div>
@@ -76,7 +75,7 @@ const AnonymousDropdown = ({
       key: "anonymous",
       label: (
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex items-center ">
             <Avatar
               size={size || 30}
               icon={getIcon("anonymous", 20)}
@@ -96,11 +95,11 @@ const AnonymousDropdown = ({
       onMenuClick={handleMenuClick}
       trigger={["click"]}
     >
-      <div className="cursor-pointer">
+      <div className="cursor-pointer flex items-center">
         {renderAvatar()}
         {showName && (
           <div className="inline-flex items-center gap-1">
-            <span className="ml-2 text-black">{displayName}</span>
+            <span className="ml-2 text-black text-base">{displayName}</span>
             <div className="w-4 h-4">{getIcon("chevronDown")}</div>
           </div>
         )}

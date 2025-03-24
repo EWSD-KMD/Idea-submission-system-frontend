@@ -28,7 +28,7 @@ const PostCardIdeaList = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {ideas.map((idea) => (
         <PostCard
           key={idea.id}

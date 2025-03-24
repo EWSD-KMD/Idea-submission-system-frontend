@@ -44,7 +44,7 @@ const ResetPassword = () => {
       message.success({
         content: "Password reset successfully!",
         key: "resetPassword",
-        duration: 2,
+        duration: 3,
       });
       router.push("/login");
     } catch (error: any) {
@@ -89,7 +89,6 @@ const ResetPassword = () => {
           name="resetPassword"
           onFinish={onFinish}
           layout="vertical"
-          className="space-y-4"
         >
           <Form.Item
             name="newPassword"
@@ -97,12 +96,9 @@ const ResetPassword = () => {
               { required: true, message: "Please input your new password!" },
               { min: 8, message: "Password must be at least 8 characters!" },
             ]}
+            className="pb-3"
           >
-            <Password
-              placeholder="New Password"
-              size="large"
-              className="w-full"
-            />
+            <Password placeholder="New Password" size="large" className="" />
           </Form.Item>
           <Form.Item
             name="confirmPassword"

@@ -34,7 +34,7 @@ const NavBar = ({ createPostIdeaRef }: NavBarProps) => {
         backgroundPosition: "center",
         height: "80px",
       }}
-      className="flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-20 xl:px-40"
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-20 xl:px-40"
     >
       <div className="relative w-[191px] h-[44px]" onClick={handleHomeClick}>
         <Image
@@ -47,21 +47,18 @@ const NavBar = ({ createPostIdeaRef }: NavBarProps) => {
       </div>
       <div className="flex gap-3 items-center">
         {/* Mobile version - icon only */}
-        <div className="block sm:hidden">
-          <Button icon="plus" rounded className="text-primary" />
-        </div>
-        {/* Desktop version - icon with label */}
-        <div className="hidden sm:block">
+        <div className="flex gap-3 items-center">
           <Button
-            label="Post Idea"
             icon="plus"
+            label={"Post Idea"}
             rounded
+            responsive
             className="text-primary"
             onClick={handleClick}
           />
+          <Notification />
+          <AvatarDropdown />
         </div>
-        <Notification />
-        <AvatarDropdown />
       </div>
     </div>
   );

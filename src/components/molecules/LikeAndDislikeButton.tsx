@@ -1,5 +1,5 @@
 "use client";
-import { formatCount } from "@/utils/format";
+import { formatCount } from "@/utils/formatCount";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
 

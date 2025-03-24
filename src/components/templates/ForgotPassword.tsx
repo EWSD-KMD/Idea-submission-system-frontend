@@ -49,10 +49,15 @@ const ForgotPassword = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 sm:p-6">
       <div className="w-full max-w-xs sm:max-w-sm md:max-w-md bg-white rounded-lg shadow-lg p-6 sm:p-8 space-y-6">
-        <p className="text-center text- sm:text-base md:text-lg text-gray-800 pb-2">
-          Enter the email address and we’ll send you a code to reset your
-          password.
-        </p>
+        <div className="text-center">
+          <h1 className="font-bold text-lg sm:text-xl md:text-2xl text-gray-800 mb-2 sm:mb-4">
+            Forgot Password
+          </h1>
+          <p className="text-center text-base pb-2 text-gray-500">
+            Enter the email address and we’ll send you a code to reset your
+            password.
+          </p>
+        </div>
 
         <Form name="forgotPassword" onFinish={onFinish} layout="vertical">
           <Form.Item
@@ -78,6 +83,16 @@ const ForgotPassword = () => {
               htmlType="submit"
               size="large"
               loading={loading}
+            />
+          </Form.Item>
+          <Form.Item>
+            <Button
+              label="Back to login form"
+              className="w-full"
+              type="link"
+              size="small"
+              loading={loading}
+              onClick={() => router.push("/login")}
             />
           </Form.Item>
         </Form>
