@@ -34,7 +34,7 @@ const PostBox = ({ onOpenModal }: PostBoxProps) => {
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Avatar size={40}>U</Avatar>
+          <Avatar label="Kaung Sat" />
           <span className="text-body-xl opacity-50">
             What do you want to share?
           </span>
@@ -45,6 +45,7 @@ const PostBox = ({ onOpenModal }: PostBoxProps) => {
             icon="wrapper"
             label="Upload Media"
             rounded
+            responsive
             className="text-primary"
             onClick={handleMediaUpload}
           />

@@ -94,7 +94,7 @@ const AvatarDropdown = () => {
             </div>
           }
         >
-          <Avatar>U</Avatar>
+          <Avatar label="Kaung Sat" />
         </AntBadge>
       </div>
     </AntDropdown>

@@ -154,7 +154,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
       >
         {currentStep === 0 ? (
           <div className="flex flex-col">
-            <AnonymousDropdown name={username} showName />
+            <AnonymousDropdown name={"ksh"} showName />
             <Divider className="w-full my-3" />
             <span className="text-body-xl font-bold mb-4">
               What do you want to share?
@@ -221,6 +221,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
                     selectedCategory ? selectedCategory.name : "Add Category"
                   }
                   rounded
+                  responsive
                   className="text-primary"
                   onClick={() => setCategoryModalOpen(true)}
                 />
@@ -244,6 +245,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
                     icon={getIcon("wrapper", 20)}
                     label="Upload Media"
                     rounded
+                    responsive
                     className="text-primary"
                     disabled={fileList.length > 0}
                   />
