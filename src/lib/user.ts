@@ -4,6 +4,15 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  roleId: number;
+  role: {
+    id: number;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface UserResponse {
@@ -12,10 +21,16 @@ interface UserResponse {
   data: User;
 }
 
-export async function getUserById(id: number): Promise<User> {
+export async function getUserById(
+  id: number,
+  accessToken: string
+): Promise<User> {
   const res = await fetch(`${API_URL}/users/${id}`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`, // Add accessToken
+    },
   });
   if (!res.ok) {
     throw new Error(`Request failed with status: ${res.status}`);

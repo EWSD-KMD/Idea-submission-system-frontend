@@ -91,7 +91,6 @@ const ForgotPassword = () => {
               className="w-full"
               type="link"
               size="small"
-              loading={loading}
               onClick={() => router.push("/login")}
             />
           </Form.Item>

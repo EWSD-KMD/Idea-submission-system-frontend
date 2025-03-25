@@ -3,32 +3,50 @@
 import { useEffect, useState } from "react";
 import { getAllIdeas, Idea } from "@/lib/idea";
 import PostCard from "../organisms/PostCard";
+import Loading from "@/app/loading";
+import { Pagination } from "antd";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const PostCardIdeaList = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [totalIdeas, setTotalIdeas] = useState(0);
+  const pageSize = 5;
+
+  // Get current page from URL or default to 1
+  const currentPage = Number(searchParams.get("page")) || 1;
+
+  const fetchIdeas = async (page: number) => {
+    setLoading(true);
+    try {
+      const response = await getAllIdeas(page, pageSize);
+      setIdeas(response.data.ideas);
+      setTotalIdeas(response.data.total);
+    } catch (err: any) {
+      setError(err.message || "Failed to load ideas");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchIdeas = async () => {
-      setLoading(true);
-      try {
-        const response = await getAllIdeas(1, 10);
-        setIdeas(response.data.ideas);
-      } catch (err: any) {
-        setError(err.message || "Failed to load ideas");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchIdeas();
-  }, []);
+    fetchIdeas(currentPage);
+  }, [currentPage]);
 
-  if (loading) return <div>Loading...</div>;
+  const handlePageChange = (page: number) => {
+    // Update URL with new page number
+    router.push(`/?page=${page}`);
+  };
+
+  if (loading) return <Loading />;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="space-y-3">
+      {/* Ideas List */}
       {ideas.map((idea) => (
         <PostCard
           key={idea.id}
@@ -45,6 +63,21 @@ const PostCardIdeaList = () => {
           commentsCount={idea.comments.length}
         />
       ))}
+
+      {/* Pagination */}
+      {ideas.length > 0 && (
+        <div className="py-4 sm:py-10  flex justify-center">
+          <Pagination
+            current={currentPage}
+            total={totalIdeas}
+            pageSize={pageSize}
+            onChange={handlePageChange}
+            showSizeChanger={false}
+            showQuickJumper={false}
+            className="ant-pagination-custom"
+          />
+        </div>
+      )}
     </div>
   );
 };

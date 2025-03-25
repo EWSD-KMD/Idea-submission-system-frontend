@@ -23,7 +23,7 @@ const AvatarWithNameAndDept = ({
   const { isMobile } = useResponsive();
 
   // Responsive sizes
-  const avatarSize = isMobile ? 40 : size || 48;
+  const avatarSize = isMobile ? 44 : size || 48;
   const nameSize = isMobile ? "text-base" : "text-lg";
   const infoSize = isMobile ? "text-xs" : "text-sm";
 
