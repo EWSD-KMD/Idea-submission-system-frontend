@@ -6,6 +6,7 @@ import PostCard from "../organisms/PostCard";
 import Loading from "@/app/loading";
 import { Pagination } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
+import Cookies from "js-cookie";
 
 const PostCardIdeaList = () => {
   const router = useRouter();
@@ -22,10 +23,14 @@ const PostCardIdeaList = () => {
   const fetchIdeas = async (page: number) => {
     setLoading(true);
     try {
-      const response = await getAllIdeas(page, pageSize);
+      const accessToken = Cookies.get("accessToken");
+      const response = await getAllIdeas(page, pageSize, accessToken);
       setIdeas(response.data.ideas);
       setTotalIdeas(response.data.total);
     } catch (err: any) {
+      if (err.message.includes("Unauthorized")) {
+        router.push("/login");
+      }
       setError(err.message || "Failed to load ideas");
     } finally {
       setLoading(false);
