@@ -23,7 +23,7 @@ interface UserResponse {
 
 export async function getUserById(
   id: number,
-  accessToken: string
+  accessToken?: string
 ): Promise<User> {
   const res = await fetch(`${API_URL}/users/${id}`, {
     method: "GET",
