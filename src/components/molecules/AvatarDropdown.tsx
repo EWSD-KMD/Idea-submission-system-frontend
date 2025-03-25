@@ -1,10 +1,11 @@
 "use client";
-import { MenuProps } from "antd";
+import { MenuProps, message } from "antd";
 import Avatar from "../atoms/Avatar";
 import { getIcon } from "../atoms/Icon";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/contexts/UserContext";
 
 const AntBadge = dynamic(() => import("antd").then((mod) => mod.Badge), {
   ssr: false,
@@ -14,22 +15,22 @@ const AntDropdown = dynamic(() => import("antd").then((mod) => mod.Dropdown), {
   ssr: false,
 });
 
-const renderProfileItem = () => {
+const renderProfileItem = (userName: string | null) => {
   return (
     <div className="flex items-center gap-2">
       <Avatar size={32}>U</Avatar>
       <div className="flex flex-col">
-        <span className="font-medium">Email</span>
+        <span className="font-medium">{userName}</span>
         <span className="text-xs text-gray-500">Department Name</span>
       </div>
     </div>
   );
 };
 
-const getDropdownItems = (): MenuProps["items"] => [
+const getDropdownItems = (userName: string | null): MenuProps["items"] => [
   {
     key: "profile",
-    label: renderProfileItem(),
+    label: renderProfileItem(userName),
   },
   {
     type: "divider",
@@ -51,6 +52,7 @@ const getDropdownItems = (): MenuProps["items"] => [
 
 const AvatarDropdown = () => {
   const { logoutUser } = useAuth();
+  const { userName } = useUser();
   const router = useRouter();
   const handleMenuClick = ({ key }: { key: string }) => {
     switch (key) {
@@ -62,7 +64,10 @@ const AvatarDropdown = () => {
         break;
       case "logout":
         logoutUser();
-        router.push("/login");
+        message.success({
+          content: "Logged out successfully!",
+          duration: 3,
+        });
         break;
       default:
         break;
@@ -72,7 +77,7 @@ const AvatarDropdown = () => {
   return (
     <AntDropdown
       menu={{
-        items: getDropdownItems(),
+        items: getDropdownItems(userName),
         onClick: handleMenuClick,
       }}
       placement="bottomRight"

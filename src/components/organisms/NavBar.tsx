@@ -36,7 +36,10 @@ const NavBar = ({ createPostIdeaRef }: NavBarProps) => {
       }}
       className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-20 xl:px-40"
     >
-      <div className="relative w-[191px] h-[44px]" onClick={handleHomeClick}>
+      <div
+        className="relative w-[191px] h-[44px] cursor-pointer"
+        onClick={handleHomeClick}
+      >
         <Image
           src={logo}
           alt="logo"

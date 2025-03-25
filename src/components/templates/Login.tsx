@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { Form, message } from "antd"; // Added message for better UX feedback
+import { Form, message } from "antd";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
 import { useRouter } from "next/navigation";

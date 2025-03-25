@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import Avatar from "../atoms/Avatar";
 import Button from "../atoms/Button";
+import { useResponsive } from "@/utils/responsive";
 
 const AntCard = dynamic(() => import("antd").then((mod) => mod.Card), {
   ssr: false,
@@ -13,18 +14,10 @@ interface PostBoxProps {
 }
 
 const PostBox = ({ onOpenModal }: PostBoxProps) => {
+  const { isMobile, isTablet } = useResponsive();
+
   const handleCardClick = () => {
-    onOpenModal(); // Trigger modal opening
-  };
-
-  const handleMediaUpload = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click event
-    alert("Opening media upload");
-  };
-
-  const handleAttachment = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click event
-    alert("Opening attachment");
+    onOpenModal();
   };
 
   return (
@@ -32,10 +25,12 @@ const PostBox = ({ onOpenModal }: PostBoxProps) => {
       onClick={handleCardClick}
       className="cursor-pointer rounded-2xl shadow-[0px_5px_24px_0px_#0000000D]"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
-          <Avatar label="Kaung Sat" />
-          <span className="text-body-xl opacity-50">
+          <Avatar label="Kaung Sat" size={isMobile ? 32 : 40} />
+          <span
+            className={`${isMobile ? "text-sm" : "text-body-xl"} opacity-50`}
+          >
             What do you want to share?
           </span>
         </div>
@@ -47,9 +42,10 @@ const PostBox = ({ onOpenModal }: PostBoxProps) => {
             rounded
             responsive
             className="text-primary"
-            onClick={handleMediaUpload}
+            size={"middle"}
           />
-          <Button icon="paperclip" rounded onClick={handleAttachment} />
+
+          {/* <Button icon="paperclip" rounded size={"middle"} /> */}
         </div>
       </div>
     </AntCard>

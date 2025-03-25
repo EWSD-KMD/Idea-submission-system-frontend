@@ -39,6 +39,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (storedAccessToken && storedRefreshToken) {
       setAccessToken(storedAccessToken);
       setRefreshToken(storedRefreshToken);
+      try {
+        const decoded: JwtPayload = jwtDecode(storedAccessToken);
+        setUserId(decoded.userId);
+      } catch (error) {
+        console.error("Failed to decode stored token:", error);
+      }
     }
   }, []);
 
@@ -74,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUserId(null);
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
+    window.location.href = "/login";
   };
 
   const fetchWithAuth = (url: string, options: RequestInit = {}) => {
