@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  const accessToken = req.cookies.get("accessToken")?.value;
+  const refreshToken = req.cookies.get("refreshToken")?.value;
   const { pathname, searchParams } = req.nextUrl;
-
+  console.log("hello");
   const redirectIfAuthenticated = ["/login", "/forgot-password"];
   const isRedirectRoute = redirectIfAuthenticated.includes(pathname);
 
-  if (isRedirectRoute && !accessToken) {
+  if (isRedirectRoute && !refreshToken) {
     console.log("Unauthenticated, allowing access to:", pathname);
     return NextResponse.next();
   }
@@ -22,11 +22,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (!accessToken) {
-    console.log("No accessToken, redirecting to /login from:", pathname);
+  if (!refreshToken) {
+    console.log("No refreshToken, redirecting to /login from:", pathname);
     return NextResponse.redirect(new URL("/login", req.url));
   }
-  if (isRedirectRoute && accessToken) {
+  if (isRedirectRoute && refreshToken) {
     console.log("Authenticated, redirecting to / from:", pathname);
     return NextResponse.redirect(new URL("/", req.url));
   }

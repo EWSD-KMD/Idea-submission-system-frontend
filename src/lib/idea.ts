@@ -65,24 +65,14 @@ export interface IdeasResponse {
 
 export async function getAllIdeas(
   page: number = 1,
-  limit: number = 5,
-  token?: string,
-  config: RequestInit = {}
+  limit: number = 5
 ): Promise<IdeasResponse> {
-  const url = `/ideas?page=${page}&limit=${limit}`;
-
-  const headers = {
-    ...config.headers,
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
-
   try {
-    const response = await get<IdeasResponse>(url, { ...config, headers });
+    const url = `/ideas?page=${page}&limit=${limit}`;
+    const response = await get<IdeasResponse>(url);
+    console.log("response", response);
     return response;
   } catch (error: any) {
-    if (error.status === 401) {
-      throw new Error("Unauthorized: Please login again");
-    }
     throw new Error(error.message || "Failed to fetch ideas");
   }
 }

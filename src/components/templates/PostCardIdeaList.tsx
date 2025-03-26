@@ -6,10 +6,13 @@ import PostCard from "../organisms/PostCard";
 import Loading from "@/app/loading";
 import { Pagination } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
-import Cookies from "js-cookie";
+import { useAuth } from "@/contexts/AuthContext";
+
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const PostCardIdeaList = () => {
   const router = useRouter();
+  const { fetchWithAuth } = useAuth();
   const searchParams = useSearchParams();
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(false);
@@ -23,14 +26,25 @@ const PostCardIdeaList = () => {
   const fetchIdeas = async (page: number) => {
     setLoading(true);
     try {
-      const accessToken = Cookies.get("accessToken");
-      const response = await getAllIdeas(page, pageSize, accessToken);
+      const response = await getAllIdeas(page, pageSize);
       setIdeas(response.data.ideas);
       setTotalIdeas(response.data.total);
+      // const response = await fetchWithAuth(
+      //   `${API_URL}/ideas?page=${page}&limit=${pageSize}`,
+      //   {
+      //     method: "GET",
+      //   }
+      // );
+
+      // if (!response.ok) {
+      //   const resData = await response.json();
+      //   throw new Error(resData.message || "Failed to fetch ideas");
+      // }
+
+      // const data = await response.json();
+      // setIdeas(data.data.ideas);
+      // setTotalIdeas(data.data.total);
     } catch (err: any) {
-      if (err.message.includes("Unauthorized")) {
-        router.push("/login");
-      }
       setError(err.message || "Failed to load ideas");
     } finally {
       setLoading(false);
