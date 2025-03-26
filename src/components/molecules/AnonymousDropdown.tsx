@@ -4,7 +4,11 @@ import { MenuProps } from "antd";
 import DropDown from "../atoms/DropDown";
 import Avatar from "../atoms/Avatar";
 import { getIcon } from "../atoms/Icon";
+import dynamic from "next/dynamic";
 
+const AntBadge = dynamic(() => import("antd").then((mod) => mod.Badge), {
+  ssr: false,
+});
 interface AnonymousDropdownProps {
   name: string;
   showName?: boolean;
@@ -95,15 +99,35 @@ const AnonymousDropdown = ({
       onMenuClick={handleMenuClick}
       trigger={["click"]}
     >
-      <div className="cursor-pointer flex items-center">
-        {renderAvatar()}
-        {showName && (
+      {showName ? (
+        <div className="cursor-pointer flex items-center">
+          {renderAvatar()}
           <div className="inline-flex items-center gap-1">
             <span className="ml-2 text-black text-base">{displayName}</span>
             <div className="w-4 h-4">{getIcon("chevronDown")}</div>
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <AntBadge
+          size="small"
+          offset={[-8, 32]}
+          count={
+            <div
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: "100%",
+                cursor: "pointer",
+              }}
+            >
+              {getIcon("chevronDown")}
+            </div>
+          }
+        >
+          <div className="cursor-pointer flex items-center">
+            {renderAvatar()}
+          </div>
+        </AntBadge>
+      )}
     </DropDown>
   );
 };
