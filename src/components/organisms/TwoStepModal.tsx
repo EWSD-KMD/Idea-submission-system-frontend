@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { Divider, Input, Modal, Upload, message } from "antd";
 import AnonymousDropdown from "../molecules/AnonymousDropdown";
 import TextArea from "antd/es/input/TextArea";
@@ -10,15 +10,21 @@ import CategoryModal, { Category } from "../molecules/CategoryModal";
 import Image from "../atoms/Image";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserById } from "@/lib/user";
-
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+import { createIdea } from "@/lib/idea";
+import { useRouter } from "next/navigation";
 
 interface TwoStepModalProps {
   visible: boolean;
   onCancel: () => void;
+  setIsDataRefresh: Dispatch<SetStateAction<boolean>>;
 }
 
-const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
+const TwoStepModal = ({
+  visible,
+  onCancel,
+  setIsDataRefresh,
+}: TwoStepModalProps) => {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -33,7 +39,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
   const nextStep = () => setCurrentStep(currentStep + 1);
   const prevStep = () => setCurrentStep(currentStep - 1);
 
-  const { fetchWithAuth, userId } = useAuth();
+  const { userId } = useAuth();
   const { confirm } = Modal;
 
   useEffect(() => {
@@ -76,34 +82,31 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
   const isImageFile = (file: any) => file.type.startsWith("image/");
 
   const handleSubmitIdea = async () => {
-    if (!title.trim() || !body.trim() || !selectedCategory) {
-      message.error("Please complete all required fields.");
-      return;
-    }
-    setLoading(true);
-    try {
-      const response = await fetchWithAuth(`${API_URL}/ideas`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+    if (userId) {
+      if (!title.trim() || !body.trim() || !selectedCategory) {
+        message.error("Please complete all required fields.");
+        return;
+      }
+      setLoading(true);
+      try {
+        const data = {
           title,
           description: body,
           categoryId: selectedCategory.id,
           departmentId: 1,
           userId: userId,
-        }),
-      });
+        };
 
-      if (!response.ok) {
-        const resData = await response.json();
-        throw new Error(resData.message || "Failed to post idea");
+        await createIdea(data);
+        message.success("Idea posted successfully!");
+        setIsDataRefresh(true);
+        router.push("/");
+        resetForm();
+      } catch (error: any) {
+        message.error(error.message || "Failed to post idea");
+      } finally {
+        setLoading(false);
       }
-      message.success("Idea posted successfully!");
-      resetForm();
-    } catch (error: any) {
-      message.error(error.message || "Failed to post idea");
-    } finally {
-      setLoading(false);
     }
   };
 

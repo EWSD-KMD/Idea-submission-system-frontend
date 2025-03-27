@@ -1,4 +1,4 @@
-import { get } from "@/config/api/httpRequest/httpMethod";
+import { get, post } from "@/config/api/httpRequest/httpMethod";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -6,9 +6,6 @@ const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 export interface Category {
   id: number;
   name: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 // Department type
@@ -56,6 +53,14 @@ export interface IdeasResponseData {
   totalPages: number;
 }
 
+export interface CreateIdeaRequest {
+  title: string;
+  description: string;
+  categoryId: number;
+  departmentId: number;
+  userId: number;
+}
+
 // Full API response type
 export interface IdeasResponse {
   err: number;
@@ -74,5 +79,22 @@ export async function getAllIdeas(
     return response;
   } catch (error: any) {
     throw new Error(error.message || "Failed to fetch ideas");
+  }
+}
+
+export async function createIdea(ideaData: CreateIdeaRequest) {
+  try {
+    const url = "/ideas";
+
+    const response = await post<CreateIdeaRequest, IdeasResponse>(
+      url,
+      ideaData
+    );
+    return response;
+  } catch (error: any) {
+    if (error.status === 401) {
+      throw new Error("Unauthorized: Please login again");
+    }
+    throw new Error(error.message || "Failed to create idea");
   }
 }

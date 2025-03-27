@@ -11,7 +11,10 @@ export type ErrorType = {
 };
 
 let isRefreshing = false;
-let refreshPromise: Promise<string> | null = null;
+export type RefreshPromiseType = Promise<{
+  accessToken: string;
+  refreshToken: string;
+}>;
 
 export const fetchRequest = async <TResponse, TRequest = unknown>(
   method: HTTPMethod,
@@ -58,21 +61,34 @@ export const fetchRequest = async <TResponse, TRequest = unknown>(
     return await executeRequest(accessToken);
   } catch (error) {
     if ((error as ErrorType).status === 401) {
+      let tokens = null;
       try {
         if (!isRefreshing) {
           isRefreshing = true;
-          refreshPromise = refreshAccessToken(refreshToken);
+          tokens = await refreshAccessToken(refreshToken);
         }
 
-        const newAccessToken = await (refreshPromise as Promise<string>);
-        isRefreshing = false;
-        console.log("newAccessToken", newAccessToken);
-        refreshPromise = null;
-
-        return await executeRequest(newAccessToken);
+        if (tokens) {
+          const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+            tokens;
+          isRefreshing = false;
+          console.log("newAccessToken", newAccessToken);
+          console.log("newRefreshToken :>> ", newRefreshToken);
+          Cookies.set("accessToken", newAccessToken, {
+            secure: true,
+            sameSite: "strict",
+            expires: 1 / 24,
+          });
+          Cookies.set("refreshToken", newRefreshToken, {
+            secure: true,
+            sameSite: "strict",
+            expires: 7,
+          });
+          return await executeRequest(newAccessToken);
+        }
       } catch (refreshError) {
         isRefreshing = false;
-        refreshPromise = null;
+
         throw new Error("Session expired. Please login again.");
       }
     }

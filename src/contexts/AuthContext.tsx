@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-import { login, logout, authFetch, forgotPassword } from "../lib/auth";
+import { login, logout, forgotPassword } from "../lib/auth";
 
 interface JwtPayload {
   userId: number;
@@ -22,7 +22,6 @@ interface AuthContextType {
   userId: number | null;
   loginUser: (email: string, password: string) => Promise<void>;
   logoutUser: () => Promise<void>;
-  fetchWithAuth: (url: string, options?: RequestInit) => Promise<Response>;
   forgotPassword: (email: string) => Promise<void>;
 }
 
@@ -83,25 +82,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = "/login";
   };
 
-  const fetchWithAuth = (url: string, options: RequestInit = {}) => {
-    if (!accessToken || !refreshToken) {
-      throw new Error("Not authenticated");
-    }
-    return authFetch(url, options, accessToken, refreshToken, (newToken) => {
-      setAccessToken(newToken);
-      Cookies.set("accessToken", newToken, {
-        secure: true,
-        sameSite: "strict",
-        expires: 1 / 24,
-      });
-      try {
-        const decoded: JwtPayload = jwtDecode(newToken);
-        setUserId(decoded.userId);
-      } catch (error) {
-        console.error("Failed to decode refreshed token:", error);
-      }
-    });
-  };
+  // const fetchWithAuth = (url: string, options: RequestInit = {}) => {
+  //   if (!accessToken || !refreshToken) {
+  //     throw new Error("Not authenticated");
+  //   }
+  //   return authFetch(url, options, accessToken, refreshToken, (newToken) => {
+  //     setAccessToken(newToken);
+  //     Cookies.set("accessToken", newToken, {
+  //       secure: true,
+  //       sameSite: "strict",
+  //       expires: 1 / 24,
+  //     });
+  //     try {
+  //       const decoded: JwtPayload = jwtDecode(newToken);
+  //       setUserId(decoded.userId);
+  //     } catch (error) {
+  //       console.error("Failed to decode refreshed token:", error);
+  //     }
+  //   });
+  // };
 
   const handleForgotPassword = async (email: string) => {
     await forgotPassword(email);
@@ -115,7 +114,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         userId,
         loginUser,
         logoutUser,
-        fetchWithAuth,
         forgotPassword: handleForgotPassword,
       }}
     >

@@ -1,3 +1,5 @@
+import { RefreshPromiseType } from "@/config/api/httpRequest/httpConfig";
+
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 interface LoginResponse {
@@ -45,7 +47,7 @@ export async function login(
 
 export async function refreshAccessToken(
   refreshToken: string
-): Promise<string> {
+): RefreshPromiseType {
   const res = await fetch(`${API_URL}/auth/refresh`, {
     method: "POST",
     headers: {
@@ -62,43 +64,7 @@ export async function refreshAccessToken(
     throw new Error(response.message || "Refresh failed");
   }
 
-  return response.data.accessToken;
-}
-
-export async function authFetch(
-  url: string,
-  options: RequestInit = {},
-  accessToken: string,
-  refreshToken: string,
-  refreshCallback: (newToken: string) => void
-): Promise<Response> {
-  const fetchOptions = {
-    ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${accessToken}`,
-    },
-  };
-
-  let res = await fetch(url, fetchOptions);
-
-  if (res.status === 401) {
-    const newAccessToken = await refreshAccessToken(refreshToken);
-    refreshCallback(newAccessToken);
-    res = await fetch(url, {
-      ...fetchOptions,
-      headers: {
-        ...fetchOptions.headers,
-        Authorization: `Bearer ${newAccessToken}`,
-      },
-    });
-  }
-
-  if (!res.ok) {
-    throw new Error(`Request failed: ${res.status}`);
-  }
-
-  return res;
+  return response.data;
 }
 
 export async function logout(refreshToken: string): Promise<void> {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Col, Grid, Row } from "antd";
 import DepartmentCard from "@/components/organisms/DepartmentCard";
 import NavBar from "@/components/organisms/NavBar";
@@ -14,6 +14,7 @@ import { useSearchParams } from "next/navigation";
 const { useBreakpoint } = Grid;
 
 const HomeLayout = () => {
+  const [isDataRefresh, setIsDataRefresh] = useState(true);
   const createPostIdeaRef = useRef<CreatePostIdeaRef>(null);
   const screens = useBreakpoint();
   const searchParams = useSearchParams();
@@ -41,9 +42,15 @@ const HomeLayout = () => {
               className="flex flex-col gap-3"
             >
               <div className={currentPage === 1 ? "block" : "hidden"}>
-                <CreatePostIdea ref={createPostIdeaRef} />
+                <CreatePostIdea
+                  ref={createPostIdeaRef}
+                  setIsDataRefresh={setIsDataRefresh}
+                />
               </div>
-              <PostCardIdeaList />
+              <PostCardIdeaList
+                isDataRefresh={isDataRefresh}
+                setIsDataRefresh={setIsDataRefresh}
+              />
             </Col>
 
             {screens.lg && (

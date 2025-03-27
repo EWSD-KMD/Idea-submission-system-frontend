@@ -1,18 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { getAllIdeas, Idea } from "@/lib/idea";
 import PostCard from "../organisms/PostCard";
 import Loading from "@/app/loading";
 import { Pagination } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-const PostCardIdeaList = () => {
+const PostCardIdeaList = ({
+  isDataRefresh,
+  setIsDataRefresh,
+}: {
+  isDataRefresh: boolean;
+  setIsDataRefresh: Dispatch<SetStateAction<boolean>>;
+}) => {
   const router = useRouter();
-  const { fetchWithAuth } = useAuth();
   const searchParams = useSearchParams();
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(false);
@@ -29,21 +31,7 @@ const PostCardIdeaList = () => {
       const response = await getAllIdeas(page, pageSize);
       setIdeas(response.data.ideas);
       setTotalIdeas(response.data.total);
-      // const response = await fetchWithAuth(
-      //   `${API_URL}/ideas?page=${page}&limit=${pageSize}`,
-      //   {
-      //     method: "GET",
-      //   }
-      // );
-
-      // if (!response.ok) {
-      //   const resData = await response.json();
-      //   throw new Error(resData.message || "Failed to fetch ideas");
-      // }
-
-      // const data = await response.json();
-      // setIdeas(data.data.ideas);
-      // setTotalIdeas(data.data.total);
+      setIsDataRefresh(false);
     } catch (err: any) {
       setError(err.message || "Failed to load ideas");
     } finally {
@@ -52,11 +40,11 @@ const PostCardIdeaList = () => {
   };
 
   useEffect(() => {
-    fetchIdeas(currentPage);
-  }, [currentPage]);
+    isDataRefresh && fetchIdeas(currentPage);
+  }, [currentPage, isDataRefresh]);
 
   const handlePageChange = (page: number) => {
-    // Update URL with new page number
+    setIsDataRefresh(true);
     router.push(`/?page=${page}`);
   };
 
