@@ -37,13 +37,18 @@ const PostCard = ({
   dislikes,
   views,
   imageSrc,
-  commentsCount,
+  commentsCount: initialCommentsCount,
 }: PostCardProps) => {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [commentsCount, setCommentsCount] = useState(initialCommentsCount);
   const { isMobile, isTablet } = useResponsive();
 
   const handleCardClick = () => {
     setIsCommentsOpen((prev) => !prev);
+  };
+
+  const handleCommentsChange = (newCount: number) => {
+    setCommentsCount(newCount);
   };
 
   const truncatedDescription = getTruncatedText(
@@ -63,7 +68,7 @@ const PostCard = ({
         <AvatarWithNameAndDept
           name={userName}
           department={departmentName}
-          classroom="Classroom"
+          category="Classroom"
           time={timeAgo(createdAt)}
           avatarSrc=""
         />
@@ -118,7 +123,11 @@ const PostCard = ({
         {/* Comments Section */}
         {isCommentsOpen && (
           <div className={`mt-4 ${isMobile ? "px-2" : "px-4"}`}>
-            <CommentSection postId={id.toString()} isOpen={isCommentsOpen} />
+            <CommentSection
+              ideaId={id}
+              isOpen={isCommentsOpen}
+              onCommentsChange={handleCommentsChange}
+            />
           </div>
         )}
       </div>

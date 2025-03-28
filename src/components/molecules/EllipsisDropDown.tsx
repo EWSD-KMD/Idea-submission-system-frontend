@@ -3,14 +3,13 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { getIcon } from "../atoms/Icon";
-import { MenuProps } from "antd";
-import { Modal, message, Radio, Input, Divider } from "antd";
+import { MenuProps, Modal, message, Radio, Input, Divider } from "antd";
 
 const AntDropdown = dynamic(() => import("antd").then((mod) => mod.Dropdown), {
   ssr: false,
 });
 
-const getDropdownItems = (commentId: string): MenuProps["items"] => [
+const getDropdownItems = (commentId: number): MenuProps["items"] => [
   {
     key: `report-${commentId}`,
     label: "Report",
@@ -36,7 +35,19 @@ const getDropdownItems = (commentId: string): MenuProps["items"] => [
 
 const { confirm } = Modal;
 
-const EllipsisDropDown = ({ commentId, onEdit, initialText }: { commentId: string; onEdit?: (id: string, text: string) => void; initialText: string }) => {
+interface EllipsisDropDownProps {
+  commentId: number;
+  onEdit?: (id: number, text: string) => void;
+  onDelete?: (id: number) => void; // New callback for delete
+  initialText: string;
+}
+
+const EllipsisDropDown: React.FC<EllipsisDropDownProps> = ({
+  commentId,
+  onEdit,
+  onDelete,
+  initialText,
+}) => {
   const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const [reportReason, setReportReason] = useState("offensive");
   const [additionalDetails, setAdditionalDetails] = useState("");
@@ -65,35 +76,13 @@ const EllipsisDropDown = ({ commentId, onEdit, initialText }: { commentId: strin
     });
   };
 
+  // Modified to call onDelete if provided
   const handleCmtDelete = () => {
-    message.success("Comment deleted");
-  };
-
-  const showIdeaDeleteConfirm = () => {
-    confirm({
-      title: "Delete this Idea?",
-      content:
-        "Are you sure you want to delete this idea? This action cannot be undone.",
-      okText: "Yes, Delete",
-      cancelText: "Cancel",
-      okButtonProps: {
-        className: "rounded-full",
-      },
-      cancelButtonProps: {
-        className: "rounded-full",
-      },
-      centered: true,
-      onOk() {
-        handleIdeaDelete();
-      },
-      onCancel() {
-        console.log("Cancel");
-      },
-    });
-  };
-
-  const handleIdeaDelete = () => {
-    message.success("Idea deleted");
+    if (onDelete) {
+      onDelete(commentId);
+    } else {
+      message.success("Comment deleted (dummy)");
+    }
   };
 
   const showReportModal = () => {
@@ -140,7 +129,6 @@ const EllipsisDropDown = ({ commentId, onEdit, initialText }: { commentId: strin
           onClick: handleMenuClick,
         }}
         placement="bottomRight"
-        arrow
         trigger={["click"]}
       >
         <div>
@@ -150,9 +138,7 @@ const EllipsisDropDown = ({ commentId, onEdit, initialText }: { commentId: strin
         </div>
       </AntDropdown>
       <Modal
-        title={
-          <h2 className="text-lg font-semibold">Report Comment</h2>
-        }
+        title={<h2 className="text-lg font-semibold">Report Comment</h2>}
         open={isReportModalVisible}
         onOk={handleReportOk}
         onCancel={handleReportCancel}
