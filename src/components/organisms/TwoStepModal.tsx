@@ -154,7 +154,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
       >
         {currentStep === 0 ? (
           <div className="flex flex-col">
-            <AnonymousDropdown name={"ksh"} showName />
+            <AnonymousDropdown name={username} showName />
             <Divider className="w-full my-3" />
             <span className="text-body-xl font-bold mb-4">
               What do you want to share?

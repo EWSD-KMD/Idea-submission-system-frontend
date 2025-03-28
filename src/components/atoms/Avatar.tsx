@@ -11,7 +11,7 @@ interface CustomAvatarProps extends AvatarProps {
   src?: string;
   alt?: string;
   size?: number;
-  label?: string; // Add label prop for fallback text
+  label?: string | null; // Add label prop for fallback text
 }
 
 const Avatar = ({

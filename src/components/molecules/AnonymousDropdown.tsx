@@ -10,7 +10,7 @@ const AntBadge = dynamic(() => import("antd").then((mod) => mod.Badge), {
   ssr: false,
 });
 interface AnonymousDropdownProps {
-  name: string;
+  name: string | null;
   showName?: boolean;
   photo?: string;
   size?: number;

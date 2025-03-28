@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Avatar from "../atoms/Avatar";
 import Button from "../atoms/Button";
 import { useResponsive } from "@/utils/responsive";
+import { useUser } from "@/contexts/UserContext";
 
 const AntCard = dynamic(() => import("antd").then((mod) => mod.Card), {
   ssr: false,
@@ -15,6 +16,7 @@ interface PostBoxProps {
 
 const PostBox = ({ onOpenModal }: PostBoxProps) => {
   const { isMobile, isTablet } = useResponsive();
+  const { userName } = useUser();
 
   const handleCardClick = () => {
     onOpenModal();
@@ -27,7 +29,7 @@ const PostBox = ({ onOpenModal }: PostBoxProps) => {
     >
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
-          <Avatar label="Kaung Sat" size={isMobile ? 32 : 40} />
+          <Avatar label={userName} size={isMobile ? 32 : 40} />
           <span
             className={`${isMobile ? "text-sm" : "text-body-xl"} opacity-50`}
           >

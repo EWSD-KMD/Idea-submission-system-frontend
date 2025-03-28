@@ -4,7 +4,7 @@ import { useResponsive } from "@/utils/responsive";
 interface AvatarWithNameAndDeptProps {
   name: string;
   department: string;
-  classroom: string;
+  category: string;
   time: string;
   avatarSrc?: string;
   size?: number;
@@ -14,7 +14,7 @@ interface AvatarWithNameAndDeptProps {
 const AvatarWithNameAndDept = ({
   name,
   department,
-  classroom,
+  category,
   time,
   avatarSrc,
   size,
@@ -35,7 +35,7 @@ const AvatarWithNameAndDept = ({
         <div className="flex flex-wrap items-center gap-1">
           <span className={`${infoSize} text-gray-500`}>{department}</span>
           <span className={`${infoSize} text-gray-500`}>•</span>
-          <span className={`${infoSize} text-gray-500`}>{classroom}</span>
+          <span className={`${infoSize} text-gray-500`}>{category}</span>
           <span className={`${infoSize} text-gray-500 `}>•</span>
           <span className={`${infoSize} text-gray-500`}>{time}</span>
         </div>
