@@ -18,7 +18,7 @@ const AntDropdown = dynamic(() => import("antd").then((mod) => mod.Dropdown), {
 const renderProfileItem = (userName: string | null) => {
   return (
     <div className="flex items-center gap-2">
-      <Avatar size={32}>U</Avatar>
+      <Avatar size={32} label={"Kaung Sat"} />
       <div className="flex flex-col">
         <span className="font-medium">{userName}</span>
         <span className="text-xs text-gray-500">Department Name</span>

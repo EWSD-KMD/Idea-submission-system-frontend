@@ -14,7 +14,7 @@ interface PostBoxProps {
 }
 
 const PostBox = ({ onOpenModal }: PostBoxProps) => {
-  const { isMobile, isTablet } = useResponsive();
+  const { isMobile } = useResponsive();
 
   const handleCardClick = () => {
     onOpenModal();

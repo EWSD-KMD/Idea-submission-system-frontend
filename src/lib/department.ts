@@ -1,10 +1,10 @@
 import { get } from "@/config/api/httpRequest/httpMethod";
-import { CategoriesResponse } from "@/constant/type";
+import { DepartmentsResponse } from "@/constant/type";
 
-export async function getCategories(): Promise<CategoriesResponse> {
+export async function getDepartments(): Promise<DepartmentsResponse> {
   try {
-    const url = "/categories";
-    const response = get<CategoriesResponse>(url);
+    const url = `/departments`;
+    const response = await get<DepartmentsResponse>(url);
     return response;
   } catch (error: unknown) {
     if (error && typeof error === "object" && "message" in error) {

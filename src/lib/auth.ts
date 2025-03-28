@@ -1,26 +1,11 @@
 import { RefreshPromiseType } from "@/config/api/httpRequest/httpConfig";
+import {
+  ForgotPasswordResponse,
+  LoginResponse,
+  ResetPasswordResponse,
+} from "@/constant/type";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-interface LoginResponse {
-  err: number;
-  message: string;
-  data: {
-    accessToken: string;
-    refreshToken: string;
-  };
-}
-
-interface ForgotPasswordResponse {
-  err: number;
-  message: string;
-}
-
-interface ResetPasswordResponse {
-  err: number;
-  message: string;
-  data: null;
-}
 
 export async function login(
   email: string,

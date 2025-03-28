@@ -16,14 +16,9 @@ import { useRouter } from "next/navigation";
 interface TwoStepModalProps {
   visible: boolean;
   onCancel: () => void;
-  setIsDataRefresh: Dispatch<SetStateAction<boolean>>;
 }
 
-const TwoStepModal = ({
-  visible,
-  onCancel,
-  setIsDataRefresh,
-}: TwoStepModalProps) => {
+const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -99,7 +94,6 @@ const TwoStepModal = ({
 
         await createIdea(data);
         message.success("Idea posted successfully!");
-        setIsDataRefresh(true);
         router.push("/");
         resetForm();
       } catch (error: any) {

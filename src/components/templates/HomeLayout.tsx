@@ -14,7 +14,6 @@ import { useSearchParams } from "next/navigation";
 const { useBreakpoint } = Grid;
 
 const HomeLayout = () => {
-  const [isDataRefresh, setIsDataRefresh] = useState(true);
   const createPostIdeaRef = useRef<CreatePostIdeaRef>(null);
   const screens = useBreakpoint();
   const searchParams = useSearchParams();
@@ -26,36 +25,29 @@ const HomeLayout = () => {
       <div className="pt-24">
         <div className="mx-auto px-4 lg:px-20 xl:px-40">
           <Row gutter={[24, 24]} className="relative">
+            {/* Sorting Menu - Fixed Position */}
             {(screens.md || screens.lg || screens.xl) && (
-              <Col xs={0} sm={0} md={6} lg={4} className="h-screen">
-                <div className="fixed top-24 w-[inherit] max-h-[calc(100vh-6rem)] overflow-y-auto hide-scrollbar">
+              <Col xs={0} sm={0} md={6} lg={4}>
+                <div className="sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto hide-scrollbar">
                   <SortingMenu />
                 </div>
               </Col>
             )}
 
-            <Col
-              xs={24}
-              sm={24}
-              md={18}
-              lg={16}
-              className="flex flex-col gap-3"
-            >
-              <div className={currentPage === 1 ? "block" : "hidden"}>
-                <CreatePostIdea
-                  ref={createPostIdeaRef}
-                  setIsDataRefresh={setIsDataRefresh}
-                />
-              </div>
-              <PostCardIdeaList
-                isDataRefresh={isDataRefresh}
-                setIsDataRefresh={setIsDataRefresh}
-              />
+            {/* Main Content - Scrollable */}
+            <Col xs={24} sm={24} md={18} lg={16} className="min-h-screen">
+              {currentPage === 1 && (
+                <div className="pb-3">
+                  <CreatePostIdea ref={createPostIdeaRef} />
+                </div>
+              )}
+              <PostCardIdeaList />
             </Col>
 
+            {/* Department Card - Fixed Position */}
             {screens.lg && (
-              <Col xs={0} sm={0} md={0} lg={4} className="h-screen">
-                <div className="fixed top-24 w-[inherit]">
+              <Col xs={0} sm={0} md={0} lg={4}>
+                <div className="sticky top-24">
                   <DepartmentCard />
                 </div>
               </Col>
@@ -66,5 +58,4 @@ const HomeLayout = () => {
     </div>
   );
 };
-
 export default HomeLayout;

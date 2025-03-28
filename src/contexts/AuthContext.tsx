@@ -82,26 +82,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = "/login";
   };
 
-  // const fetchWithAuth = (url: string, options: RequestInit = {}) => {
-  //   if (!accessToken || !refreshToken) {
-  //     throw new Error("Not authenticated");
-  //   }
-  //   return authFetch(url, options, accessToken, refreshToken, (newToken) => {
-  //     setAccessToken(newToken);
-  //     Cookies.set("accessToken", newToken, {
-  //       secure: true,
-  //       sameSite: "strict",
-  //       expires: 1 / 24,
-  //     });
-  //     try {
-  //       const decoded: JwtPayload = jwtDecode(newToken);
-  //       setUserId(decoded.userId);
-  //     } catch (error) {
-  //       console.error("Failed to decode refreshed token:", error);
-  //     }
-  //   });
-  // };
-
   const handleForgotPassword = async (email: string) => {
     await forgotPassword(email);
   };

@@ -1,19 +1,14 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { getAllIdeas, Idea } from "@/lib/idea";
+import { useEffect, useState } from "react";
+import { getAllIdeas } from "@/lib/idea";
 import PostCard from "../organisms/PostCard";
 import Loading from "@/app/loading";
 import { Pagination } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Idea } from "@/constant/type";
 
-const PostCardIdeaList = ({
-  isDataRefresh,
-  setIsDataRefresh,
-}: {
-  isDataRefresh: boolean;
-  setIsDataRefresh: Dispatch<SetStateAction<boolean>>;
-}) => {
+const PostCardIdeaList = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [ideas, setIdeas] = useState<Idea[]>([]);
@@ -22,7 +17,6 @@ const PostCardIdeaList = ({
   const [totalIdeas, setTotalIdeas] = useState(0);
   const pageSize = 5;
 
-  // Get current page from URL or default to 1
   const currentPage = Number(searchParams.get("page")) || 1;
 
   const fetchIdeas = async (page: number) => {
@@ -31,7 +25,6 @@ const PostCardIdeaList = ({
       const response = await getAllIdeas(page, pageSize);
       setIdeas(response.data.ideas);
       setTotalIdeas(response.data.total);
-      setIsDataRefresh(false);
     } catch (err: any) {
       setError(err.message || "Failed to load ideas");
     } finally {
@@ -40,20 +33,18 @@ const PostCardIdeaList = ({
   };
 
   useEffect(() => {
-    isDataRefresh && fetchIdeas(currentPage);
-  }, [currentPage, isDataRefresh]);
+    fetchIdeas(currentPage);
+  }, [currentPage]);
 
   const handlePageChange = (page: number) => {
-    setIsDataRefresh(true);
     router.push(`/?page=${page}`);
   };
 
   if (loading) return <Loading />;
-  if (error) return <div>Error: {error}</div>;
+  if (error) return <div>Errors: {error}</div>;
 
   return (
     <div className="space-y-3">
-      {/* Ideas List */}
       {ideas.map((idea) => (
         <PostCard
           key={idea.id}

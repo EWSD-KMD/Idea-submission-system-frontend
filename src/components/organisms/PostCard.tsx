@@ -116,11 +116,11 @@ const PostCard = ({
         </div>
 
         {/* Comments Section */}
-        {isCommentsOpen && (
+        {/* {isCommentsOpen && (
           <div className={`mt-4 ${isMobile ? "px-2" : "px-4"}`}>
             <CommentSection postId={id.toString()} isOpen={isCommentsOpen} />
           </div>
-        )}
+        )} */}
       </div>
     </Card>
   );
