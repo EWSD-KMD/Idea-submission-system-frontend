@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllIdeas, Idea } from "@/lib/idea";
+import { getAllIdeas } from "@/lib/idea";
 import PostCard from "../organisms/PostCard";
 import Loading from "@/app/loading";
 import { Pagination } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
-import Cookies from "js-cookie";
+import { Idea } from "@/constant/type";
 
 const PostCardIdeaList = () => {
   const router = useRouter();
@@ -17,20 +17,15 @@ const PostCardIdeaList = () => {
   const [totalIdeas, setTotalIdeas] = useState(0);
   const pageSize = 5;
 
-  // Get current page from URL or default to 1
   const currentPage = Number(searchParams.get("page")) || 1;
 
   const fetchIdeas = async (page: number) => {
     setLoading(true);
     try {
-      const accessToken = Cookies.get("accessToken");
-      const response = await getAllIdeas(page, pageSize, accessToken);
+      const response = await getAllIdeas(page, pageSize);
       setIdeas(response.data.ideas);
       setTotalIdeas(response.data.total);
     } catch (err: any) {
-      if (err.message.includes("Unauthorized")) {
-        router.push("/login");
-      }
       setError(err.message || "Failed to load ideas");
     } finally {
       setLoading(false);
@@ -41,17 +36,31 @@ const PostCardIdeaList = () => {
     fetchIdeas(currentPage);
   }, [currentPage]);
 
+  const handleLikeUpdate = (id: number, newLikeCount: number) => {
+    // setIdeas((prevIdeas) =>
+    //   prevIdeas.map((idea) =>
+    //     idea.id === id ? { ...idea, likes: newLikeCount } : idea
+    //   )
+    // );
+  };
+
+  const handleDislikeUpdate = (id: number, newDislikeCount: number) => {
+    // setIdeas((prevIdeas) =>
+    //   prevIdeas.map((idea) =>
+    //     idea.id === id ? { ...idea, dislikes: newDislikeCount } : idea
+    //   )
+    // );
+  };
+
   const handlePageChange = (page: number) => {
-    // Update URL with new page number
     router.push(`/?page=${page}`);
   };
 
   if (loading) return <Loading />;
-  if (error) return <div>Error: {error}</div>;
+  if (error) return <div>Errors: {error}</div>;
 
   return (
     <div className="space-y-3">
-      {/* Ideas List */}
       {ideas.map((idea) => (
         <PostCard
           key={idea.id}
@@ -66,6 +75,8 @@ const PostCardIdeaList = () => {
           views={idea.views}
           imageSrc={idea.imageSrc || undefined}
           commentsCount={idea.comments.length}
+          onLikeUpdate={handleLikeUpdate}
+          onDislikeUpdate={handleDislikeUpdate}
         />
       ))}
 

@@ -1,43 +1,39 @@
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+import { get, post } from "@/config/api/httpRequest/httpMethod";
+import {
+  ChangePasswordRequest,
+  ChangePasswordResponse,
+  User,
+  UserResponse,
+} from "@/constant/type";
+import { isErrorWithMessage } from "@/utils/errorWithMessage";
 
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  roleId: number;
-  role: {
-    id: number;
-    name: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-  createdAt: string;
-  updatedAt: string;
+export async function getUserById(id: number): Promise<User> {
+  try {
+    const url = `/users/${id}`;
+    const response = await get<UserResponse>(url);
+    return response.data;
+  } catch (error: unknown) {
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
+    }
+    throw new Error("Failed to fetch user");
+  }
 }
 
-interface UserResponse {
-  err: number;
-  message: string;
-  data: User;
-}
-
-export async function getUserById(
-  id: number,
-  accessToken?: string
-): Promise<User> {
-  const res = await fetch(`${API_URL}/users/${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`, // Add accessToken
-    },
-  });
-  if (!res.ok) {
-    throw new Error(`Request failed with status: ${res.status}`);
+export async function changePassword(
+  changePasswordData: ChangePasswordRequest
+): Promise<ChangePasswordResponse> {
+  try {
+    const url = "/auth/update-password";
+    const response = await post<ChangePasswordRequest, ChangePasswordResponse>(
+      url,
+      changePasswordData
+    );
+    return response;
+  } catch (error: unknown) {
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
+    }
+    throw new Error("Failed to change password");
   }
-  const response: UserResponse = await res.json();
-  if (response.err !== 0) {
-    throw new Error(response.message || "Failed to fetch user");
-  }
-  return response.data;
 }

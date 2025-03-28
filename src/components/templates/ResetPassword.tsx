@@ -114,6 +114,7 @@ const ResetPassword = () => {
                 },
               }),
             ]}
+            className="pb-3"
           >
             <Password
               placeholder="Confirm Password"

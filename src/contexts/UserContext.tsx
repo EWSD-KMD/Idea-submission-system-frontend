@@ -25,12 +25,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (userId && accessToken) {
-      getUserById(userId, accessToken)
+      getUserById(userId)
         .then((user) => {
           if (user) {
             setEmail(user.email);
             setUserName(user.name);
-            setRole(user.role.name); // Now works with updated User interface
+            setRole(user.role.name);
           }
         })
         .catch((error) => {

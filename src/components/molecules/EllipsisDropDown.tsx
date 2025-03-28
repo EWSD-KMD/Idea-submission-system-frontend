@@ -10,14 +10,14 @@ const AntDropdown = dynamic(() => import("antd").then((mod) => mod.Dropdown), {
 });
 
 const getDropdownItems = (commentId: number): MenuProps["items"] => [
-  {
-    key: `report-${commentId}`,
-    label: "Report",
-    icon: getIcon("alert"),
-  },
-  {
-    type: "divider",
-  },
+  // {
+  //   key: `report-${commentId}`,
+  //   label: "Report",
+  //   icon: getIcon("alert"),
+  // },
+  // {
+  //   type: "divider",
+  // },
   {
     key: `edit-${commentId}`,
     label: "Edit",
@@ -113,7 +113,7 @@ const EllipsisDropDown: React.FC<EllipsisDropDownProps> = ({
         showReportModal();
         break;
       case `edit-${commentId}`:
-        if (onEdit) onEdit(commentId, initialText); // Trigger edit mode in parent
+        if (onEdit) onEdit(commentId, initialText);
         break;
       case `delete-${commentId}`:
         showCmtDeleteConfirm();

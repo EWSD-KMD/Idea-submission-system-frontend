@@ -1,24 +1,11 @@
+import { RefreshPromiseType } from "@/config/api/httpRequest/httpConfig";
+import {
+  ForgotPasswordResponse,
+  LoginResponse,
+  ResetPasswordResponse,
+} from "@/constant/type";
+
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-interface LoginResponse {
-  err: number;
-  message: string;
-  data: {
-    accessToken: string;
-    refreshToken: string;
-  };
-}
-
-interface ForgotPasswordResponse {
-  err: number;
-  message: string;
-}
-
-interface ResetPasswordResponse {
-  err: number;
-  message: string;
-  data: null;
-}
 
 export async function login(
   email: string,
@@ -45,7 +32,7 @@ export async function login(
 
 export async function refreshAccessToken(
   refreshToken: string
-): Promise<string> {
+): RefreshPromiseType {
   const res = await fetch(`${API_URL}/auth/refresh`, {
     method: "POST",
     headers: {
@@ -62,43 +49,7 @@ export async function refreshAccessToken(
     throw new Error(response.message || "Refresh failed");
   }
 
-  return response.data.accessToken;
-}
-
-export async function authFetch(
-  url: string,
-  options: RequestInit = {},
-  accessToken: string,
-  refreshToken: string,
-  refreshCallback: (newToken: string) => void
-): Promise<Response> {
-  const fetchOptions = {
-    ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${accessToken}`,
-    },
-  };
-
-  let res = await fetch(url, fetchOptions);
-
-  if (res.status === 401) {
-    const newAccessToken = await refreshAccessToken(refreshToken);
-    refreshCallback(newAccessToken);
-    res = await fetch(url, {
-      ...fetchOptions,
-      headers: {
-        ...fetchOptions.headers,
-        Authorization: `Bearer ${newAccessToken}`,
-      },
-    });
-  }
-
-  if (!res.ok) {
-    throw new Error(`Request failed: ${res.status}`);
-  }
-
-  return res;
+  return response.data;
 }
 
 export async function logout(refreshToken: string): Promise<void> {

@@ -1,13 +1,11 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { Divider, Modal, message } from "antd";
 import { getIcon } from "../atoms/Icon";
-import { getShowCategories } from "@/lib/category";
+import { getCategories } from "@/lib/category";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-
-export interface Category {
-  id: number;
-  name: string;
-}
+import { Category, CategoriesResponse } from "@/constant/type";
 
 interface CategoryModalProps {
   open: boolean;
@@ -34,8 +32,8 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
   const loadCategories = async () => {
     setLoading(true);
     try {
-      const data = await getShowCategories();
-      setCategories(data);
+      const response: CategoriesResponse = await getCategories();
+      setCategories(response.data.categories);
     } catch (error: any) {
       console.error("Error fetching categories:", error);
       message.error(error.message || "Something went wrong.");

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { logo, navigationBackground } from "../../assets/images";
 import Button from "../atoms/Button";
-import AvatarDropdown from "../molecules/AvatarDropdown";
+import AvatarDropdown from "./AvatarDropdown";
 import Notification from "../molecules/Notification";
 import { useRouter } from "next/navigation";
 import { RefObject } from "react";

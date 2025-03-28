@@ -1,40 +1,61 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// Define public routes that don't require authentication
+const PUBLIC_ROUTES = ["/login", "/forgot-password", "/users/forget-password"];
+// Define maximum number of redirects to prevent loops
+const MAX_REDIRECTS = 3;
+
 export async function middleware(req: NextRequest) {
-  const accessToken = req.cookies.get("accessToken")?.value;
   const { pathname, searchParams } = req.nextUrl;
+  const accessToken = req.cookies.get("accessToken")?.value;
+  const refreshToken = req.cookies.get("refreshToken")?.value;
 
-  const redirectIfAuthenticated = ["/login", "/forgot-password"];
-  const isRedirectRoute = redirectIfAuthenticated.includes(pathname);
+  const redirectCount = parseInt(
+    req.cookies.get("redirectCount")?.value || "0"
+  );
 
-  if (isRedirectRoute && !accessToken) {
-    console.log("Unauthenticated, allowing access to:", pathname);
+  // Prevent redirect loops
+  if (redirectCount >= MAX_REDIRECTS) {
+    // Clear redirect count and tokens
+    const response = NextResponse.redirect(new URL("/login", req.url));
+    response.cookies.delete("redirectCount");
+    response.cookies.delete("accessToken");
+    response.cookies.delete("refreshToken");
+    return response;
+  }
+
+  // Handle public routes
+  if (PUBLIC_ROUTES.includes(pathname)) {
+    if (accessToken && refreshToken) {
+      // If authenticated, redirect to home
+      return NextResponse.redirect(new URL("/", req.url));
+    }
     return NextResponse.next();
   }
 
+  // Handle password reset route specifically
   if (pathname === "/users/forget-password") {
     const token = searchParams.get("token");
     if (!token) {
-      console.log("No token, redirecting to /forgot-password");
       return NextResponse.redirect(new URL("/forgot-password", req.url));
     }
-    console.log("Token present, allowing /users/forget-password");
     return NextResponse.next();
   }
 
-  if (!accessToken) {
-    console.log("No accessToken, redirecting to /login from:", pathname);
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
-  if (isRedirectRoute && accessToken) {
-    console.log("Authenticated, redirecting to / from:", pathname);
-    return NextResponse.redirect(new URL("/", req.url));
+  if (!accessToken || !refreshToken) {
+    const response = NextResponse.redirect(new URL("/login", req.url));
+
+    response.cookies.set("redirectCount", String(redirectCount + 1), {
+      maxAge: 30,
+    });
+    return response;
   }
 
-  console.log("Authenticated, allowing access to:", pathname);
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.cookies.delete("redirectCount");
+  return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next|static|api|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
