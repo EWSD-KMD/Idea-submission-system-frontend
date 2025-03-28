@@ -36,6 +36,22 @@ const PostCardIdeaList = () => {
     fetchIdeas(currentPage);
   }, [currentPage]);
 
+  const handleLikeUpdate = (id: number, newLikeCount: number) => {
+    // setIdeas((prevIdeas) =>
+    //   prevIdeas.map((idea) =>
+    //     idea.id === id ? { ...idea, likes: newLikeCount } : idea
+    //   )
+    // );
+  };
+
+  const handleDislikeUpdate = (id: number, newDislikeCount: number) => {
+    // setIdeas((prevIdeas) =>
+    //   prevIdeas.map((idea) =>
+    //     idea.id === id ? { ...idea, dislikes: newDislikeCount } : idea
+    //   )
+    // );
+  };
+
   const handlePageChange = (page: number) => {
     router.push(`/?page=${page}`);
   };
@@ -59,6 +75,8 @@ const PostCardIdeaList = () => {
           views={idea.views}
           imageSrc={idea.imageSrc || undefined}
           commentsCount={idea.comments.length}
+          onLikeUpdate={handleLikeUpdate}
+          onDislikeUpdate={handleDislikeUpdate}
         />
       ))}
 

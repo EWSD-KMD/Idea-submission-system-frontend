@@ -1,5 +1,6 @@
 import { get } from "@/config/api/httpRequest/httpMethod";
 import { CategoriesResponse } from "@/constant/type";
+import { isErrorWithMessage } from "@/utils/errorWithMessage";
 
 export async function getCategories(): Promise<CategoriesResponse> {
   try {
@@ -7,11 +8,9 @@ export async function getCategories(): Promise<CategoriesResponse> {
     const response = get<CategoriesResponse>(url);
     return response;
   } catch (error: unknown) {
-    if (error && typeof error === "object" && "message" in error) {
-      throw new Error(
-        (error as { message: string }).message || "Failed to fetch user"
-      );
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
     }
-    throw new Error("Failed to fetch user");
+    throw new Error("Failed to fetch categories");
   }
 }

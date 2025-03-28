@@ -36,7 +36,15 @@ const getDropdownItems = (commentId: string): MenuProps["items"] => [
 
 const { confirm } = Modal;
 
-const EllipsisDropDown = ({ commentId, onEdit, initialText }: { commentId: string; onEdit?: (id: string, text: string) => void; initialText: string }) => {
+const EllipsisDropDown = ({
+  commentId,
+  onEdit,
+  initialText,
+}: {
+  commentId: string;
+  onEdit?: (id: string, text: string) => void;
+  initialText: string;
+}) => {
   const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const [reportReason, setReportReason] = useState("offensive");
   const [additionalDetails, setAdditionalDetails] = useState("");
@@ -124,7 +132,7 @@ const EllipsisDropDown = ({ commentId, onEdit, initialText }: { commentId: strin
         showReportModal();
         break;
       case `edit-${commentId}`:
-        if (onEdit) onEdit(commentId, initialText); // Trigger edit mode in parent
+        if (onEdit) onEdit(commentId, initialText);
         break;
       case `delete-${commentId}`:
         showCmtDeleteConfirm();
@@ -150,9 +158,7 @@ const EllipsisDropDown = ({ commentId, onEdit, initialText }: { commentId: strin
         </div>
       </AntDropdown>
       <Modal
-        title={
-          <h2 className="text-lg font-semibold">Report Comment</h2>
-        }
+        title={<h2 className="text-lg font-semibold">Report Comment</h2>}
         open={isReportModalVisible}
         onOk={handleReportOk}
         onCancel={handleReportCancel}

@@ -6,6 +6,8 @@ import dynamic from "next/dynamic";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
+import { useState } from "react";
+import ChangePasswordModal from "./ChangePasswordModal";
 
 const AntBadge = dynamic(() => import("antd").then((mod) => mod.Badge), {
   ssr: false,
@@ -54,13 +56,14 @@ const AvatarDropdown = () => {
   const { logoutUser } = useAuth();
   const { userName } = useUser();
   const router = useRouter();
+  const [changePasswordModal, setChangePasswordModal] = useState(false);
   const handleMenuClick = ({ key }: { key: string }) => {
     switch (key) {
       case "profile":
         router.push("/profile-page");
         break;
       case "changePassword":
-        console.log("Change password clicked");
+        setChangePasswordModal(true);
         break;
       case "logout":
         logoutUser();
@@ -75,34 +78,40 @@ const AvatarDropdown = () => {
   };
 
   return (
-    <AntDropdown
-      menu={{
-        items: getDropdownItems(userName),
-        onClick: handleMenuClick,
-      }}
-      placement="bottomRight"
-      arrow
-      trigger={["click"]}
-    >
-      <div className="relative cursor-pointer">
-        <AntBadge
-          size="small"
-          offset={[-8, 32]}
-          count={
-            <div
-              style={{
-                backgroundColor: "#fff",
-                borderRadius: "100%",
-              }}
-            >
-              {getIcon("chevronDown")}
-            </div>
-          }
-        >
-          <Avatar label="Kaung Sat" />
-        </AntBadge>
-      </div>
-    </AntDropdown>
+    <>
+      <AntDropdown
+        menu={{
+          items: getDropdownItems(userName),
+          onClick: handleMenuClick,
+        }}
+        placement="bottomRight"
+        arrow
+        trigger={["click"]}
+      >
+        <div className="relative cursor-pointer">
+          <AntBadge
+            size="small"
+            offset={[-8, 32]}
+            count={
+              <div
+                style={{
+                  backgroundColor: "#fff",
+                  borderRadius: "100%",
+                }}
+              >
+                {getIcon("chevronDown")}
+              </div>
+            }
+          >
+            <Avatar label="Kaung Sat" />
+          </AntBadge>
+        </div>
+      </AntDropdown>
+      <ChangePasswordModal
+        visible={changePasswordModal}
+        onCancel={() => setChangePasswordModal(false)}
+      />
+    </>
   );
 };
 

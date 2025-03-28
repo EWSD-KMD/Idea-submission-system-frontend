@@ -1,5 +1,11 @@
-import { get } from "@/config/api/httpRequest/httpMethod";
-import { User, UserResponse } from "@/constant/type";
+import { get, post } from "@/config/api/httpRequest/httpMethod";
+import {
+  ChangePasswordRequest,
+  ChangePasswordResponse,
+  User,
+  UserResponse,
+} from "@/constant/type";
+import { isErrorWithMessage } from "@/utils/errorWithMessage";
 
 export async function getUserById(id: number): Promise<User> {
   try {
@@ -7,11 +13,27 @@ export async function getUserById(id: number): Promise<User> {
     const response = await get<UserResponse>(url);
     return response.data;
   } catch (error: unknown) {
-    if (error && typeof error === "object" && "message" in error) {
-      throw new Error(
-        (error as { message: string }).message || "Failed to fetch user"
-      );
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
     }
     throw new Error("Failed to fetch user");
+  }
+}
+
+export async function changePassword(
+  changePasswordData: ChangePasswordRequest
+): Promise<ChangePasswordResponse> {
+  try {
+    const url = "/auth/update-password";
+    const response = await post<ChangePasswordRequest, ChangePasswordResponse>(
+      url,
+      changePasswordData
+    );
+    return response;
+  } catch (error: unknown) {
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
+    }
+    throw new Error("Failed to change password");
   }
 }

@@ -41,6 +41,16 @@ export interface UserResponse {
   message: string;
   data: User;
 }
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordResponse {
+  err: number;
+  message: string;
+}
 // #endregion
 
 // #region Categories
@@ -146,6 +156,13 @@ export interface IdeasResponse {
   err: number;
   message: string;
   data: IdeasResponseData;
+}
+export interface LikeIdeaResponse {
+  err: number;
+  message: string;
+  data: {
+    idea: Idea;
+  };
 }
 // #endregion
 

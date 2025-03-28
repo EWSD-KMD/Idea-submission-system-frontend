@@ -11,19 +11,25 @@ import CommentSection from "./CommentSection";
 import timeAgo from "@/utils/timeago";
 import { useResponsive } from "@/utils/responsive";
 import { getTruncatedText } from "@/utils/getTruncatedText";
+import { Idea } from "@/constant/type";
 
-interface PostCardProps {
-  id: number;
-  title: string;
-  description: string;
+export interface PostCardProps
+  extends Pick<
+    Idea,
+    | "id"
+    | "title"
+    | "description"
+    | "likes"
+    | "dislikes"
+    | "views"
+    | "createdAt"
+    | "imageSrc"
+  > {
   userName: string;
   departmentName: string;
-  createdAt: string;
-  likes: number;
-  dislikes: number;
-  views: number;
-  imageSrc?: string;
   commentsCount: number;
+  onLikeUpdate?: (id: number, newLikeCount: number) => void;
+  onDislikeUpdate?: (id: number, newLikeCount: number) => void;
 }
 
 const PostCard = ({
@@ -38,6 +44,8 @@ const PostCard = ({
   views,
   imageSrc,
   commentsCount,
+  onLikeUpdate,
+  onDislikeUpdate,
 }: PostCardProps) => {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const { isMobile, isTablet } = useResponsive();
@@ -99,8 +107,13 @@ const PostCard = ({
         <div className="flex justify-between items-center">
           <div className="flex gap-2">
             <LikeAndDislikeButton
+              ideaId={id}
               likeCount={likes}
               dislikeCount={dislikes}
+              onLike={(newLikeCount) => onLikeUpdate?.(id, newLikeCount)}
+              onDislike={(newDislikeCount) =>
+                onDislikeUpdate?.(id, newDislikeCount)
+              }
               // size={isMobile ? "small" : "middle"}
             />
             <CommentButton

@@ -1,5 +1,10 @@
 import { get, post } from "@/config/api/httpRequest/httpMethod";
-import { CreateIdeaRequest, IdeasResponse } from "@/constant/type";
+import {
+  CreateIdeaRequest,
+  IdeasResponse,
+  LikeIdeaResponse,
+} from "@/constant/type";
+import { isErrorWithMessage } from "@/utils/errorWithMessage";
 
 export async function getAllIdeas(
   page: number = 1,
@@ -9,8 +14,11 @@ export async function getAllIdeas(
     const url = `/ideas?page=${page}&limit=${limit}`;
     const response = await get<IdeasResponse>(url);
     return response;
-  } catch (error: any) {
-    throw new Error(error.message || "Failed to fetch ideas");
+  } catch (error: unknown) {
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
+    }
+    throw new Error("Failed to fetch ideas");
   }
 }
 
@@ -23,10 +31,23 @@ export async function createIdea(ideaData: CreateIdeaRequest) {
       ideaData
     );
     return response;
-  } catch (error: any) {
-    if (error.status === 401) {
-      throw new Error("Unauthorized: Please login again");
+  } catch (error: unknown) {
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
     }
-    throw new Error(error.message || "Failed to create idea");
+    throw new Error("Failed to create idea");
+  }
+}
+
+export async function LikeIdea(ideaId: number): Promise<LikeIdeaResponse> {
+  const url = `/ideas/${ideaId}/like`;
+  try {
+    const response = await post<null, LikeIdeaResponse>(url, null);
+    return response;
+  } catch (error: unknown) {
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
+    }
+    throw new Error("Failed to like idea");
   }
 }

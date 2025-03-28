@@ -6,12 +6,13 @@ import AnonymousDropdown from "../molecules/AnonymousDropdown";
 import TextArea from "antd/es/input/TextArea";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
-import CategoryModal, { Category } from "../molecules/CategoryModal";
+import CategoryModal from "../molecules/CategoryModal";
 import Image from "../atoms/Image";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserById } from "@/lib/user";
 import { createIdea } from "@/lib/idea";
 import { useRouter } from "next/navigation";
+import { Category } from "@/constant/type";
 
 interface TwoStepModalProps {
   visible: boolean;
