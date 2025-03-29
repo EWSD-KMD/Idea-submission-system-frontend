@@ -6,14 +6,17 @@ import Button from "../atoms/Button";
 import AvatarWithNameAndDept from "./AvatarWithNameAndDept";
 import EllipsisDropDown from "./EllipsisDropDown";
 import Cookies from "js-cookie";
-import { updateComment, deleteComment, Comment as APIComment } from "@/lib/comment";
+import { updateComment, deleteComment } from "@/lib/comment";
 
 interface CommentsProps {
   comments: APIComment[];
   reloadComments: (page: number, limit: number) => void;
 }
 
-const Comments: React.FC<CommentsProps> = ({ comments: initialComments, reloadComments: reloadComments }) => {
+const Comments: React.FC<CommentsProps> = ({
+  comments: initialComments,
+  reloadComments: reloadComments,
+}) => {
   const [comments, setComments] = useState<APIComment[]>(initialComments);
   const [editCommentId, setEditCommentId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -30,7 +33,11 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments, reloadCo
   const handleSave = async (commentId: number) => {
     setLoading(true);
     try {
-      const updatedComment = await updateComment(commentId, editedText, accessToken);
+      const updatedComment = await updateComment(
+        commentId,
+        editedText,
+        accessToken
+      );
       message.success("Comment updated successfully");
       setComments((prevComments) =>
         prevComments.map((comment) =>
@@ -105,7 +112,7 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments, reloadCo
                     onClick={() => handleSave(comment.id)}
                     type="primary"
                     rounded
-                    loading= {loading}
+                    loading={loading}
                     className="m-2"
                   />
                   <Button

@@ -35,7 +35,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ onCommentSubmit }) => {
   };
 
   return (
-    <div className="flex gap-2 bg-white">
+    <div className="flex gap-3 w-full">
       <AnonymousDropdown name={userName} />
       <div className="flex flex-col w-full rounded-lg border border-gray-300">
         <div className="flex flex-col w-full items-end">

@@ -2,7 +2,6 @@
 
 import NavBar from "@/components/organisms/NavBar";
 import ProfileCard from "@/components/organisms/ProfileCard";
-import PostCard from "@/components/organisms/PostCard";
 import dynamic from "next/dynamic";
 
 const Row = dynamic(() => import("antd").then((mod) => mod.Row), {

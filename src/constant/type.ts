@@ -133,7 +133,7 @@ export interface Idea {
   category: Category;
   department: Omit<Department, "_count">;
   user: User;
-  comments: Comment[];
+  comments: CommentData[];
   imageSrc?: string;
 }
 
@@ -157,12 +157,46 @@ export interface IdeasResponse {
   message: string;
   data: IdeasResponseData;
 }
+export interface IdeaDetailResponse {
+  err: number;
+  message: string;
+  data: Idea;
+}
 export interface LikeIdeaResponse {
   err: number;
   message: string;
   data: {
     idea: Idea;
   };
+}
+// #endregion
+
+// #region Comments\
+
+export interface CommentResponse {
+  err: number;
+  message: string;
+  data: {
+    comments: CommentData[];
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+export interface CommentData {
+  id: number;
+  content: string;
+  ideaId: number;
+  userId: number;
+  createdAt: string;
+  updatedAt: string;
+  user: User;
+}
+export interface CommentRequest {
+  content: string;
+  ideaId: number;
+  userId: number;
 }
 // #endregion
 

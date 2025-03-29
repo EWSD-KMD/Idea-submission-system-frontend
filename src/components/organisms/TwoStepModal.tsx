@@ -96,6 +96,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
         await createIdea(data);
         message.success("Idea posted successfully!");
         router.push("/");
+        router.refresh();
         resetForm();
       } catch (error: any) {
         message.error(error.message || "Failed to post idea");

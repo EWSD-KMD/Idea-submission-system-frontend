@@ -1,15 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Col, Grid, Row } from "antd";
 import DepartmentCard from "@/components/organisms/DepartmentCard";
-import NavBar from "@/components/organisms/NavBar";
 import CreatePostIdea, {
   CreatePostIdeaRef,
 } from "@/components/templates/CreatePostIdea";
 import SortingMenu from "@/components/templates/SortingMenu";
 import PostCardIdeaList from "@/components/templates/PostCardIdeaList";
 import { useSearchParams } from "next/navigation";
+import NavBarWrapper from "./NavBarWrapper";
 
 const { useBreakpoint } = Grid;
 
@@ -21,7 +21,7 @@ const HomeLayout = () => {
 
   return (
     <div>
-      <NavBar createPostIdeaRef={createPostIdeaRef} />
+      <NavBarWrapper />
       <div className="pt-24">
         <div className="mx-auto px-4 lg:px-20 xl:px-40">
           <Row gutter={[24, 24]} className="relative">
@@ -35,13 +35,15 @@ const HomeLayout = () => {
             )}
 
             {/* Main Content - Scrollable */}
-            <Col xs={24} sm={24} md={18} lg={16} className="min-h-screen">
-              {currentPage === 1 && (
-                <div className="pb-3">
-                  <CreatePostIdea ref={createPostIdeaRef} />
-                </div>
-              )}
-              <PostCardIdeaList />
+            <Col xs={24} sm={24} md={18} lg={16}>
+              <div className="max-h-[calc(100vh-6rem)] overflow-y-auto hide-scrollbar">
+                {currentPage === 1 && (
+                  <div className="pb-3">
+                    <CreatePostIdea ref={createPostIdeaRef} />
+                  </div>
+                )}
+                <PostCardIdeaList />
+              </div>
             </Col>
 
             {/* Department Card - Fixed Position */}

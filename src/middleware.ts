@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Define public routes that don't require authentication
 const PUBLIC_ROUTES = ["/login", "/forgot-password", "/users/forget-password"];
-// Define maximum number of redirects to prevent loops
 const MAX_REDIRECTS = 3;
 
 export async function middleware(req: NextRequest) {
@@ -14,9 +12,7 @@ export async function middleware(req: NextRequest) {
     req.cookies.get("redirectCount")?.value || "0"
   );
 
-  // Prevent redirect loops
   if (redirectCount >= MAX_REDIRECTS) {
-    // Clear redirect count and tokens
     const response = NextResponse.redirect(new URL("/login", req.url));
     response.cookies.delete("redirectCount");
     response.cookies.delete("accessToken");
@@ -24,7 +20,6 @@ export async function middleware(req: NextRequest) {
     return response;
   }
 
-  // Handle public routes
   if (PUBLIC_ROUTES.includes(pathname)) {
     if (accessToken && refreshToken) {
       // If authenticated, redirect to home
@@ -33,7 +28,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Handle password reset route specifically
   if (pathname === "/users/forget-password") {
     const token = searchParams.get("token");
     if (!token) {

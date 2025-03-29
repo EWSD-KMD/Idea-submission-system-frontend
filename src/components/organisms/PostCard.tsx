@@ -1,17 +1,18 @@
 "use client";
 
-import { Card } from "antd";
+import { Card, Divider } from "antd";
 import Image from "../atoms/Image";
 import AvatarWithNameAndDept from "../molecules/AvatarWithNameAndDept";
 import LikeAndDislikeButton from "../molecules/LikeAndDislikeButton";
 import CommentButton from "../molecules/CommentButton";
 import ViewCount from "../molecules/ViewCount";
 import { useState } from "react";
-import CommentSection from "./CommentSection";
+import CommentSection from "./CommentUpload";
 import timeAgo from "@/utils/timeago";
 import { useResponsive } from "@/utils/responsive";
 import { getTruncatedText } from "@/utils/getTruncatedText";
 import { Idea } from "@/constant/type";
+import { useRouter } from "next/navigation";
 
 export interface PostCardProps
   extends Pick<
@@ -44,19 +45,27 @@ const PostCard = ({
   views,
   imageSrc,
   commentsCount: initialCommentsCount,
-  onLikeUpdate,
-  onDislikeUpdate,
 }: PostCardProps) => {
+  const router = useRouter();
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [commentsCount, setCommentsCount] = useState(initialCommentsCount);
   const { isMobile, isTablet } = useResponsive();
 
-  const handleCardClick = () => {
-    setIsCommentsOpen((prev) => !prev);
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent navigation if clicking on interaction buttons
+    if (
+      e.target instanceof Element &&
+      (e.target.closest(".interaction-buttons") || e.target.closest(".ant-btn"))
+    ) {
+      e.stopPropagation();
+      return;
+    }
+
+    router.push(`/idea/${id}`);
   };
 
-  const handleCommentsChange = (newCount: number) => {
-    setCommentsCount(newCount);
+  const handleComment = () => {
+    setIsCommentsOpen(!isCommentsOpen);
   };
 
   const truncatedDescription = getTruncatedText(
@@ -64,15 +73,15 @@ const PostCard = ({
     isMobile,
     isTablet,
     {
-      mobileLength: 100,
-      tabletLength: 200,
+      mobileLength: 30,
+      tabletLength: 40,
+      desktopLength: 50,
     }
   );
 
   return (
-    <Card className="w-full">
+    <Card className="w-full cursor-pointer" onClick={handleCardClick}>
       <div className="space-y-3 sm:space-y-4">
-        {/* Header Section */}
         <AvatarWithNameAndDept
           name={userName}
           department={departmentName}
@@ -80,8 +89,6 @@ const PostCard = ({
           time={timeAgo(createdAt)}
           avatarSrc=""
         />
-
-        {/* Title Section */}
         <h2
           className={`font-semibold ${isMobile ? "text-sm" : "text-base"} my-2`}
         >
@@ -108,39 +115,29 @@ const PostCard = ({
           </div>
         )}
 
-        {/* Interaction Buttons Section */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center interaction-buttons">
           <div className="flex gap-2">
             <LikeAndDislikeButton
               ideaId={id}
               likeCount={likes}
               dislikeCount={dislikes}
-              onLike={(newLikeCount) => onLikeUpdate?.(id, newLikeCount)}
-              onDislike={(newDislikeCount) =>
-                onDislikeUpdate?.(id, newDislikeCount)
-              }
-              // size={isMobile ? "small" : "middle"}
             />
             <CommentButton
               commentCount={commentsCount}
-              onClick={handleCardClick}
-              // size={isMobile ? "small" : "middle"}
+              onClick={handleComment}
             />
           </div>
-          <ViewCount
-            viewCount={views}
-            // size={isMobile ? "small" : "middle"}
-          />
+          <ViewCount viewCount={views} />
         </div>
 
-        {/* Comments Section */}
         {isCommentsOpen && (
-          <div className={`mt-4 ${isMobile ? "px-2" : "px-4"}`}>
-            <CommentSection
-              ideaId={id}
-              isOpen={isCommentsOpen}
-              onCommentsChange={handleCommentsChange}
-            />
+          <div>
+            <Divider />
+            <div
+              className={` interaction-buttons ${isMobile ? "px-2" : "px-4"}`}
+            >
+              <CommentSection ideaId={id} isOpen={isCommentsOpen} />
+            </div>
           </div>
         )}
       </div>
