@@ -157,11 +157,59 @@ export interface IdeasResponse {
   message: string;
   data: IdeasResponseData;
 }
+
+export interface IdeaResponse {
+  err: number;
+  message: string;
+  data: Idea;
+}
+
 export interface LikeIdeaResponse {
   err: number;
   message: string;
   data: {
     idea: Idea;
+  };
+}
+// #endregion
+
+// #region Notifications Types
+export interface Notification {
+  id: number;
+  type: "LIKE" | "DISLIKE" | "COMMENT";
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+  fromUser: {
+    id: number;
+    name: string;
+  };
+  idea: {
+    id: number;
+    title: string;
+  };
+}
+
+export interface NotificationsResponseData {
+  notifications: Notification[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface NotificationsResponse {
+  err: number;
+  message: string;
+  data: NotificationsResponseData;
+}
+
+export interface MarkAsReadResponse {
+  err: number;
+  message: string;
+  data: {
+    message: string;
   };
 }
 // #endregion

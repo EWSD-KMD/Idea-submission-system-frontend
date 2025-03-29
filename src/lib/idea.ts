@@ -1,6 +1,7 @@
 import { get, post } from "@/config/api/httpRequest/httpMethod";
 import {
   CreateIdeaRequest,
+  IdeaResponse,
   IdeasResponse,
   LikeIdeaResponse,
 } from "@/constant/type";
@@ -19,6 +20,19 @@ export async function getAllIdeas(
       throw new Error(error.message);
     }
     throw new Error("Failed to fetch ideas");
+  }
+}
+
+export async function getIdeaById(id:number): Promise<IdeaResponse> {
+  try {
+    const url = `/ideas/${id}`;
+    const response = await get<IdeaResponse>(url);
+    return response;
+  } catch (error: unknown) {
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
+    }
+    throw new Error("Failed to fetch idea");
   }
 }
 
