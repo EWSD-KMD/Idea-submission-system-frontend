@@ -6,7 +6,6 @@ import { getIcon } from "../atoms/Icon";
 import Avatar from "../atoms/Avatar";
 import { Divider, List, message, Skeleton } from "antd";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
-import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import {
   getNotifications,
@@ -16,7 +15,6 @@ import {
 import { NotificationsResponseData } from "@/constant/type";
 import Image from "../atoms/Image";
 import InfiniteScroll from "react-infinite-scroll-component";
-import Loading from "@/app/loading";
 
 const AntBadge = dynamic(() => import("antd").then((mod) => mod.Badge), {
   ssr: false,
@@ -45,7 +43,6 @@ const NotificationComponent = () => {
     totalPages: number;
   } | null>(null);
   const router = useRouter();
-  const accessToken = Cookies.get("accessToken");
 
   // Fetch notifications from the API
   const fetchNotifications = async (page: number = 1, limit: number = 10) => {
@@ -55,8 +52,7 @@ const NotificationComponent = () => {
     try {
       const res: NotificationsResponseData = await getNotifications(
         page,
-        limit,
-        accessToken
+        limit
       );
       // Map the API response to the shape used in UI:
       const mappedNotifications: NotificationItem[] = res.notifications.map(
@@ -89,10 +85,6 @@ const NotificationComponent = () => {
   useEffect(() => {
     // Fetch notifications on mount
     fetchNotifications();
-    // Set an interval to refresh notifications every 30 seconds (60000 ms)
-    const intervalId = setInterval(fetchNotifications, 30000);
-    // Cleanup the interval on unmount
-    return () => clearInterval(intervalId);
   }, []);
 
   // Count unread notifications
@@ -101,7 +93,7 @@ const NotificationComponent = () => {
   // Mark all notifications as read and update state without re-fetching
   const handleMarkAllRead = async () => {
     try {
-      await markAllNotificationsAsRead(accessToken);
+      await markAllNotificationsAsRead();
       setNotifications((prev) =>
         prev.map((notif) => ({ ...notif, read: true }))
       );
@@ -116,7 +108,7 @@ const NotificationComponent = () => {
     if (!notif.read) {
       try {
         console.log(notif.id);
-        await markNotificationAsRead(notif.id, accessToken);
+        await markNotificationAsRead(notif.id);
 
         setNotifications((prev) =>
           prev.map((n) => (n.id === notif.id ? { ...n, read: true } : n))
@@ -126,7 +118,7 @@ const NotificationComponent = () => {
       }
     }
     if (notif.ideaId) {
-      router.push(`/detail-page/?ideaId=${notif.ideaId}`);
+      router.push(`/idea/${notif.ideaId}`);
     } else {
       message.info("No associated idea for this notification");
     }
@@ -177,7 +169,22 @@ const NotificationComponent = () => {
             hasMore={
               pagination ? notifications.length < pagination.total : false
             }
-            loader={<Loading />}
+            loader={
+              <div className="flex justify-center p-3">
+                <div className="w-40 h-20">
+                  <DotLottieReact
+                    src="https://lottie.host/fce7f0b5-ed51-4cf5-b87c-c54e181f2423/Q5CUbjHeB0.lottie"
+                    loop
+                    autoplay
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                </div>
+              </div>
+            }
             endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
             scrollableTarget="scrollableDiv"
           >
@@ -208,26 +215,6 @@ const NotificationComponent = () => {
             />
           </InfiniteScroll>
         ) : (
-          // notifications.map((notif) => (
-          //   <React.Fragment key={notif.id}>
-          //     <div
-          //       className={`flex items-center gap-3 p-3 cursor-pointer ${
-          //         notif.read ? "bg-white" : "bg-blue-50"
-          //       } rounded-md hover:bg-gray-50`}
-          //       onClick={() => handleNotificationClick(notif)}
-          //     >
-          //       <Avatar src={notif.userAvatar} size={40} />
-          //       <div className="flex-1">
-          //         <p className="text-sm text-gray-900">
-          //           <span className="font-semibold">{notif.userName}</span>{" "}
-          //           {notif.message}
-          //         </p>
-          //         <p className="text-xs text-gray-500">{notif.time}</p>
-          //       </div>
-          //     </div>
-          //     <Divider className="m-0" />
-          //   </React.Fragment>
-          // ))
           <div className="flex flex-col items-center justify-center p-4 mt-20">
             <Image
               src="/no_bell_alarm.svg"

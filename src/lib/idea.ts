@@ -1,7 +1,7 @@
 import { get, post } from "@/config/api/httpRequest/httpMethod";
 import {
   CreateIdeaRequest,
-  IdeaResponse,
+  IdeaDetailResponse,
   IdeasResponse,
   LikeIdeaResponse,
 } from "@/constant/type";
@@ -9,7 +9,7 @@ import { isErrorWithMessage } from "@/utils/errorWithMessage";
 
 export async function getAllIdeas(
   page: number = 1,
-  limit: number = 5
+  limit: number = 5 
 ): Promise<IdeasResponse> {
   try {
     const url = `/ideas?page=${page}&limit=${limit}`;
@@ -23,10 +23,10 @@ export async function getAllIdeas(
   }
 }
 
-export async function getIdeaById(id:number): Promise<IdeaResponse> {
+export async function getIdeaById(ideaId: number): Promise<IdeaDetailResponse> {
   try {
-    const url = `/ideas/${id}`;
-    const response = await get<IdeaResponse>(url);
+    const url = `/ideas/${ideaId}`;
+    const response = await get<IdeaDetailResponse>(url);
     return response;
   } catch (error: unknown) {
     if (isErrorWithMessage(error)) {

@@ -5,20 +5,22 @@ import { Input, message } from "antd";
 import Button from "../atoms/Button";
 import AvatarWithNameAndDept from "./AvatarWithNameAndDept";
 import EllipsisDropDown from "./EllipsisDropDown";
-import Cookies from "js-cookie";
-import { updateComment, deleteComment, Comment as APIComment } from "@/lib/comment";
+import { updateComment, deleteComment } from "@/lib/comment";
+import { CommentData, CommentResponse, CommentUpdateResponse, User } from "@/constant/type";
 
 interface CommentsProps {
-  comments: APIComment[];
+  comments: CommentData[];
   reloadComments: (page: number, limit: number) => void;
 }
 
-const Comments: React.FC<CommentsProps> = ({ comments: initialComments, reloadComments: reloadComments }) => {
-  const [comments, setComments] = useState<APIComment[]>(initialComments);
+const Comments: React.FC<CommentsProps> = ({
+  comments: initialComments,
+  reloadComments: reloadComments,
+}) => {
+  const [comments, setComments] = useState<CommentData[]>(initialComments);
   const [editCommentId, setEditCommentId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [editedText, setEditedText] = useState<string>("");
-  const accessToken = Cookies.get("accessToken");
 
   // Handle comment edit
   const handleEdit = (commentId: number, initialText: string) => {
@@ -30,11 +32,22 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments, reloadCo
   const handleSave = async (commentId: number) => {
     setLoading(true);
     try {
-      const updatedComment = await updateComment(commentId, editedText, accessToken);
+      const updatedComment: CommentUpdateResponse = await updateComment(
+        commentId,
+        editedText,
+      );
       message.success("Comment updated successfully");
-      setComments((prevComments) =>
-        prevComments.map((comment) =>
-          comment.id === commentId ? updatedComment : comment
+      console.log(updatedComment)
+      setComments((prevComments: CommentData[]) =>
+        prevComments.map((comment: CommentData) =>
+          comment.id === commentId ? comment = { 
+            id: comment.id ,
+            content: updatedComment.data.content,
+            ideaId: comment.ideaId,
+            userId: comment.userId,
+            createdAt: comment.createdAt,
+            updatedAt: comment.updatedAt,
+            user: comment.user,} : comment
         )
       );
       setEditCommentId(null);
@@ -54,7 +67,7 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments, reloadCo
   // Handle deleting a comment
   const handleDelete = async (commentId: number) => {
     try {
-      await deleteComment(commentId, accessToken);
+      await deleteComment(commentId);
       message.success("Comment deleted successfully");
       // Remove the deleted comment from state
       reloadComments(1, 2);
@@ -65,7 +78,7 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments, reloadCo
 
   return (
     <div className="flex flex-col -mb-5 w-full">
-      {comments.map((comment) => (
+      {comments.map((comment: CommentData) => (
         <div
           key={comment.id}
           className="flex flex-col gap-2 mb-5"
@@ -105,7 +118,7 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments, reloadCo
                     onClick={() => handleSave(comment.id)}
                     type="primary"
                     rounded
-                    loading= {loading}
+                    loading={loading}
                     className="m-2"
                   />
                   <Button

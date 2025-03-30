@@ -23,6 +23,8 @@ const NavBar = ({ createPostIdeaRef }: NavBarProps) => {
   const handleClick = () => {
     if (createPostIdeaRef?.current) {
       createPostIdeaRef.current.openModal();
+    } else {
+      console.error("createPostIdeaRef is not defined or null");
     }
   };
 
