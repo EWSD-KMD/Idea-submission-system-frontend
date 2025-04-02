@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Col, Grid, Row } from "antd";
 import DepartmentCard from "@/components/organisms/DepartmentCard";
 import CreatePostIdea, {
@@ -19,6 +19,22 @@ const HomeLayout = () => {
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
 
+  const [selectedFilters, setSelectedFilters] = useState({
+    department: "allDept",
+    category: "allCtg",
+  });
+
+  const handleSelectionChange = (selected: {
+    // sorting: string;
+    department: string;
+    category: string;
+  }) => {
+    setSelectedFilters({
+      department: selected.department,
+      category: selected.category,
+    });
+  };
+
   return (
     <div>
       <NavBarWrapper />
@@ -29,7 +45,7 @@ const HomeLayout = () => {
             {(screens.md || screens.lg || screens.xl) && (
               <Col xs={0} sm={0} md={6} lg={4}>
                 <div className="sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto hide-scrollbar">
-                  <SortingMenu />
+                  <SortingMenu onSelectionChange={handleSelectionChange} />
                 </div>
               </Col>
             )}
@@ -42,7 +58,18 @@ const HomeLayout = () => {
                     <CreatePostIdea ref={createPostIdeaRef} />
                   </div>
                 )}
-                <PostCardIdeaList />
+                <PostCardIdeaList
+                  departmentId={
+                    selectedFilters.department === "allDept"
+                      ? undefined
+                      : selectedFilters.department
+                  }
+                  categoryId={
+                    selectedFilters.category === "allCtg"
+                      ? undefined
+                      : selectedFilters.category
+                  }
+                />
               </div>
             </Col>
 

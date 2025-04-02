@@ -1,18 +1,45 @@
 import { get, post } from "@/config/api/httpRequest/httpMethod";
 import {
   CreateIdeaRequest,
+  GetAllIdeasParams,
   IdeaDetailResponse,
   IdeasResponse,
   LikeIdeaResponse,
 } from "@/constant/type";
 import { isErrorWithMessage } from "@/utils/errorWithMessage";
 
-export async function getAllIdeas(
-  page: number = 1,
-  limit: number = 5 
-): Promise<IdeasResponse> {
+export async function getAllIdeas({
+  page = 1,
+  limit = 5,
+  departmentId,
+  categoryId,
+  status = "SHOW",
+  userId,
+}: GetAllIdeasParams = {}): Promise<IdeasResponse> {
+  // Create base params object
+  const baseParams: Record<string, string> = {
+    page: page.toString(),
+    limit: limit.toString(),
+  };
+
+  if (userId) {
+    baseParams.userId = userId.toString();
+  }
+
+  if (departmentId && departmentId !== "allDept") {
+    baseParams.departmentId = departmentId;
+  }
+  if (categoryId && categoryId !== "allCtg") {
+    baseParams.categoryId = categoryId;
+  }
+  if (status) {
+    baseParams.status = status;
+  }
+
+  const queryParams = new URLSearchParams(baseParams);
+
   try {
-    const url = `/ideas?page=${page}&limit=${limit}`;
+    const url = `/ideas?${queryParams.toString()}`;
     const response = await get<IdeasResponse>(url);
     return response;
   } catch (error: unknown) {
@@ -63,5 +90,18 @@ export async function LikeIdea(ideaId: number): Promise<LikeIdeaResponse> {
       throw new Error(error.message);
     }
     throw new Error("Failed to like idea");
+  }
+}
+
+export async function DislikeIdea(ideaId: number): Promise<LikeIdeaResponse> {
+  const url = `/ideas/${ideaId}/dislike`;
+  try {
+    const response = await post<null, LikeIdeaResponse>(url, null);
+    return response;
+  } catch (error: unknown) {
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
+    }
+    throw new Error("Failed to dislike idea");
   }
 }

@@ -29,8 +29,6 @@ export interface PostCardProps
   userName: string;
   departmentName: string;
   commentsCount: number;
-  onLikeUpdate?: (id: number, newLikeCount: number) => void;
-  onDislikeUpdate?: (id: number, newLikeCount: number) => void;
 }
 
 const PostCard = ({
@@ -52,7 +50,6 @@ const PostCard = ({
   const { isMobile, isTablet } = useResponsive();
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Prevent navigation if clicking on interaction buttons
     if (
       e.target instanceof Element &&
       (e.target.closest(".interaction-buttons") || e.target.closest(".ant-btn"))
@@ -60,7 +57,6 @@ const PostCard = ({
       e.stopPropagation();
       return;
     }
-
     router.push(`/idea/${id}`);
   };
 
@@ -94,16 +90,10 @@ const PostCard = ({
         >
           {title}
         </h2>
-
-        {/* Description Section */}
-        <p
-          onClick={handleCardClick}
-          className={`cursor-pointer ${isMobile ? "text-sm" : "text-base"}`}
-        >
+        <p className={`cursor-pointer ${isMobile ? "text-sm" : "text-base"}`}>
           {truncatedDescription}
         </p>
 
-        {/* Image Section */}
         {imageSrc && (
           <div className="mb-4 w-full">
             <Image

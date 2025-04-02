@@ -2,71 +2,81 @@
 import { formatCount } from "@/utils/formatCount";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
-import { useState } from "react";
-import { LikeIdea } from "@/lib/idea";
+import { useState, useEffect } from "react";
+import { DislikeIdea, LikeIdea } from "@/lib/idea";
 import { message } from "antd";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface LikeAndDislikeButtonProps {
   ideaId: number;
   likeCount: number;
   dislikeCount: number;
-  onLike?: (newLikeCount: number) => void; // Callback to update parent state
-  onDislike?: (newDislikeCount: number) => void; // Callback to update parent state
 }
 
 const LikeAndDislikeButton = ({
   ideaId,
   likeCount: initialLikeCount,
   dislikeCount: initialDislikeCount,
-  onLike,
-  onDislike,
 }: LikeAndDislikeButtonProps) => {
+  const { userId } = useAuth();
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [dislikeCount, setDislikeCount] = useState(initialDislikeCount);
-  const [error, setError] = useState<string | null>(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
+
+  useEffect(() => {
+    const checkReactionState = async () => {
+      try {
+        // const hasLiked = await checkIfLike(ideaId, userId);
+        // const hasDisliked = await checkIfUnlike(ideaId, userId);
+        // setIsLiked(hasLiked);
+        // setIsDisliked(hasDisliked);
+      } catch (error) {
+        console.error("Error checking reaction state:", error);
+      }
+    };
+    checkReactionState();
+  }, [ideaId, userId]);
 
   const handleLike = async () => {
-    const previousCount = likeCount;
-    setLikeCount((prev) => prev + 1);
-    onLike?.(likeCount + 1);
+    // Optimistic update
+    const newLikeCount = isLiked ? likeCount - 1 : likeCount + 1;
+    const newDislikeCount = isDisliked ? dislikeCount - 1 : dislikeCount;
+
+    setLikeCount(newLikeCount);
+    setDislikeCount(newDislikeCount);
+    setIsLiked(!isLiked);
+    setIsDisliked(false);
 
     try {
       await LikeIdea(ideaId);
-      // const serverLikeCount = response.data.idea.likes;
-      // setLikeCount(serverLikeCount);
     } catch (error) {
-      setLikeCount(previousCount);
-      onLike?.(previousCount);
-      setError("Failed to like idea");
-      message.error("Fail to like idea:");
+      message.error("Failed to like idea");
     }
   };
 
-  // const handleDislike = async () => {
-  //   if (loading) return;
-  //   setLoading(true);
-  //   try {
-  //     const response = await fetch(`/api/ideas/${ideaId}/dislike`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //     });
-  //     if (!response.ok) throw new Error("Failed to dislike idea");
-  //     const data = await response.json(); // Assuming backend returns updated counts
-  //     const newDislikeCount = data.data?.dislikes || dislikeCount + 1; // Adjust based on backend response
-  //     setDislikeCount(newDislikeCount);
-  //     if (onDislike) onDislike(newDislikeCount); // Notify parent
-  //   } catch (error) {
-  //     console.error("Error disliking idea:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const handleDislike = async () => {
+    // Optimistic update
+    const newDislikeCount = isDisliked ? dislikeCount - 1 : dislikeCount + 1;
+    const newLikeCount = isLiked ? likeCount - 1 : likeCount;
+
+    setLikeCount(newLikeCount);
+    setDislikeCount(newDislikeCount);
+    setIsDisliked(!isDisliked);
+    setIsLiked(false);
+
+    try {
+      await DislikeIdea(ideaId);
+    } catch (error) {
+      message.error("Failed to dislike idea");
+    }
+  };
 
   return (
     <div className="inline-flex items-center bg-[#E6EFFD] rounded-full">
       <Button
         label={formatCount(likeCount)}
-        icon={getIcon("thumbsUp")}
+        icon={isLiked ? getIcon("thumbsUpFill") : getIcon("thumbsUp")}
         type="text"
         className="text-primary font-bold"
         onClick={handleLike}
@@ -74,10 +84,10 @@ const LikeAndDislikeButton = ({
       <span className="opacity-30">|</span>
       <Button
         label={formatCount(dislikeCount)}
-        icon={getIcon("thumbsDown")}
+        icon={isDisliked ? getIcon("thumbsDownFill") : getIcon("thumbsDown")}
         type="text"
         className="text-primary font-bold"
-        onClick={() => {}}
+        onClick={handleDislike}
       />
     </div>
   );

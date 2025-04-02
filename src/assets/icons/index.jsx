@@ -25,6 +25,8 @@ import alertIcon from "./general/circle-alert.svg";
 import fileTextIcon from "./general/file-text.svg";
 import trashWhiteIcon from "./general/trash-white.svg";
 import fileTextBlueIcon from "./general/file-text-blue.svg";
+import thumbsUpFillIcon from "./general/thumbs-up-fill.svg";
+import thumbsDownFillIcon from "./general/thumbs-down-fill.svg";
 
 export {
   plusIcon,
@@ -53,5 +55,7 @@ export {
   alertIcon,
   fileTextIcon,
   trashWhiteIcon,
-  fileTextBlueIcon
+  fileTextBlueIcon,
+  thumbsUpFillIcon,
+  thumbsDownFillIcon,
 };

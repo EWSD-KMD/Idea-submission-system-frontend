@@ -5,14 +5,27 @@ import { useEffect, useState } from "react";
 import { Category, Department } from "@/constant/type";
 import { getDepartments } from "@/lib/department";
 
-const SortingMenu = () => {
+interface SelectedState {
+  department: string;
+  category: string;
+}
+
+interface SortingMenuProps {
+  onSelectionChange: (selected: SelectedState) => void;
+}
+
+const SortingMenu = ({ onSelectionChange }: SortingMenuProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [selected, setSelected] = useState<SelectedState>({
+    department: "allDept",
+    category: "allCtg",
+  });
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getCategories();
-        console.log("categories", response);
         setCategories(response.data.categories);
       } catch (error: any) {
         console.error("Error fetching categories:", error);
@@ -21,7 +34,6 @@ const SortingMenu = () => {
     const fetchDepartments = async () => {
       try {
         const response = await getDepartments();
-        console.log("departments", response);
         setDepartments(response.data.departments);
       } catch (error: any) {
         console.error("Error fetching departments:", error);
@@ -30,6 +42,28 @@ const SortingMenu = () => {
     fetchCategories();
     fetchDepartments();
   }, []);
+
+  const handleSelectionChange = (key: string) => {
+    let newSelected = { ...selected };
+
+    if (key.startsWith("department-")) {
+      const deptId = key.replace("department-", "");
+      newSelected = { ...newSelected, department: deptId };
+    } else if (key.startsWith("category-")) {
+      const catId = key.replace("category-", "");
+      newSelected = { ...newSelected, category: catId };
+    }
+
+    setSelected(newSelected);
+    onSelectionChange(newSelected);
+  };
+
+  const currentlySelectedKeys = [
+    `department-${selected.department}`,
+    `category-${selected.category}`,
+  ];
+
+  console.log("currentSelectedKeys", currentlySelectedKeys);
 
   const menuItems = [
     {
@@ -46,7 +80,7 @@ const SortingMenu = () => {
       label: "Department",
       children: [
         {
-          key: "allDept",
+          key: "department-allDept",
           label: "All Departments",
         },
         ...departments.map((department) => ({
@@ -59,7 +93,7 @@ const SortingMenu = () => {
       key: "categories",
       label: "Category",
       children: [
-        { key: "allCtg", label: "All Categories" },
+        { key: "category-allCtg", label: "All Categories" },
         ...categories.map((category) => ({
           key: `category-${category.id}`,
           label: category.name,
@@ -71,9 +105,10 @@ const SortingMenu = () => {
   return (
     <SortingMenuTab
       items={menuItems}
-      defaultSelected={["latest"]}
-      defaultOpen={["sort"]}
-      onChange={(key) => console.log(`Selected: ${key}`)}
+      // defaultSelected={["department-allDept"]}
+      // defaultOpen={["departments"]}
+      onChange={handleSelectionChange}
+      selected={currentlySelectedKeys}
     />
   );
 };

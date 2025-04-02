@@ -169,6 +169,16 @@ export interface LikeIdeaResponse {
     idea: Idea;
   };
 }
+
+export interface GetAllIdeasParams {
+  page?: number;
+  limit?: number;
+  departmentId?: string;
+  categoryId?: string;
+  // sortBy?: "latest" | "popular" | "viewed";
+  status?: string;
+  userId?: number;
+}
 // #endregion
 
 // #region Comments\

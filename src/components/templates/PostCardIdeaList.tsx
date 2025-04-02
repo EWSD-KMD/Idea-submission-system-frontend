@@ -7,9 +7,21 @@ import Loading from "@/app/loading";
 import { Pagination } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Idea } from "@/constant/type";
+import { useAuth } from "@/contexts/AuthContext";
 
-const PostCardIdeaList = () => {
+interface PostCardIdeaListProps {
+  departmentId?: string;
+  categoryId?: string;
+  sortBy?: string;
+}
+
+const PostCardIdeaList = ({
+  departmentId,
+  categoryId,
+  sortBy = "latest",
+}: PostCardIdeaListProps) => {
   const router = useRouter();
+  const { userId } = useAuth();
   const searchParams = useSearchParams();
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(false);
@@ -21,43 +33,70 @@ const PostCardIdeaList = () => {
 
   const fetchIdeas = async (page: number) => {
     setLoading(true);
-    try {
-      const response = await getAllIdeas(page, pageSize);
-      setIdeas(response.data.ideas);
-      setTotalIdeas(response.data.total);
-    } catch (err: any) {
-      setError(err.message || "Failed to load ideas");
-    } finally {
-      setLoading(false);
+    if (userId) {
+      try {
+        const params = {
+          page,
+          limit: pageSize,
+          userId,
+          sortBy,
+          ...(departmentId && departmentId !== "allDept" && { departmentId }),
+          ...(categoryId && categoryId !== "allCtg" && { categoryId }),
+          status: "SHOW",
+        };
+
+        const response = await getAllIdeas(params);
+        console.log("response", response);
+
+        if (response.err === 0) {
+          setIdeas(response.data.ideas);
+          setTotalIdeas(response.data.total);
+        } else {
+          throw new Error(response.message);
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to load ideas");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
     fetchIdeas(currentPage);
-  }, [currentPage]);
-
-  const handleLikeUpdate = (id: number, newLikeCount: number) => {
-    // setIdeas((prevIdeas) =>
-    //   prevIdeas.map((idea) =>
-    //     idea.id === id ? { ...idea, likes: newLikeCount } : idea
-    //   )
-    // );
-  };
-
-  const handleDislikeUpdate = (id: number, newDislikeCount: number) => {
-    // setIdeas((prevIdeas) =>
-    //   prevIdeas.map((idea) =>
-    //     idea.id === id ? { ...idea, dislikes: newDislikeCount } : idea
-    //   )
-    // );
-  };
+  }, [currentPage, departmentId, categoryId, sortBy, userId]);
 
   const handlePageChange = (page: number) => {
-    router.push(`/?page=${page}`);
+    const params = new URLSearchParams(searchParams);
+
+    // Update page number
+    params.set("page", page.toString());
+
+    // Update filters only if they're not default values
+    if (departmentId && departmentId !== "allDept") {
+      params.set("departmentId", departmentId);
+    } else {
+      params.delete("departmentId");
+    }
+
+    if (categoryId && categoryId !== "allCtg") {
+      params.set("categoryId", categoryId);
+    } else {
+      params.delete("categoryId");
+    }
+
+    if (sortBy && sortBy !== "latest") {
+      params.set("sortBy", sortBy);
+    } else {
+      params.delete("sortBy");
+    }
+
+    router.push(`/?${params.toString()}`);
   };
 
   if (loading) return <Loading />;
-  if (error) return <div>Errors: {error}</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!ideas.length) return <div>No ideas found</div>;
 
   return (
     <div className="space-y-3">
@@ -75,25 +114,20 @@ const PostCardIdeaList = () => {
           views={idea.views}
           imageSrc={idea.imageSrc || undefined}
           commentsCount={idea.comments.length}
-          onLikeUpdate={handleLikeUpdate}
-          onDislikeUpdate={handleDislikeUpdate}
         />
       ))}
 
-      {/* Pagination */}
-      {ideas.length > 0 && (
-        <div className="py-4 sm:py-10  flex justify-center">
-          <Pagination
-            current={currentPage}
-            total={totalIdeas}
-            pageSize={pageSize}
-            onChange={handlePageChange}
-            showSizeChanger={false}
-            showQuickJumper={false}
-            className="ant-pagination-custom"
-          />
-        </div>
-      )}
+      <div className="py-4 sm:py-10 flex justify-center">
+        <Pagination
+          current={currentPage}
+          total={totalIdeas}
+          pageSize={pageSize}
+          onChange={handlePageChange}
+          showSizeChanger={false}
+          showQuickJumper={false}
+          className="ant-pagination-custom"
+        />
+      </div>
     </div>
   );
 };

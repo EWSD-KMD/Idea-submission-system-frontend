@@ -27,6 +27,8 @@ import {
   fileTextIcon,
   trashWhiteIcon,
   fileTextBlueIcon,
+  thumbsUpFillIcon,
+  thumbsDownFillIcon,
 } from "../../assets/icons";
 import { ReactNode } from "react";
 import Image from "next/image";
@@ -58,7 +60,9 @@ export type IconName =
   | "alert"
   | "fileText"
   | "trashWhite"
-  | "fileTextBlue";
+  | "fileTextBlue"
+  | "thumbsUpFill"
+  | "thumbsDownFill";
 
 interface IconConfig {
   src: string;
@@ -90,14 +94,20 @@ const iconConfig: Record<IconName, IconConfig> = {
   userRound: { src: userRoundIcon, alt: "user round icon", size: 18 },
   lockKeyHole: { src: lockKeyHoleIcon, alt: "lock key hole icon", size: 18 },
   mail: { src: mailIcon, alt: "mail icon", size: 18 },
-  pencil: { src: pencilIcon, alt: "pencil icon", size: 20},
-  trash: {src: trashIcon, alt: "trash icon", size: 20},
-  refresh: {src: refreshIcon, alt: "refresh icon", size: 20},
-  ellipsis: {src: ellipsisIcon, alt: "ellipsis icon", size: 20},
-  alert: {src: alertIcon, alt: "alert icon", size: 20},
-  fileText: {src: fileTextIcon, alt: "fileText icon", size: 20},
-  trashWhite: {src: trashWhiteIcon, alt: "trash icon", size: 20},
-  fileTextBlue: {src: fileTextBlueIcon, alt: "fileText icon", size: 20}
+  pencil: { src: pencilIcon, alt: "pencil icon", size: 20 },
+  trash: { src: trashIcon, alt: "trash icon", size: 20 },
+  refresh: { src: refreshIcon, alt: "refresh icon", size: 20 },
+  ellipsis: { src: ellipsisIcon, alt: "ellipsis icon", size: 20 },
+  alert: { src: alertIcon, alt: "alert icon", size: 20 },
+  fileText: { src: fileTextIcon, alt: "fileText icon", size: 20 },
+  trashWhite: { src: trashWhiteIcon, alt: "trash icon", size: 20 },
+  fileTextBlue: { src: fileTextBlueIcon, alt: "fileText icon", size: 20 },
+  thumbsUpFill: { src: thumbsUpFillIcon, alt: "thumbs up icon", size: 20 },
+  thumbsDownFill: {
+    src: thumbsDownFillIcon,
+    alt: "thumbs down icon",
+    size: 20,
+  },
 };
 
 const IconComponent = ({
