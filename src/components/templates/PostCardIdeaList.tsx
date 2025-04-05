@@ -39,7 +39,6 @@ const PostCardIdeaList = ({
         const params = {
           page,
           limit: pageSize,
-          userId,
           sortBy,
           ...(departmentId && departmentId !== "allDept" && { departmentId }),
           ...(categoryId && categoryId !== "allCtg" && { categoryId }),
@@ -122,6 +121,7 @@ const PostCardIdeaList = ({
           description={idea.description}
           userName={idea.user.name}
           departmentName={idea.department.name}
+          category={idea.category.name}
           createdAt={idea.createdAt}
           likes={idea.likes}
           dislikes={idea.dislikes}

@@ -19,18 +19,32 @@ const UserIdeaList: React.FC = () => {
   const { userId } = useAuth(); // This hook should return the logged in user's info
 
   // Fetch ideas from the API
+
   const fetchIdeas = async (page: number) => {
     setLoading(true);
-    setError(null);
-    try {
-      const response = await getAllIdeas({ page, limit: pageSize });
-      setIdeas(response.data.ideas);
-      setTotalIdeas(response.data.total);
-    } catch (error: any) {
-      setError(error.message || "Failed to load ideas");
-      message.error(error.message || "Failed to load ideas");
-    } finally {
-      setLoading(false);
+    if (userId) {
+      try {
+        const params = {
+          page,
+          limit: pageSize,
+          userId,
+          status: "SHOW",
+        };
+
+        const response = await getAllIdeas(params);
+        console.log("response", response);
+
+        if (response.err === 0) {
+          setIdeas(response.data.ideas);
+          setTotalIdeas(response.data.total);
+        } else {
+          throw new Error(response.message);
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to load ideas");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -59,12 +73,9 @@ const UserIdeaList: React.FC = () => {
       </div>
     );
 
-  // Filter ideas to show only those posted by the logged in user
-  const userIdeas = ideas.filter((idea) => idea.user.id === userId);
-
   return (
     <div className="space-y-3">
-      {userIdeas.map((idea) => (
+      {ideas.map((idea) => (
         <PostCard
           key={idea.id}
           id={idea.id}
@@ -72,6 +83,7 @@ const UserIdeaList: React.FC = () => {
           description={idea.description}
           userName={idea.user.name}
           departmentName={idea.department.name}
+          category={idea.category.name}
           createdAt={idea.createdAt}
           likes={idea.likes}
           dislikes={idea.dislikes}

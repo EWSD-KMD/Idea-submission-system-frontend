@@ -28,6 +28,7 @@ export interface PostCardProps
   > {
   userName: string;
   departmentName: string;
+  category: string;
   commentsCount: number;
 }
 
@@ -37,6 +38,7 @@ const PostCard = ({
   description,
   userName,
   departmentName,
+  category,
   createdAt,
   likes,
   dislikes,
@@ -81,7 +83,7 @@ const PostCard = ({
         <AvatarWithNameAndDept
           name={userName}
           department={departmentName}
-          category="Classroom"
+          category={category}
           time={timeAgo(createdAt)}
           avatarSrc=""
         />
