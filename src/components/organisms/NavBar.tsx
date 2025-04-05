@@ -56,19 +56,30 @@ const NavBar = ({ createPostIdeaRef }: NavBarProps) => {
       <div className="flex gap-3 items-center">
         {/* Mobile version - icon only */}
         <div className="flex gap-3 items-center">
-          <Tooltip title="Idea submission is closed" color="red">
-            <span>
-              <Button
-                icon={`${isSubmissionClose ? "plusDisabled" : "plus"}`}
-                label={"Post Idea"}
-                rounded
-                responsive
-                className="text-primary disabled:bg-white"
-                onClick={handleClick}
-                disabled={isSubmissionClose}
-              />
-            </span>
-          </Tooltip>
+          {isSubmissionClose ? (
+            <Tooltip title="Idea submission is closed" color="red">
+              <span>
+                <Button
+                  icon="plusDisabled"
+                  label="Post Idea"
+                  rounded
+                  responsive
+                  className="text-primary disabled:bg-white"
+                  onClick={handleClick}
+                  disabled
+                />
+              </span>
+            </Tooltip>
+          ) : (
+            <Button
+              icon="plus"
+              label="Post Idea"
+              rounded
+              responsive
+              className="text-primary"
+              onClick={handleClick}
+            />
+          )}
           <Notification />
           <AvatarDropdown />
         </div>
