@@ -11,6 +11,7 @@ import PostCardIdeaList from "@/components/templates/PostCardIdeaList";
 import { useSearchParams } from "next/navigation";
 import NavBarWrapper from "./NavBarWrapper";
 import SortingDropdown from "../molecules/SortingDropdown";
+import { useUser } from "@/contexts/UserContext";
 
 const { useBreakpoint } = Grid;
 
@@ -19,6 +20,14 @@ const HomeLayout = () => {
   const screens = useBreakpoint();
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
+
+  const {
+    academicYear,
+    submissionDate,
+    finalClosureDate,
+    isSubmissionClose,
+    isFinalClosure,
+  } = useUser();
 
   const [selectedFilters, setSelectedFilters] = useState({
     department: "allDept",
@@ -54,7 +63,7 @@ const HomeLayout = () => {
             {/* Main Content - Scrollable */}
             <Col xs={24} sm={24} md={18} lg={16}>
               <div className="max-h-[calc(100vh-6rem)] overflow-y-auto hide-scrollbar">
-                {currentPage === 1 && (
+                {currentPage === 1 && !isSubmissionClose && (
                   <div className="pb-3">
                     <CreatePostIdea ref={createPostIdeaRef} />
                   </div>
@@ -83,7 +92,13 @@ const HomeLayout = () => {
             {screens.lg && (
               <Col xs={0} sm={0} md={0} lg={4}>
                 <div className="sticky top-24">
-                  <DepartmentCard />
+                  <DepartmentCard
+                    academicYear={academicYear}
+                    submissionDate={submissionDate}
+                    finalClosureDate={finalClosureDate}
+                    isSubmissionClose={isSubmissionClose}
+                    isFinalClosure={isFinalClosure}
+                  />
                 </div>
               </Col>
             )}

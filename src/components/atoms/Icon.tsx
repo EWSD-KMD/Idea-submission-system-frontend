@@ -29,6 +29,7 @@ import {
   fileTextBlueIcon,
   thumbsUpFillIcon,
   thumbsDownFillIcon,
+  plusDisabledIcon,
 } from "../../assets/icons";
 import { ReactNode } from "react";
 import Image from "next/image";
@@ -62,7 +63,8 @@ export type IconName =
   | "trashWhite"
   | "fileTextBlue"
   | "thumbsUpFill"
-  | "thumbsDownFill";
+  | "thumbsDownFill"
+  | "plusDisabled";
 
 interface IconConfig {
   src: string;
@@ -108,6 +110,7 @@ const iconConfig: Record<IconName, IconConfig> = {
     alt: "thumbs down icon",
     size: 20,
   },
+  plusDisabled: { src: plusDisabledIcon, alt: "plus disabled", size: 24 },
 };
 
 const IconComponent = ({

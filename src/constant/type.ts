@@ -263,6 +263,21 @@ export interface MarkAsReadResponse {
 }
 // #endregion
 
+//region AcademicYears Type
+export interface AcademicYear {
+  id: number;
+  year: number;
+  closureDate: string;
+  finalClosureDate: string;
+}
+
+export interface AcademicYearsResponse {
+  err: number;
+  message: string;
+  data: AcademicYear;
+}
+//end region
+
 export interface ErrorResponse {
   err: number;
   message: string;

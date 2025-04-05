@@ -27,6 +27,7 @@ import trashWhiteIcon from "./general/trash-white.svg";
 import fileTextBlueIcon from "./general/file-text-blue.svg";
 import thumbsUpFillIcon from "./general/thumbs-up-fill.svg";
 import thumbsDownFillIcon from "./general/thumbs-down-fill.svg";
+import plusDisabledIcon from "./general/plus_disabled.svg";
 
 export {
   plusIcon,
@@ -58,4 +59,5 @@ export {
   fileTextBlueIcon,
   thumbsUpFillIcon,
   thumbsDownFillIcon,
+  plusDisabledIcon,
 };

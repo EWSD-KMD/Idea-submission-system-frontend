@@ -8,6 +8,8 @@ import Notification from "../molecules/Notification";
 import { useRouter } from "next/navigation";
 import { RefObject } from "react";
 import { CreatePostIdeaRef } from "../templates/CreatePostIdea";
+import { useUser } from "@/contexts/UserContext";
+import { Tooltip } from "antd";
 
 interface NavBarProps {
   createPostIdeaRef?: RefObject<CreatePostIdeaRef>;
@@ -15,6 +17,7 @@ interface NavBarProps {
 
 const NavBar = ({ createPostIdeaRef }: NavBarProps) => {
   const router = useRouter();
+  const { isSubmissionClose } = useUser();
 
   const handleHomeClick = () => {
     router.push("/");
@@ -53,14 +56,19 @@ const NavBar = ({ createPostIdeaRef }: NavBarProps) => {
       <div className="flex gap-3 items-center">
         {/* Mobile version - icon only */}
         <div className="flex gap-3 items-center">
-          <Button
-            icon="plus"
-            label={"Post Idea"}
-            rounded
-            responsive
-            className="text-primary"
-            onClick={handleClick}
-          />
+          <Tooltip title="Idea submission is closed" color="red">
+            <span>
+              <Button
+                icon={`${isSubmissionClose ? "plusDisabled" : "plus"}`}
+                label={"Post Idea"}
+                rounded
+                responsive
+                className="text-primary disabled:bg-white"
+                onClick={handleClick}
+                disabled={isSubmissionClose}
+              />
+            </span>
+          </Tooltip>
           <Notification />
           <AvatarDropdown />
         </div>
