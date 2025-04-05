@@ -50,16 +50,12 @@ const Notification = () => {
       setLoading(true);
     }
     try {
-      const res: NotificationsResponseData = await getNotifications(
-        page,
-        limit
-      );
-      // Map the API response to the shape used in UI:
+      const res: NotificationsResponseData = await getNotifications(page, limit);
       const mappedNotifications: NotificationItem[] = res.notifications.map(
         (notif: any) => ({
           id: notif.id,
           userName: notif.fromUser?.name || "Unknown",
-          userAvatar: "", // Update if your API returns an avatar URL
+          userAvatar: "", // Adjust if API returns an avatar URL
           message: notif.message,
           time: new Date(notif.createdAt).toLocaleTimeString(),
           read: notif.isRead,
@@ -83,14 +79,13 @@ const Notification = () => {
   };
 
   useEffect(() => {
-    // Fetch notifications on mount
     fetchNotifications();
   }, []);
 
   // Count unread notifications
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // Mark all notifications as read and update state without re-fetching
+  // Mark all notifications as read
   const handleMarkAllRead = async () => {
     try {
       await markAllNotificationsAsRead();
@@ -103,13 +98,11 @@ const Notification = () => {
     }
   };
 
-  // Handle clicking on a notification: mark it as read and route to the idea
+  // Handle notification click: mark as read and route to idea detail if available.
   const handleNotificationClick = async (notif: NotificationItem) => {
     if (!notif.read) {
       try {
-        console.log(notif.id);
         await markNotificationAsRead(notif.id);
-
         setNotifications((prev) =>
           prev.map((n) => (n.id === notif.id ? { ...n, read: true } : n))
         );
@@ -124,6 +117,7 @@ const Notification = () => {
     }
   };
 
+  // Load more notifications when scrolled to bottom
   const handleLoadMore = async () => {
     if (pagination && pagination.page < pagination.totalPages) {
       await fetchNotifications(pagination.page + 1, pagination.limit);
@@ -131,26 +125,25 @@ const Notification = () => {
   };
 
   const notificationContent = (
-    <div className="lg:w-80 sm:w-60">
-      <div className="flex justify-between items-center lg:px-3  md:px-3  sm:px-3">
-        <h3 className="lg:text-lg sm:text-sm font-semibold text-gray-900">Notifications</h3>
+    <div className="w-60 sm:w-80">
+      <div className="flex justify-between items-center px-2 sm:px-3 py-2 border-b border-gray-200">
+        <h3 className="text-md sm:text-lg font-semibold text-gray-900">Notifications</h3>
         <button
           onClick={handleMarkAllRead}
           className={
             unreadCount === 0
-              ? "text-gray-300 text-xs lg:text-sm font-medium"
-              : "text-xs lg:text-sm font-medium hover:underline"
+              ? "text-gray-300 text-[10px] sm:text-sm font-medium"
+              : "text-[10px] sm:text-sm font-medium hover:underline"
           }
           disabled={unreadCount === 0}
         >
           Mark all read
         </button>
       </div>
-      <Divider className="m-3"/>
-      <div id="scrollableDiv" className="min-h-80 max-h-80 overflow-y-auto">
+      <div id="scrollableDiv" className="min-h-40 max-h-80 overflow-y-auto">
         {loading ? (
-          <div className="flex justify-center p-3 mt-20">
-            <div className="w-40 h-20">
+          <div className="flex justify-center p-3 mt-10">
+            <div className="w-32 h-16">
               <DotLottieReact
                 src="https://lottie.host/fce7f0b5-ed51-4cf5-b87c-c54e181f2423/Q5CUbjHeB0.lottie"
                 loop
@@ -167,12 +160,10 @@ const Notification = () => {
           <InfiniteScroll
             dataLength={notifications.length}
             next={handleLoadMore}
-            hasMore={
-              pagination ? notifications.length < pagination.total : false
-            }
+            hasMore={pagination ? notifications.length < pagination.total : false}
             loader={
               <div className="flex justify-center p-3">
-                <div className="w-40 h-20">
+                <div className="w-32 h-16">
                   <DotLottieReact
                     src="https://lottie.host/fce7f0b5-ed51-4cf5-b87c-c54e181f2423/Q5CUbjHeB0.lottie"
                     loop
@@ -199,16 +190,16 @@ const Notification = () => {
                   } rounded-md`}
                 >
                   <div
-                    className="flex items-center gap-3 p-3 cursor-pointer w-full min-h-20"
+                    className="flex items-center gap-3 p-2 sm:p-3 cursor-pointer w-full min-h-[3rem]"
                     onClick={() => handleNotificationClick(notif)}
                   >
                     <Avatar src={notif.userAvatar} size={40} />
                     <div className="flex-1">
-                      <p className="text-sm text-gray-900">
+                      <p className="text-[12px] sm:text-sm text-gray-900">
                         <span className="font-semibold">{notif.userName}</span>{" "}
                         {notif.message}
                       </p>
-                      <p className="text-xs text-gray-500">{notif.time}</p>
+                      <p className="text-[10px] sm:text-xs text-gray-500">{notif.time}</p>
                     </div>
                   </div>
                 </List.Item>
@@ -216,14 +207,14 @@ const Notification = () => {
             />
           </InfiniteScroll>
         ) : (
-          <div className="flex flex-col items-center justify-center p-4 mt-20">
+          <div className="flex flex-col items-center justify-center p-4 mt-10">
             <Image
               src="/no_bell_alarm.svg"
               alt="No Notifications yet"
               className="max-w-md w-full h-auto"
               preview={false}
             />
-            <div className="p-4 text-gray-500 text-sm text-center">
+            <div className="p-2 text-gray-500 text-xs sm:text-sm text-center">
               No notifications yet.
             </div>
           </div>
@@ -239,6 +230,7 @@ const Notification = () => {
         arrow
         placement="bottomLeft"
         trigger="click"
+        autoAdjustOverflow
       >
         <button className="bg-opacity-30 bg-gray-600 text-white rounded-full p-2">
           {getIcon("bell")}

@@ -70,7 +70,7 @@ const HomeLayout = () => {
                 )}
                 {!screens.md && (
                   <div className="flex justify-start py-1">
-                    <SortingDropdown />
+                    <SortingDropdown onFiltersChange={handleSelectionChange}/>
                   </div>
                 )}
                 <PostCardIdeaList
