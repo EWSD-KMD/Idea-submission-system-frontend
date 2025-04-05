@@ -33,7 +33,7 @@ interface NotificationItem {
   ideaId: number | null;
 }
 
-const NotificationComponent = () => {
+const Notification = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [pagination, setPagination] = useState<{
@@ -131,21 +131,22 @@ const NotificationComponent = () => {
   };
 
   const notificationContent = (
-    <div className="w-80">
-      <div className="flex justify-between items-center p-3 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+    <div className="lg:w-80 sm:w-60">
+      <div className="flex justify-between items-center lg:px-3  md:px-3  sm:px-3">
+        <h3 className="lg:text-lg sm:text-sm font-semibold text-gray-900">Notifications</h3>
         <button
           onClick={handleMarkAllRead}
           className={
             unreadCount === 0
-              ? "text-gray-300 text-sm font-medium"
-              : "text-sm font-medium hover:underline"
+              ? "text-gray-300 text-xs lg:text-sm font-medium"
+              : "text-xs lg:text-sm font-medium hover:underline"
           }
           disabled={unreadCount === 0}
         >
           Mark all read
         </button>
       </div>
+      <Divider className="m-3"/>
       <div id="scrollableDiv" className="min-h-80 max-h-80 overflow-y-auto">
         {loading ? (
           <div className="flex justify-center p-3 mt-20">
@@ -236,7 +237,7 @@ const NotificationComponent = () => {
       <AntPopover
         content={notificationContent}
         arrow
-        placement="bottomRight"
+        placement="bottomLeft"
         trigger="click"
       >
         <button className="bg-opacity-30 bg-gray-600 text-white rounded-full p-2">
@@ -247,4 +248,4 @@ const NotificationComponent = () => {
   );
 };
 
-export default NotificationComponent;
+export default Notification;

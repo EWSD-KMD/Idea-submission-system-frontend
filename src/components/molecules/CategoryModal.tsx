@@ -6,6 +6,7 @@ import { getIcon } from "../atoms/Icon";
 import { getCategories } from "@/lib/category";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { Category, CategoriesResponse } from "@/constant/type";
+import { Skeleton } from "antd";
 
 interface CategoryModalProps {
   open: boolean;
@@ -61,19 +62,17 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
       </div>
       <Divider className="w-full m-0" />
       {loading ? (
-        <div className="flex items-center justify-center">
-          <div className="w-20 h-20">
-            <DotLottieReact
-              src="https://lottie.host/fce7f0b5-ed51-4cf5-b87c-c54e181f2423/Q5CUbjHeB0.lottie"
-              loop
-              autoplay
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-              }}
-            />
-          </div>
+        <div className="w-full flex-col p-2">
+        <Skeleton.Input active block/>
+        <Divider className="m-2"/>
+        <Skeleton.Input active block/>
+        <Divider className="m-2"/>
+        <Skeleton.Input active block/>
+        <Divider className="m-2"/>
+        <Skeleton.Input active block/>
+        <Divider className="m-2"/>
+        <Skeleton.Input active block/>
+        <Divider className="m-2"/>
         </div>
       ) : (
         <div className="flex flex-col">

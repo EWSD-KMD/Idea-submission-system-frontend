@@ -10,6 +10,7 @@ import SortingMenu from "@/components/templates/SortingMenu";
 import PostCardIdeaList from "@/components/templates/PostCardIdeaList";
 import { useSearchParams } from "next/navigation";
 import NavBarWrapper from "./NavBarWrapper";
+import SortingDropdown from "../molecules/SortingDropdown";
 
 const { useBreakpoint } = Grid;
 
@@ -56,6 +57,11 @@ const HomeLayout = () => {
                 {currentPage === 1 && (
                   <div className="pb-3">
                     <CreatePostIdea ref={createPostIdeaRef} />
+                  </div>
+                )}
+                {!screens.md && (
+                  <div className="flex justify-start py-1">
+                    <SortingDropdown />
                   </div>
                 )}
                 <PostCardIdeaList

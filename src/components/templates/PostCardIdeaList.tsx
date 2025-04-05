@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { getAllIdeas } from "@/lib/idea";
 import PostCard from "../organisms/PostCard";
-import Loading from "@/app/loading";
 import { Pagination } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Idea } from "@/constant/type";
 import { useAuth } from "@/contexts/AuthContext";
+import Image from "../atoms/Image";
+import PostLoading from "../molecules/PostLoading";
 
 interface PostCardIdeaListProps {
   departmentId?: string;
@@ -94,9 +95,22 @@ const PostCardIdeaList = ({
     router.push(`/?${params.toString()}`);
   };
 
-  if (loading) return <Loading />;
+  if (loading) return <PostLoading/>;
   if (error) return <div>Error: {error}</div>;
-  if (!ideas.length) return <div>No ideas found</div>;
+  if (!ideas.length)
+    return (
+      <div className="flex flex-col items-center justify-center p-4 mt-40">
+        <Image
+          src="/noIdea.svg"
+          alt="No ideas here yet."
+          className="max-w-md w-full h-auto"
+          preview={false}
+        />
+        <div className="p-4 text-gray-500 text-sm text-center">
+          No ideas here yet.
+        </div>
+      </div>
+    );
 
   return (
     <div className="space-y-3">
