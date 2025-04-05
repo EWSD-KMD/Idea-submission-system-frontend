@@ -41,7 +41,7 @@ const DepartmentCard = ({
             className="text-body-sm mb-1 rounded-lg border-none inline-block w-fit"
           />
           <span className="font-semibold text-primary text-body-xl">
-            {academicYear}
+            {academicYear && `${academicYear}/${academicYear + 1}`}
           </span>
         </div>
 
