@@ -10,12 +10,14 @@ import { CommentData } from "@/constant/type"; // Import CommentData type
 interface CommentSectionProps {
   ideaId: number;
   isOpen: boolean;
+  reloadKey?: number;
   onCommentsChange?: (newCount: number) => void;
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({
   ideaId,
   isOpen,
+  reloadKey,
   onCommentsChange,
 }) => {
   const [comments, setComments] = useState<CommentData[]>([]);
@@ -68,7 +70,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     if (isOpen) {
       loadComments(1, 3); // Load the first 3 comments when opened
     }
-  }, [isOpen, ideaId]);
+  }, [isOpen, ideaId, reloadKey]);
 
   const handleLoadMore = async () => {
     if (pagination && pagination.page < pagination.totalPages) {
@@ -87,8 +89,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({
           <List
             dataSource={comments}
             renderItem={(comment: CommentData) => (
-              <List.Item key={comment.id} style={{ border: "none" }}>
-                <Comments comments={[comment]} reloadComments={loadComments} />
+              <List.Item key={comment.id} style={{ margin: 0, padding: 0, border: "none" }}>
+                <Comments comments={[comment]}/>
               </List.Item>
             )}
           />

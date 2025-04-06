@@ -23,6 +23,14 @@ const DetailPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isCommentsOpen, setIsCommentsOpen] = useState(true);
 
+  // State used to trigger a reload of comments.
+  const [commentReloadKey, setCommentReloadKey] = useState(0);
+
+  // This function is passed to CommentUpload and Comments.
+  const handleCommentsReload = () => {
+    setCommentReloadKey((prev) => prev + 1);
+  };
+
   useEffect(() => {
     const fetchIdea = async () => {
       try {
@@ -106,8 +114,18 @@ const DetailPage = () => {
           {/* Comments Section */}
           <Divider />
           <div className="flex flex-col gap-3 px-2 sm:px-4">
-            <CommentUpload ideaId={idea.id} isOpen={true} />
-            <CommentSection ideaId={idea.id} isOpen={true} />
+            {/* Pass the callback to CommentUpload */}
+            <CommentUpload
+              ideaId={idea.id}
+              isOpen={true}
+              onCommentAdded={handleCommentsReload}
+            />
+            {/* Pass the reload key to CommentSection */}
+            <CommentSection
+              ideaId={idea.id}
+              isOpen={true}
+              reloadKey={commentReloadKey}
+            />
           </div>
         </div>
       </Card>

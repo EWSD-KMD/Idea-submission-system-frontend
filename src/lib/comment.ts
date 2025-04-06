@@ -1,7 +1,12 @@
 import { get, post, put, remove } from "@/config/api/httpRequest/httpMethod";
 import { isErrorWithMessage } from "@/utils/errorWithMessage";
 
-import { CommentUpdateResponse, CommentResponse, Idea } from "@/constant/type";
+import {
+  CommentUpdateResponse,
+  CommentResponse,
+  Idea,
+  DeleteCommentResponse,
+} from "@/constant/type";
 
 export async function createComment(
   ideaId: number,
@@ -57,10 +62,13 @@ export async function updateComment(
   }
 }
 
-export async function deleteComment(commentId: number): Promise<void> {
+export async function deleteComment(
+  commentId: number
+): Promise<DeleteCommentResponse> {
   try {
     const url = `/comments/comments/${commentId}`;
-    remove<void>(url);
+    const response = await remove<DeleteCommentResponse>(url);
+    return response;
   } catch (error: unknown) {
     if (isErrorWithMessage(error)) {
       throw new Error(error.message);

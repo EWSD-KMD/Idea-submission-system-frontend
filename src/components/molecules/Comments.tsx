@@ -4,23 +4,21 @@ import React, { useState } from "react";
 import { Input, message } from "antd";
 import Button from "../atoms/Button";
 import AvatarWithNameAndDept from "./AvatarWithNameAndDept";
-import EllipsisDropDown from "./EllipsisDropDown";
 import { updateComment, deleteComment } from "@/lib/comment";
-import { CommentData, CommentResponse, CommentUpdateResponse, User } from "@/constant/type";
+import { CommentData, CommentUpdateResponse } from "@/constant/type";
+import { useAuth } from "@/contexts/AuthContext";
+import EllipsisDropDownCmt from "./EllipsisDropDownCmt";
 
 interface CommentsProps {
   comments: CommentData[];
-  reloadComments: (page: number, limit: number) => void;
 }
 
-const Comments: React.FC<CommentsProps> = ({
-  comments: initialComments,
-  reloadComments: reloadComments,
-}) => {
+const Comments: React.FC<CommentsProps> = ({ comments: initialComments }) => {
   const [comments, setComments] = useState<CommentData[]>(initialComments);
   const [editCommentId, setEditCommentId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [editedText, setEditedText] = useState<string>("");
+  const { userId } = useAuth();
 
   // Handle comment edit
   const handleEdit = (commentId: number, initialText: string) => {
@@ -34,20 +32,22 @@ const Comments: React.FC<CommentsProps> = ({
     try {
       const updatedComment: CommentUpdateResponse = await updateComment(
         commentId,
-        editedText,
+        editedText
       );
       message.success("Comment updated successfully");
-      console.log(updatedComment)
+      console.log(updatedComment);
       setComments((prevComments: CommentData[]) =>
         prevComments.map((comment: CommentData) =>
-          comment.id === commentId ? comment = { 
-            id: comment.id ,
-            content: updatedComment.data.content,
-            ideaId: comment.ideaId,
-            userId: comment.userId,
-            createdAt: comment.createdAt,
-            updatedAt: comment.updatedAt,
-            user: comment.user,} : comment
+          comment.id === commentId
+            ? (comment = {
+                id: comment.id,
+                content: updatedComment.data.content,
+                createdAt: comment.createdAt,
+                updatedAt: comment.updatedAt,
+                user: comment.user,
+                idea: comment.idea,
+              })
+            : comment
         )
       );
       setEditCommentId(null);
@@ -67,40 +67,60 @@ const Comments: React.FC<CommentsProps> = ({
   // Handle deleting a comment
   const handleDelete = async (commentId: number) => {
     try {
-      await deleteComment(commentId);
-      message.success("Comment deleted successfully");
-      // Remove the deleted comment from state
-      reloadComments(1, 2);
-    } catch (error: any) {
-      message.error(error.message || "Failed to delete comment");
+      const response = await deleteComment(commentId);
+      if (response.err === 0) {
+        message.success(response.data.message);
+        setComments((prev) =>
+          prev.map((comment) =>
+            comment.id === commentId
+              ? { ...comment, isDeleting: true }
+              : comment
+          )
+        );
+        setTimeout(() => {
+          setComments((prev) =>
+            prev.filter((comment) => comment.id !== commentId)
+          );
+        }, 200);
+      } else {
+        message.error(response.message);
+      }
+    } catch (error) {
+      message.error("Failed to delete idea");
     }
   };
 
   return (
-    <div className="flex flex-col -mb-5 w-full">
+    <div className="flex flex-col w-full">
       {comments.map((comment: CommentData) => (
         <div
           key={comment.id}
-          className="flex flex-col gap-2 mb-5"
+          className={`flex flex-col gap-2 transition-all duration-200 ease-in-out ${
+            comment.isDeleting
+              ? "opacity-0 translate-y-[-10px]"
+              : "opacity-100 translate-y-0 mb-4"
+          }`}
           aria-label={`Comment by ${comment.user.name}`}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <AvatarWithNameAndDept
                 name={comment.user.name}
-                department="test"
-                category="test"
+                department={comment.idea.department.name}
+                category={comment.idea.category.name}
                 time={new Date(comment.createdAt).toLocaleTimeString()}
                 avatarSrc={""}
                 size={40}
               />
             </div>
-            <EllipsisDropDown
-              commentId={comment.id}
-              onEdit={(id, text) => handleEdit(id, text)}
-              onDelete={(id) => handleDelete(id)}
-              initialText={comment.content}
-            />
+            {userId === comment.user.id && (
+              <EllipsisDropDownCmt
+                commentId={comment.id}
+                onEdit={(id, text) => handleEdit(id, text)}
+                onDelete={(id) => handleDelete(id)}
+                initialText={comment.content}
+              />
+            )}
           </div>
           {editCommentId === comment.id ? (
             <div className="flex flex-col rounded-lg border border-gray-300 ml-13">

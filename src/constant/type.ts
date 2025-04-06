@@ -222,6 +222,7 @@ export interface CommentData {
   updatedAt: string;
   user: User;
   idea: Idea;
+  isDeleting?: boolean;
 }
 export interface CommentRequest {
   content: string;
