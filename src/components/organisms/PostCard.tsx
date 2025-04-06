@@ -13,6 +13,7 @@ import { useResponsive } from "@/utils/responsive";
 import { getTruncatedText } from "@/utils/getTruncatedText";
 import { Idea } from "@/constant/type";
 import { useRouter } from "next/navigation";
+import EllipsisDropDownPost from "../molecules/EllipsisDropDownPost";
 
 export interface PostCardProps
   extends Pick<
@@ -27,9 +28,12 @@ export interface PostCardProps
     | "imageSrc"
   > {
   userName: string;
+  ideaUserId: number;
   departmentName: string;
   category: string;
   commentsCount: number;
+  // Optional callback to remove the post from the UI after deletion
+  onDelete?: (id: number) => void;
 }
 
 const PostCard = ({
@@ -37,6 +41,7 @@ const PostCard = ({
   title,
   description,
   userName,
+  ideaUserId,
   departmentName,
   category,
   createdAt,
@@ -45,6 +50,7 @@ const PostCard = ({
   views,
   imageSrc,
   commentsCount: initialCommentsCount,
+  onDelete,
 }: PostCardProps) => {
   const router = useRouter();
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
@@ -80,13 +86,25 @@ const PostCard = ({
   return (
     <Card className="w-full cursor-pointer" onClick={handleCardClick}>
       <div className="space-y-3 sm:space-y-4">
-        <AvatarWithNameAndDept
-          name={userName}
-          department={departmentName}
-          category={category}
-          time={timeAgo(createdAt)}
-          avatarSrc=""
-        />
+        <div className="flex justify-between interaction-buttons">
+          <AvatarWithNameAndDept
+            name={userName}
+            department={departmentName}
+            category={category}
+            time={timeAgo(createdAt)}
+            avatarSrc=""
+          />
+          <div>
+            <EllipsisDropDownPost
+              ideaId={id}
+              ideaUserId={ideaUserId}
+              initialTitle={title}
+              initialDescription={description}
+              // Pass the onDelete callback from parent if provided
+              onDelete={onDelete}
+            />
+          </div>
+        </div>
         <h2
           className={`font-semibold ${isMobile ? "text-sm" : "text-base"} my-2`}
         >
@@ -126,7 +144,7 @@ const PostCard = ({
           <div>
             <Divider />
             <div
-              className={` interaction-buttons ${isMobile ? "px-2" : "px-4"}`}
+              className={`interaction-buttons ${isMobile ? "px-2" : "px-4"}`}
             >
               <CommentSection ideaId={id} isOpen={isCommentsOpen} />
             </div>

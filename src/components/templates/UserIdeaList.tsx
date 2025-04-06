@@ -82,6 +82,7 @@ const UserIdeaList: React.FC = () => {
           title={idea.title}
           description={idea.description}
           userName={idea.user.name}
+          ideaUserId={idea.userId}
           departmentName={idea.department.name}
           category={idea.category.name}
           createdAt={idea.createdAt}

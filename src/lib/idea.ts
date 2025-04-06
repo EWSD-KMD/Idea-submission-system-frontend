@@ -1,10 +1,13 @@
-import { get, post } from "@/config/api/httpRequest/httpMethod";
+import { get, post, put, remove } from "@/config/api/httpRequest/httpMethod";
 import {
   CreateIdeaRequest,
+  DeleteIdeaResponse,
   GetAllIdeasParams,
   IdeaDetailResponse,
   IdeasResponse,
   LikeIdeaResponse,
+  ReportIdeaRequest,
+  ReportIdeaResponse,
 } from "@/constant/type";
 import { isErrorWithMessage } from "@/utils/errorWithMessage";
 
@@ -80,6 +83,20 @@ export async function createIdea(ideaData: CreateIdeaRequest) {
   }
 }
 
+export async function deleteIdea(ideaId: number): Promise<DeleteIdeaResponse> {
+  try {
+    const url = `/ideas/${ideaId}`;
+    const response = await remove<DeleteIdeaResponse>(url);
+    return response;
+  } catch (error: unknown) {
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
+    }
+    throw new Error("Failed to delete idea");
+  }
+}
+
+
 export async function LikeIdea(ideaId: number): Promise<LikeIdeaResponse> {
   const url = `/ideas/${ideaId}/like`;
   try {
@@ -103,5 +120,24 @@ export async function DislikeIdea(ideaId: number): Promise<LikeIdeaResponse> {
       throw new Error(error.message);
     }
     throw new Error("Failed to dislike idea");
+  }
+}
+
+export async function reportIdea(
+  ideaId: number,
+  reportData: ReportIdeaRequest
+): Promise<ReportIdeaResponse> {
+  try {
+    const url = `/ideas/${ideaId}/report`;
+    const response = await post<ReportIdeaRequest, ReportIdeaResponse>(
+      url,
+      reportData
+    );
+    return response;
+  } catch (error: unknown) {
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
+    }
+    throw new Error("Failed to report idea");
   }
 }

@@ -179,6 +179,15 @@ export interface GetAllIdeasParams {
   status?: string;
   userId?: number;
 }
+
+export interface DeleteIdeaResponse {
+  err: number;
+  message: string;
+  data: {
+    message: string;
+  };
+}
+
 // #endregion
 
 // #region Comments\
@@ -209,16 +218,23 @@ export interface CommentUpdateResponse {
 export interface CommentData {
   id: number;
   content: string;
-  ideaId: number;
-  userId: number;
   createdAt: string;
   updatedAt: string;
   user: User;
+  idea: Idea;
 }
 export interface CommentRequest {
   content: string;
   ideaId: number;
   userId: number;
+}
+
+export interface DeleteCommentResponse {
+  err: number;
+  message: string;
+  data: {
+    message: string;
+  };
 }
 // #endregion
 
@@ -277,6 +293,30 @@ export interface AcademicYearsResponse {
   data: AcademicYear;
 }
 //end region
+
+// #region Reports
+export interface ReportIdeaRequest {
+  type: string;
+  detail?: string;
+}
+
+export interface Report {
+  id: number;
+  userId: number;
+  ideaId: number;
+  type: string;
+  detail?: string;
+  status: "SHOW" | "HIDE" | "DELETED";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReportIdeaResponse {
+  err: number;
+  message: string;
+  data: Report;
+}
+// #endregion
 
 export interface ErrorResponse {
   err: number;

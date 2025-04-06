@@ -94,7 +94,14 @@ const PostCardIdeaList = ({
     router.push(`/?${params.toString()}`);
   };
 
-  if (loading) return <PostLoading/>;
+  // onDelete callback to remove a deleted post from the UI
+  const handleDeletePost = (deletedIdeaId: number) => {
+    setIdeas((prevIdeas) => prevIdeas.filter((idea) => idea.id !== deletedIdeaId));
+    // Optionally update total ideas if needed
+    setTotalIdeas((prevTotal) => prevTotal - 1);
+  };
+
+  if (loading) return <PostLoading />;
   if (error) return <div>Error: {error}</div>;
   if (!ideas.length)
     return (
@@ -120,6 +127,7 @@ const PostCardIdeaList = ({
           title={idea.title}
           description={idea.description}
           userName={idea.user.name}
+          ideaUserId={idea.userId}
           departmentName={idea.department.name}
           category={idea.category.name}
           createdAt={idea.createdAt}
@@ -128,6 +136,8 @@ const PostCardIdeaList = ({
           views={idea.views}
           imageSrc={idea.imageSrc || undefined}
           commentsCount={idea.comments.length}
+          // Pass the onDelete callback to PostCard so it can remove the idea after deletion
+          onDelete={handleDeletePost}
         />
       ))}
 

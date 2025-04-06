@@ -4,34 +4,46 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { getIcon } from "../atoms/Icon";
 import { MenuProps, Modal, message, Radio, Input, Divider } from "antd";
+import { deleteIdea, reportIdea as reportIdeaAPI } from "@/lib/idea"; // adjust the import path as needed
+import { useAuth } from "@/contexts/AuthContext";
 
 const AntDropdown = dynamic(() => import("antd").then((mod) => mod.Dropdown), {
   ssr: false,
 });
 
-const getDropdownItems = (ideaId: number): MenuProps["items"] => [
-  {
-    key: `report-${ideaId}`,
-    label: "Report",
-    icon: getIcon("alert"),
-  },
-  {
-    type: "divider",
-  },
-  {
-    key: `edit-${ideaId}`,
-    label: "Edit",
-    icon: getIcon("pencil"),
-  },
-  {
-    type: "divider",
-  },
-  {
-    key: `delete-${ideaId}`,
-    label: "Delete",
-    icon: getIcon("trash"),
-  },
-];
+const getDropdownItems = (
+  ideaId: number,
+  ideaUserId: number
+): MenuProps["items"] => {
+
+  const { userId } = useAuth();
+  const isOwner = userId === ideaUserId;
+
+  if (isOwner) {
+    return [
+      {
+        key: `edit-${ideaId}`,
+        label: "Edit",
+        icon: getIcon("pencil"),
+      },
+      {
+        type: "divider",
+      },
+      {
+        key: `delete-${ideaId}`,
+        label: "Delete",
+        icon: getIcon("trash"),
+      },
+    ];
+  }
+  return [
+    {
+      key: `report-${ideaId}`,
+      label: "Report",
+      icon: getIcon("alert"),
+    },
+  ];
+};
 
 const { confirm } = Modal;
 
@@ -43,6 +55,7 @@ interface EllipsisDropDownPostProps {
     currentDescription: string
   ) => void;
   onDelete?: (ideaId: number) => void;
+  ideaUserId: number;
   initialTitle: string;
   initialDescription: string;
 }
@@ -51,15 +64,18 @@ const EllipsisDropDownPost: React.FC<EllipsisDropDownPostProps> = ({
   ideaId,
   onEdit,
   onDelete,
+  ideaUserId,
   initialTitle,
   initialDescription,
 }) => {
   const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const [reportReason, setReportReason] = useState("offensive");
   const [additionalDetails, setAdditionalDetails] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // loading state
 
-  const handleMenuClick = ({ key }: { key: string }) => {
-    switch (key) {
+  const handleMenuClick: MenuProps["onClick"] = (info) => {
+    info.domEvent.stopPropagation();
+    switch (info.key) {
       case `report-${ideaId}`:
         showReportModal();
         break;
@@ -87,11 +103,19 @@ const EllipsisDropDownPost: React.FC<EllipsisDropDownPostProps> = ({
       okButtonProps: { className: "rounded-full" },
       cancelButtonProps: { className: "rounded-full" },
       centered: true,
-      onOk() {
-        if (onDelete) {
-          onDelete(ideaId);
-        } else {
-          message.success("Post deleted (dummy)");
+      async onOk() {
+        try {
+          const response = await deleteIdea(ideaId);
+          if (response.err === 0) {
+            message.success(response.data.message);
+            if (onDelete) {
+              onDelete(ideaId);
+            }
+          } else {
+            message.error(response.message);
+          }
+        } catch (error) {
+          message.error("Failed to delete idea");
         }
       },
       onCancel() {
@@ -104,16 +128,26 @@ const EllipsisDropDownPost: React.FC<EllipsisDropDownPostProps> = ({
     setIsReportModalVisible(true);
   };
 
-  const handleReportOk = () => {
-    console.log("Report submitted:", {
-      reason: reportReason,
-      details: additionalDetails,
-    });
-    message.success("Idea post Reported");
+  const handleReportOk = async () => {
+    setIsLoading(true);
+    try {
+      const reportData = {
+        type: reportReason,
+        detail: additionalDetails,
+      };
+      const response = await reportIdeaAPI(ideaId, reportData);
+      if (response.err === 0) {
+        message.success("Report Submitted");
+      } else {
+        message.error(response.message);
+      }
+    } catch (error) {
+      message.error("Failed to report idea");
+    }
+    setIsLoading(false);
     setReportReason("offensive");
     setAdditionalDetails("");
     setIsReportModalVisible(false);
-    // Add report submission logic here
   };
 
   const handleReportCancel = () => {
@@ -126,13 +160,13 @@ const EllipsisDropDownPost: React.FC<EllipsisDropDownPostProps> = ({
     <>
       <AntDropdown
         menu={{
-          items: getDropdownItems(ideaId),
+          items: getDropdownItems(ideaId, ideaUserId),
           onClick: handleMenuClick,
         }}
         placement="bottomRight"
         trigger={["click"]}
       >
-        <div>
+        <div onClick={(e) => e.stopPropagation()}>
           <span className="text-gray-500 cursor-pointer">
             {getIcon("ellipsis")}
           </span>
@@ -143,11 +177,12 @@ const EllipsisDropDownPost: React.FC<EllipsisDropDownPostProps> = ({
         open={isReportModalVisible}
         onOk={handleReportOk}
         onCancel={handleReportCancel}
+        confirmLoading={isLoading} // Loading state applied here
         okText="Report"
         cancelText="Cancel"
         okButtonProps={{ className: "rounded-full bg-blue-600 text-white" }}
         cancelButtonProps={{ className: "rounded-full" }}
-        className="rounded-lg"
+        className="rounded-lg interaction-buttons"
         width={400}
         closable={true}
       >
