@@ -62,7 +62,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     } catch (error: any) {
       message.error(error.message || "Failed to load comments");
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
   };
 

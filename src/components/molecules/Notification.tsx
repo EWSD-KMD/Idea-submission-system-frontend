@@ -45,7 +45,7 @@ const Notification = () => {
   const router = useRouter();
 
   // Fetch notifications from the API
-  const fetchNotifications = async (page: number = 1, limit: number = 10) => {
+  const fetchNotifications = async (page: number, limit: number) => {
     if (page === 1) {
       setLoading(true);
     }
@@ -79,7 +79,7 @@ const Notification = () => {
   };
 
   useEffect(() => {
-    fetchNotifications();
+    fetchNotifications(1, 10);
   }, []);
 
   // Count unread notifications
