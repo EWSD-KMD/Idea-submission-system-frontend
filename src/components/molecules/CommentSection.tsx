@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { List, Button, message } from "antd";
+import { List, Button, message, Skeleton } from "antd";
 import Comments from "../molecules/Comments";
 import Loading from "@/app/loading";
 import { getCommentsByIdea } from "@/lib/comment";
@@ -62,7 +62,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
     } catch (error: any) {
       message.error(error.message || "Failed to load comments");
     } finally {
-      setLoading(false);
+      setLoading(true);
     }
   };
 
@@ -82,15 +82,43 @@ const CommentSection: React.FC<CommentSectionProps> = ({
 
   return (
     <div className="space-y-4">
-      {loading && comments.length === 0 ? (
-        <Loading />
+      {loading && comments.length===0 ? (
+        <div className="flex flex-col w-full gap-4">
+          <div className="flex gap-2 items-center">
+            <Skeleton.Avatar size={40} active />
+              <Skeleton.Input active/>
+          </div>
+          <div className="flex flex-col gap-1 ml-12">
+            <Skeleton.Input block active/>
+            <Skeleton.Input block active/>
+          </div>
+          <div className="flex gap-2 items-center">
+            <Skeleton.Avatar size={40} active />
+              <Skeleton.Input active/>
+          </div>
+          <div className="flex flex-col gap-1 ml-12">
+            <Skeleton.Input block active/>
+            <Skeleton.Input block active/>
+          </div>
+          <div className="flex gap-2 items-center">
+            <Skeleton.Avatar size={40} active />
+              <Skeleton.Input active/>
+          </div>
+          <div className="flex flex-col gap-1 ml-12">
+            <Skeleton.Input block active/>
+            <Skeleton.Input block active/>
+          </div>
+        </div>
       ) : (
         <>
           <List
             dataSource={comments}
             renderItem={(comment: CommentData) => (
-              <List.Item key={comment.id} style={{ margin: 0, padding: 0, border: "none" }}>
-                <Comments comments={[comment]}/>
+              <List.Item
+                key={comment.id}
+                style={{ margin: 0, padding: 0, border: "none" }}
+              >
+                <Comments comments={[comment]} />
               </List.Item>
             )}
           />

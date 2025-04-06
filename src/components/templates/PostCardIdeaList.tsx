@@ -94,11 +94,25 @@ const PostCardIdeaList = ({
     router.push(`/?${params.toString()}`);
   };
 
-  // onDelete callback to remove a deleted post from the UI
+  // State to track IDs of posts being deleted.
+  const [deletingPosts, setDeletingPosts] = useState<Set<number>>(new Set());
+
+  // onDelete callback: mark the post as deleting, then remove it after a delay.
   const handleDeletePost = (deletedIdeaId: number) => {
-    setIdeas((prevIdeas) => prevIdeas.filter((idea) => idea.id !== deletedIdeaId));
-    // Optionally update total ideas if needed
-    setTotalIdeas((prevTotal) => prevTotal - 1);
+    // Mark the post as "deleting"
+    setDeletingPosts((prev) => new Set(prev).add(deletedIdeaId));
+    // After 300ms (duration of the transition), remove it from the ideas state.
+    setTimeout(() => {
+      setIdeas((prevIdeas) =>
+        prevIdeas.filter((idea) => idea.id !== deletedIdeaId)
+      );
+      setTotalIdeas((prevTotal) => prevTotal - 1);
+      setDeletingPosts((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(deletedIdeaId);
+        return newSet;
+      });
+    }, 300);
   };
 
   if (loading) return <PostLoading />;
@@ -121,24 +135,31 @@ const PostCardIdeaList = ({
   return (
     <div className="space-y-3">
       {ideas.map((idea) => (
-        <PostCard
+        <div
           key={idea.id}
-          id={idea.id}
-          title={idea.title}
-          description={idea.description}
-          userName={idea.user.name}
-          ideaUserId={idea.userId}
-          departmentName={idea.department.name}
-          category={idea.category.name}
-          createdAt={idea.createdAt}
-          likes={idea.likes}
-          dislikes={idea.dislikes}
-          views={idea.views}
-          imageSrc={idea.imageSrc || undefined}
-          commentsCount={idea.comments.length}
-          // Pass the onDelete callback to PostCard so it can remove the idea after deletion
-          onDelete={handleDeletePost}
-        />
+          className={`transform transition-all duration-300 ease-in-out ${
+            deletingPosts.has(idea.id)
+              ? "opacity-0 translate-y-[-10px]"
+              : "opacity-100 translate-y-0"
+          }`}
+        >
+          <PostCard
+            id={idea.id}
+            title={idea.title}
+            description={idea.description}
+            userName={idea.user.name}
+            ideaUserId={idea.userId}
+            departmentName={idea.department.name}
+            category={idea.category.name}
+            createdAt={idea.createdAt}
+            likes={idea.likes}
+            dislikes={idea.dislikes}
+            views={idea.views}
+            imageSrc={idea.imageSrc || undefined}
+            commentsCount={idea.comments.length}
+            onDelete={handleDeletePost}
+          />
+        </div>
       ))}
 
       <div className="py-4 sm:py-10 flex justify-center">

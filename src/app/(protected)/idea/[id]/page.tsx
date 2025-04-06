@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Idea } from "@/constant/type";
-import { Card, Divider } from "antd";
+import { Card, Divider, Skeleton } from "antd";
 import Loading from "@/app/loading";
 import AvatarWithNameAndDept from "@/components/molecules/AvatarWithNameAndDept";
 import LikeAndDislikeButton from "@/components/molecules/LikeAndDislikeButton";
@@ -14,6 +14,7 @@ import CommentSection from "@/components/molecules/CommentSection";
 import CommentUpload from "@/components/organisms/CommentUpload";
 import { getIdeaById } from "@/lib/idea";
 import EllipsisDropDownPost from "@/components/molecules/EllipsisDropDownPost";
+import NotFound from "@/app/not-found";
 
 const DetailPage = () => {
   const params = useParams();
@@ -54,9 +55,32 @@ const DetailPage = () => {
     router.push("/");
   };
 
-  if (loading) return <Loading />;
-  if (error) return <div className="text-red-500">{error}</div>;
-  if (!idea) return <div>Idea not found</div>;
+  if (loading)
+    return (
+      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 hide-scrollbar">
+        <Card className="w-full cursor-pointer">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex gap-2 items-center">
+              <Skeleton.Avatar size="large" active />
+              <Skeleton.Input active />
+            </div>
+            <Skeleton active />
+            <div className="mb-4 w-full">
+              <Skeleton.Node active />
+            </div>
+            <div className="flex justify-between items-center">
+              <div className="flex gap-2">
+                <Skeleton.Button shape="round" active />
+                <Skeleton.Button shape="round" active />
+                <Skeleton.Button shape="round" active />
+              </div>
+              <Skeleton.Button shape="round" active />
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  if (!idea) return <NotFound />;
 
   return (
     <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 hide-scrollbar">
