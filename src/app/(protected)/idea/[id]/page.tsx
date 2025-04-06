@@ -15,6 +15,7 @@ import CommentUpload from "@/components/organisms/CommentUpload";
 import { getIdeaById } from "@/lib/idea";
 import EllipsisDropDownPost from "@/components/molecules/EllipsisDropDownPost";
 import NotFound from "@/app/not-found";
+import { useUser } from "@/contexts/UserContext";
 
 const DetailPage = () => {
   const params = useParams();
@@ -23,6 +24,7 @@ const DetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCommentsOpen, setIsCommentsOpen] = useState(true);
+  const { isFinalClosure } = useUser();
 
   // State used to trigger a reload of comments.
   const [commentReloadKey, setCommentReloadKey] = useState(0);
@@ -139,11 +141,13 @@ const DetailPage = () => {
           <Divider />
           <div className="flex flex-col gap-3 px-2 sm:px-4">
             {/* Pass the callback to CommentUpload */}
-            <CommentUpload
-              ideaId={idea.id}
-              isOpen={true}
-              onCommentAdded={handleCommentsReload}
-            />
+            <div className={`${isFinalClosure && "hidden"}`}>
+              <CommentUpload
+                ideaId={idea.id}
+                isOpen={true}
+                onCommentAdded={handleCommentsReload}
+              />
+            </div>
             {/* Pass the reload key to CommentSection */}
             <CommentSection
               ideaId={idea.id}

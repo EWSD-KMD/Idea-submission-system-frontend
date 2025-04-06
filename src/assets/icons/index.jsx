@@ -28,6 +28,7 @@ import fileTextBlueIcon from "./general/file-text-blue.svg";
 import thumbsUpFillIcon from "./general/thumbs-up-fill.svg";
 import thumbsDownFillIcon from "./general/thumbs-down-fill.svg";
 import plusDisabledIcon from "./general/plus_disabled.svg";
+import messageCircleMoreDisabledIcon from "./general/messageCircleMoreDisabled.svg"
 
 export {
   plusIcon,
@@ -60,4 +61,6 @@ export {
   thumbsUpFillIcon,
   thumbsDownFillIcon,
   plusDisabledIcon,
+  messageCircleMoreDisabledIcon,
+
 };
