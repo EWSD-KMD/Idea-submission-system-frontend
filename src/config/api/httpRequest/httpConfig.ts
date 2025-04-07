@@ -74,16 +74,8 @@ export const fetchRequest = async <TResponse, TRequest = unknown>(
           isRefreshing = false;
           console.log("newAccessToken", newAccessToken);
           console.log("newRefreshToken :>> ", newRefreshToken);
-          Cookies.set("accessToken", newAccessToken, {
-            secure: true,
-            sameSite: "strict",
-            expires: 1 / 24,
-          });
-          Cookies.set("refreshToken", newRefreshToken, {
-            secure: true,
-            sameSite: "strict",
-            expires: 7,
-          });
+          Cookies.set("accessToken", newAccessToken);
+          Cookies.set("refreshToken", newRefreshToken);
           return await executeRequest(newAccessToken);
         }
       } catch (refreshError) {

@@ -11,10 +11,15 @@ export async function login(
   email: string,
   password: string
 ): Promise<{ accessToken: string; refreshToken: string }> {
+  const data = {
+    email,
+    password,
+    source: "USER",
+  };
   const res = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify(data),
   });
 
   if (!res.ok) {

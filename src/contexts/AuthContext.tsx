@@ -52,16 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await login(email, password);
     setAccessToken(newAccessToken);
     setRefreshToken(newRefreshToken);
-    Cookies.set("accessToken", newAccessToken, {
-      secure: true,
-      sameSite: "strict",
-      expires: 1 / 24,
-    });
-    Cookies.set("refreshToken", newRefreshToken, {
-      secure: true,
-      sameSite: "strict",
-      expires: 7,
-    });
+    Cookies.set("accessToken", newAccessToken);
+    Cookies.set("refreshToken", newRefreshToken);
     try {
       const decoded: JwtPayload = jwtDecode(newAccessToken);
       setUserId(decoded.userId);
