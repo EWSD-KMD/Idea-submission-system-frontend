@@ -150,6 +150,7 @@ export interface CreateIdeaRequest {
   categoryId: number;
   departmentId: number;
   userId: number;
+  anonymous?: boolean;
 }
 
 export interface IdeasResponse {

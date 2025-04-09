@@ -16,7 +16,12 @@ const CommentBox: React.FC<CommentBoxProps> = ({ onCommentSubmit }) => {
   const [comment, setComment] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
   const { userName } = useUser();
+  
+  const handleAnonymousChange = (anonymous: boolean) => {
+    setIsAnonymous(anonymous);
+  };
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -36,7 +41,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ onCommentSubmit }) => {
 
   return (
     <div className="flex gap-3 w-full">
-      <AnonymousDropdown name={userName} />
+      <AnonymousDropdown onAnonymousChange={handleAnonymousChange} name={userName} />
       <div className="flex flex-col w-full rounded-lg border border-gray-300">
         <div className="flex flex-col w-full items-end">
           <TextArea

@@ -11,6 +11,7 @@ const AntBadge = dynamic(() => import("antd").then((mod) => mod.Badge), {
 });
 interface AnonymousDropdownProps {
   name: string | null;
+  onAnonymousChange: (isAnon: boolean) => void
   showName?: boolean;
   photo?: string;
   size?: number;
@@ -18,11 +19,12 @@ interface AnonymousDropdownProps {
 
 const AnonymousDropdown = ({
   name,
+  onAnonymousChange,
   showName = false,
   photo,
   size,
 }: AnonymousDropdownProps) => {
-  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
 
   const handleMenuClick = (key: string) => {
     switch (key) {
@@ -31,6 +33,7 @@ const AnonymousDropdown = ({
         break;
       case "anonymous":
         setIsAnonymous(true);
+        onAnonymousChange(true);
         break;
       default:
         break;

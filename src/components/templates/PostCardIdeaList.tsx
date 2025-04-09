@@ -44,7 +44,6 @@ const PostCardIdeaList = ({
           ...(categoryId && categoryId !== "allCtg" && { categoryId }),
           status: "SHOW",
         };
-
         const response = await getAllIdeas(params);
         console.log("response", response);
 
@@ -147,7 +146,7 @@ const PostCardIdeaList = ({
             id={idea.id}
             title={idea.title}
             description={idea.description}
-            userName={idea.user.name}
+            ideaUserName={idea.user.name}
             ideaUserId={idea.userId}
             departmentName={idea.department.name}
             category={idea.category.name}

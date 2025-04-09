@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getUserById } from "@/lib/user";
 import { createIdea } from "@/lib/idea";
 import { useRouter } from "next/navigation";
-import { Category } from "@/constant/type";
+import { Category, CreateIdeaRequest } from "@/constant/type";
 
 interface TwoStepModalProps {
   visible: boolean;
@@ -31,6 +31,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
   const [fileList, setFileList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState<string>("");
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
 
   const nextStep = () => setCurrentStep(currentStep + 1);
   const prevStep = () => setCurrentStep(currentStep - 1);
@@ -52,6 +53,10 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
     };
     fetchUsername();
   }, [userId]);
+
+  const handleAnonymousChange = (anonymous: boolean) => {
+    setIsAnonymous(anonymous);
+  };
 
   const handleUpload = ({ file, onSuccess }: any) => {
     if (fileList.length > 0 && fileList[0].url) {
@@ -85,12 +90,13 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
       }
       setLoading(true);
       try {
-        const data = {
+        const data : CreateIdeaRequest = {
           title,
           description: body,
           categoryId: selectedCategory.id,
           departmentId: 1,
           userId: userId,
+          anonymous: isAnonymous,
         };
 
         await createIdea(data);
@@ -153,7 +159,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
       >
         {currentStep === 0 ? (
           <div className="flex flex-col">
-            <AnonymousDropdown name={username} showName />
+            <AnonymousDropdown name={username} onAnonymousChange={handleAnonymousChange} showName />
             <Divider className="w-full my-3" />
             <span className="text-body-xl font-bold mb-4">
               What do you want to share?
