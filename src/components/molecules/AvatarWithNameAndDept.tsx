@@ -2,7 +2,7 @@ import Avatar from "../atoms/Avatar";
 import { useResponsive } from "@/utils/responsive";
 
 interface AvatarWithNameAndDeptProps {
-  name: string;
+  name: string | null;
   department: string;
   category: string;
   time: string;

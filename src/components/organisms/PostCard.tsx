@@ -14,6 +14,9 @@ import { getTruncatedText } from "@/utils/getTruncatedText";
 import { Idea } from "@/constant/type";
 import { useRouter } from "next/navigation";
 import EllipsisDropDownPost from "../molecules/EllipsisDropDownPost";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUser } from "@/contexts/UserContext";
+import Tag from "../atoms/Tag";
 
 export interface PostCardProps
   extends Pick<
@@ -27,7 +30,7 @@ export interface PostCardProps
     | "createdAt"
     | "imageSrc"
   > {
-  userName: string;
+  ideaUserName: string;
   ideaUserId: number;
   departmentName: string;
   category: string;
@@ -40,7 +43,7 @@ const PostCard = ({
   id,
   title,
   description,
-  userName,
+  ideaUserName,
   ideaUserId,
   departmentName,
   category,
@@ -56,6 +59,8 @@ const PostCard = ({
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [commentsCount, setCommentsCount] = useState(initialCommentsCount);
   const { isMobile, isTablet } = useResponsive();
+  const { userId } = useAuth();
+  const { userName } = useUser();
 
   const handleCardClick = (e: React.MouseEvent) => {
     if (
@@ -88,12 +93,25 @@ const PostCard = ({
       <div className="space-y-3 sm:space-y-4">
         <div className="flex justify-between interaction-buttons">
           <AvatarWithNameAndDept
-            name={userName}
+            name={userId === ideaUserId ? userName : ideaUserName}
             department={departmentName}
             category={category}
             time={timeAgo(createdAt)}
-            avatarSrc=""
+            avatarSrc={
+              (userId !== ideaUserId && ideaUserName === "Anonymous")
+                ? "/anonymous.svg"
+                : ""
+            }
           />
+          {userId === ideaUserId && ideaUserName === "Anonymous" && (
+            <div>
+              <Tag
+                label="Posted as Anonymous"
+                color="blue"
+                className="text-body-sm mb-1 rounded-lg border-none inline-block w-fit"
+              />
+            </div>
+          )}
           <div>
             <EllipsisDropDownPost
               ideaId={id}

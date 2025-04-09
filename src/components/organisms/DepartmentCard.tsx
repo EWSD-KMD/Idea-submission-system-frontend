@@ -46,7 +46,11 @@ const DepartmentCard = ({
         </div>
 
         <div className="flex flex-col gap-1">
-          <span className="text-gray-500 text-body-xs">
+          <span
+            className={`${
+              isSubmissionClose ? "text-red-500" : "text-gray-500"
+            } text-body-xs`}
+          >
             Final Idea Submission Date
           </span>
           <span
@@ -60,8 +64,12 @@ const DepartmentCard = ({
         </div>
 
         <div className="flex flex-col gap-1">
-          <span className="text-gray-500 text-body-xs">
-            Final Idea Submission Date
+          <span
+            className={`${
+              isFinalClosure ? "text-red-500" : "text-gray-500"
+            } text-body-xs`}
+          >
+            Final Closure Date
           </span>
           <span
             className={`${
