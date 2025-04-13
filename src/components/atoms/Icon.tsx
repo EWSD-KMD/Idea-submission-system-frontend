@@ -31,6 +31,7 @@ import {
   thumbsDownFillIcon,
   plusDisabledIcon,
   messageCircleMoreDisabledIcon,
+  downloadIcon,
 } from "../../assets/icons";
 import { ReactNode } from "react";
 import Image from "next/image";
@@ -66,7 +67,8 @@ export type IconName =
   | "thumbsUpFill"
   | "thumbsDownFill"
   | "plusDisabled"
-  | "messageCircleMoreDisabled";
+  | "messageCircleMoreDisabled"
+  | "download";
 
 interface IconConfig {
   src: string;
@@ -118,6 +120,7 @@ const iconConfig: Record<IconName, IconConfig> = {
     alt: "message circle more icon disabled",
     size: 20,
   },
+  download: { src: downloadIcon, alt: "download icon", size: 20 },
 };
 
 const IconComponent = ({

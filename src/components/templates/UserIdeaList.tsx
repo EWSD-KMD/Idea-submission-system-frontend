@@ -89,7 +89,7 @@ const UserIdeaList: React.FC = () => {
           likes={idea.likes}
           dislikes={idea.dislikes}
           views={idea.views}
-          imageSrc={idea.imageSrc || undefined}
+          files={idea.files}
           commentsCount={idea.comments.length}
         />
       ))}

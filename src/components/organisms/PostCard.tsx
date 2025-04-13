@@ -1,22 +1,25 @@
 "use client";
-
-import { Card, Divider } from "antd";
-import Image from "../atoms/Image";
+import { Card, Divider, Input, message, Skeleton } from "antd";
 import AvatarWithNameAndDept from "../molecules/AvatarWithNameAndDept";
 import LikeAndDislikeButton from "../molecules/LikeAndDislikeButton";
 import CommentButton from "../molecules/CommentButton";
 import ViewCount from "../molecules/ViewCount";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import CommentSection from "./CommentUpload";
 import timeAgo from "@/utils/timeago";
 import { useResponsive } from "@/utils/responsive";
 import { getTruncatedText } from "@/utils/getTruncatedText";
-import { Idea } from "@/constant/type";
+import { Idea, IdeaFile, UpdateIdeaRequest } from "@/constant/type";
 import { useRouter } from "next/navigation";
 import EllipsisDropDownPost from "../molecules/EllipsisDropDownPost";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUser } from "@/contexts/UserContext";
 import Tag from "../atoms/Tag";
+import ImageGallery from "../molecules/ImageGallery";
+import DocumentGallery from "../molecules/DocumentGallery";
+import { getIdeaFile, updateIdea } from "@/lib/idea";
+import TextArea from "antd/es/input/TextArea";
+import Button from "../atoms/Button";
 
 export interface PostCardProps
   extends Pick<
@@ -28,39 +31,104 @@ export interface PostCardProps
     | "dislikes"
     | "views"
     | "createdAt"
-    | "imageSrc"
+    | "files"
   > {
   ideaUserName: string;
   ideaUserId: number;
+  departmentId: number;
   departmentName: string;
+  categoryId: number;
   category: string;
+  files?: IdeaFile[];
   commentsCount: number;
-  // Optional callback to remove the post from the UI after deletion
   onDelete?: (id: number) => void;
 }
 
-const PostCard = ({
+const PostCard: React.FC<PostCardProps> = ({
   id,
   title,
   description,
   ideaUserName,
   ideaUserId,
+  departmentId,
   departmentName,
+  categoryId,
   category,
   createdAt,
   likes,
   dislikes,
   views,
-  imageSrc,
+  files,
   commentsCount: initialCommentsCount,
   onDelete,
-}: PostCardProps) => {
+}) => {
   const router = useRouter();
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [commentsCount, setCommentsCount] = useState(initialCommentsCount);
   const { isMobile, isTablet } = useResponsive();
   const { userId } = useAuth();
   const { userName } = useUser();
+
+  // States for inline editing for both title and description
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(title);
+  const [editedDescription, setEditedDescription] = useState(description);
+
+  // Local state to store preview URLs for image files and a loading flag.
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [updateLoading, setUpdateLoading] = useState(false);
+
+  // Memoize the files prop for stability.
+  const memoizedFiles = useMemo(() => files, [JSON.stringify(files)]);
+
+  // Define common image extensions.
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+
+  // Filter files into image and document files based on fileName (case insensitive)
+  const imageFiles =
+    memoizedFiles?.filter((file) => {
+      const lowerName = file.fileName.toLowerCase();
+      return imageExtensions.some((ext) => lowerName.endsWith(ext));
+    }) || [];
+  const documentFiles =
+    memoizedFiles?.filter((file) => {
+      const lowerName = file.fileName.toLowerCase();
+      return !imageExtensions.some((ext) => lowerName.endsWith(ext));
+    }) || [];
+
+  // Fetch file blobs for image files and create preview URLs.
+  useEffect(() => {
+    let isSubscribed = true;
+    const loadImageFiles = async () => {
+      setImageLoading(true);
+      if (imageFiles.length > 0) {
+        try {
+          const urls = await Promise.all(
+            imageFiles.map(async (file) => {
+              const blob = await getIdeaFile(file.id);
+              return URL.createObjectURL(blob);
+            })
+          );
+          if (isSubscribed) {
+            setImageUrls(urls);
+          }
+        } catch (error) {
+          console.error("Error loading image files:", error);
+        }
+      } else {
+        setImageUrls([]);
+      }
+      if (isSubscribed) {
+        setImageLoading(false);
+      }
+    };
+    loadImageFiles();
+    return () => {
+      isSubscribed = false;
+      imageUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [JSON.stringify(imageFiles)]);
 
   const handleCardClick = (e: React.MouseEvent) => {
     if (
@@ -74,19 +142,97 @@ const PostCard = ({
   };
 
   const handleComment = () => {
-    setIsCommentsOpen(!isCommentsOpen);
+    setIsCommentsOpen((prev) => !prev);
   };
 
-  const truncatedDescription = getTruncatedText(
-    description,
-    isMobile,
-    isTablet,
-    {
-      mobileLength: 30,
-      tabletLength: 40,
-      desktopLength: 50,
+  const handleSaveEdit = async () => {
+    setUpdateLoading(true);
+    try {
+      const updatedData: UpdateIdeaRequest = {
+        title: editedTitle,
+        description: editedDescription,
+        // Pass additional fields if required, for example:
+        categoryId: categoryId, // replace with actual value
+        departmentId: departmentId, // replace with actual value
+        // Optionally, status if your UI allows status updates:
+        status: "SHOW", // replace with actual value or leave undefined
+      };
+      const response = await updateIdea(id, updatedData);
+      // Optionally, update local state with response.data
+      // Provide feedback to user:
+      message.success("Idea updated successfully!");
+    } catch (error: any) {
+      message.error(error.message || "Failed to update idea");
+    } finally {
+      setUpdateLoading(false);
+      setIsEditing(false);
     }
-  );
+  };
+
+  // When not editing, display truncated text; when editing, display an input.
+  const renderTitle = () => {
+    if (isEditing) {
+      return (
+        <Input
+          value={editedTitle}
+          onChange={(e) => setEditedTitle(e.target.value)}
+          className="w-full interaction-buttons"
+          size={isMobile ? "small" : "middle"}
+        />
+      );
+    }
+    return (
+      <h2
+        className={`font-semibold ${isMobile ? "text-sm" : "text-base"} my-2`}
+      >
+        {editedTitle}
+      </h2>
+    );
+  };
+
+  const renderDescription = () => {
+    if (isEditing) {
+      return (
+        <div className="flex flex-col gap-2">
+          <TextArea
+            value={editedDescription}
+            onChange={(e) => setEditedDescription(e.target.value)}
+            autoSize={{ minRows: 2 }}
+            className="w-full rounded border interaction-buttons"
+          />
+          <div className="flex gap-2 interaction-buttons">
+            <Button
+              label="Save"
+              onClick={() => {
+                handleSaveEdit();
+              }}
+              type="primary"
+              rounded
+              loading={updateLoading}
+            />
+            <Button
+              label="Cancel"
+              onClick={() => {
+                setEditedTitle(editedTitle);
+                setEditedDescription(editedDescription);
+                setIsEditing(false);
+              }}
+              rounded
+            />
+          </div>
+        </div>
+      );
+    }
+    return (
+      <p className={`cursor-pointer ${isMobile ? "text-sm" : "text-base"}`}>
+        {getTruncatedText(editedDescription, isMobile, isTablet, {
+          mobileLength: 30,
+          tabletLength: 40,
+          desktopLength: 50,
+        })}
+      </p>
+    );
+  };
 
   return (
     <Card className="w-full cursor-pointer" onClick={handleCardClick}>
@@ -98,7 +244,7 @@ const PostCard = ({
             category={category}
             time={timeAgo(createdAt)}
             avatarSrc={
-              (userId !== ideaUserId && ideaUserName === "Anonymous")
+              userId !== ideaUserId && ideaUserName === "Anonymous"
                 ? "/anonymous.svg"
                 : ""
             }
@@ -118,30 +264,38 @@ const PostCard = ({
               ideaUserId={ideaUserId}
               initialTitle={title}
               initialDescription={description}
-              // Pass the onDelete callback from parent if provided
               onDelete={onDelete}
+              // onEdit callback now provides both title and description.
+              onEdit={() => {
+                setIsEditing(true);
+                setEditedTitle(editedTitle);
+                setEditedDescription(editedDescription);
+              }}
             />
           </div>
         </div>
-        <h2
-          className={`font-semibold ${isMobile ? "text-sm" : "text-base"} my-2`}
-        >
-          {title}
-        </h2>
-        <p className={`cursor-pointer ${isMobile ? "text-sm" : "text-base"}`}>
-          {truncatedDescription}
-        </p>
 
-        {imageSrc && (
+        {/* Editable title */}
+        {renderTitle()}
+
+        {/* Editable description */}
+        {renderDescription()}
+
+        {/* Render document gallery for non-image files */}
+        {documentFiles.length > 0 && (
           <div className="mb-4 w-full">
-            <Image
-              src={imageSrc}
-              className={`rounded-lg ${
-                isMobile ? "h-48" : "h-64"
-              } w-full object-cover`}
-            />
+            <DocumentGallery files={documentFiles} />
           </div>
         )}
+
+        {/* Render image gallery for image files, with skeleton while loading */}
+        <div className="mb-4 w-full interaction-buttons">
+          {imageLoading ? (
+            <Skeleton.Image active className="w-full h-24 rounded-lg" />
+          ) : (
+            imageUrls.length > 0 && <ImageGallery images={imageUrls} />
+          )}
+        </div>
 
         <div className="flex justify-between items-center interaction-buttons">
           <div className="flex gap-2">

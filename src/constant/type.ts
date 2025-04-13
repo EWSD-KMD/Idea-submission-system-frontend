@@ -117,6 +117,11 @@ export interface DepartmentDetailResponse {
 // #endregion
 
 // #region Ideas
+export interface IdeaFile {
+  id: string;
+  fileName: string;
+}
+
 export interface Idea {
   id: number;
   title: string;
@@ -134,7 +139,7 @@ export interface Idea {
   department: Omit<Department, "_count">;
   user: User;
   comments: CommentData[];
-  imageSrc?: string;
+  files?: IdeaFile[];
 }
 
 export interface IdeasResponseData {
@@ -151,6 +156,16 @@ export interface CreateIdeaRequest {
   departmentId: number;
   userId: number;
   anonymous?: boolean;
+  files?: string[];
+}
+
+export interface UpdateIdeaRequest {
+  title: string | undefined;
+  description: string | undefined;
+  categoryId: number | undefined;
+  departmentId: number | undefined;
+  anonymous?: boolean;
+  status?: string;
 }
 
 export interface IdeasResponse {
@@ -187,6 +202,17 @@ export interface DeleteIdeaResponse {
   data: {
     message: string;
   };
+}
+
+export interface FileUploadData {
+  fileId?: string;
+  fileName?: string;
+}
+
+export interface FileUploadResponse {
+  err: number;
+  message: string;
+  data: FileUploadData[]; 
 }
 
 // #endregion
@@ -227,6 +253,7 @@ export interface CommentData {
 }
 export interface CommentRequest {
   content: string;
+  isAnonymous: boolean;
   ideaId: number;
   userId: number;
 }

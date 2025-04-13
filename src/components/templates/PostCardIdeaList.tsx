@@ -148,13 +148,15 @@ const PostCardIdeaList = ({
             description={idea.description}
             ideaUserName={idea.user.name}
             ideaUserId={idea.userId}
+            departmentId={idea.department.id}
             departmentName={idea.department.name}
+            categoryId={idea.category.id}
             category={idea.category.name}
             createdAt={idea.createdAt}
             likes={idea.likes}
             dislikes={idea.dislikes}
             views={idea.views}
-            imageSrc={idea.imageSrc || undefined}
+            files={idea.files || undefined}
             commentsCount={idea.comments.length}
             onDelete={handleDeletePost}
           />

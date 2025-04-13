@@ -10,11 +10,12 @@ import {
 
 export async function createComment(
   ideaId: number,
-  content: string
+  content: string,
+  anonymous: boolean,
 ): Promise<Idea> {
   try {
     const url = `/ideas/${ideaId}/comments`;
-    const response = await post<{ content: string }, Idea>(url, { content });
+    const response = await post<{ content: string, anonymous: boolean }, Idea>(url, { content, anonymous });
     return response;
   } catch (error: unknown) {
     if (isErrorWithMessage(error)) {
