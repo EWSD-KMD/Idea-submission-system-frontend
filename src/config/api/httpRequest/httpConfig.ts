@@ -29,16 +29,19 @@ export const fetchRequest = async <TResponse, TRequest = unknown>(
     throw new Error("Not authenticated");
   }
 
-  const createConfig = (token: string): RequestInit => ({
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...customConfig.headers,
-    },
-    body: body ? JSON.stringify(body) : undefined,
-    ...customConfig,
-  });
+  const createConfig = (token: string): RequestInit => {
+    const isFormData = body instanceof FormData;
+    return {
+      method,
+      headers: {
+        ...(!isFormData && { "Content-Type": "application/json" }),
+        Authorization: `Bearer ${token}`,
+        ...customConfig.headers,
+      },
+      body: isFormData ? body : body ? JSON.stringify(body) : undefined,
+      ...customConfig,
+    };
+  };
 
   const executeRequest = async (token: string): Promise<TResponse> => {
     const response = await fetch(`${API_URL}${url}`, createConfig(token));

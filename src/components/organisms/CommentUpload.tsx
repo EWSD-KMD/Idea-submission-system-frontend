@@ -1,5 +1,4 @@
 "use client";
-
 import { message } from "antd";
 import CommentBox from "../molecules/CommentBox";
 import { createComment } from "@/lib/comment";
@@ -20,16 +19,16 @@ const CommentUpload: React.FC<CommentUploadProps> = ({
   const router = useRouter();
   const { userId } = useAuth();
 
-  const handleCreateComment = async (content: string) => {
+  // Now handleCreateComment accepts isAnonymous as a second parameter.
+  const handleCreateComment = async (content: string, isAnonymous: boolean) => {
     if (!userId) {
       message.error("User not authenticated");
       return;
     }
     try {
-      await createComment(ideaId, content);
+      // If your backend supports the anonymous flag for comments, pass isAnonymous accordingly.
+      await createComment(ideaId, content, isAnonymous);
       message.success("Comment posted successfully");
-      // If the parent provides a callback, use it to reload comments,
-      // otherwise, navigate to the idea page.
       if (onCommentAdded) {
         onCommentAdded();
       } else {

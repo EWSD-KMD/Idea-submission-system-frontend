@@ -50,9 +50,6 @@ const { confirm } = Modal;
 interface EllipsisDropDownPostProps {
   ideaId: number;
   onEdit?: (
-    ideaId: number,
-    currentTitle: string,
-    currentDescription: string
   ) => void;
   onDelete?: (ideaId: number) => void;
   ideaUserId: number;
@@ -81,7 +78,7 @@ const EllipsisDropDownPost: React.FC<EllipsisDropDownPostProps> = ({
         break;
       case `edit-${ideaId}`:
         if (onEdit) {
-          onEdit(ideaId, initialTitle, initialDescription);
+          onEdit();
         }
         break;
       case `delete-${ideaId}`:
