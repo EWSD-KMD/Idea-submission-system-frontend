@@ -56,7 +56,7 @@ const UserIdeaList: React.FC = () => {
     setCurrentPage(page);
   };
 
-  if (loading) return <PostLoading/>;
+  if (loading) return <PostLoading />;
   if (error) return <div>Error: {error}</div>;
   if (!ideas.length)
     return (
@@ -83,7 +83,9 @@ const UserIdeaList: React.FC = () => {
           description={idea.description}
           ideaUserName={idea.user.name}
           ideaUserId={idea.userId}
+          departmentId={idea.department.id}
           departmentName={idea.department.name}
+          categoryId={idea.category.id}
           category={idea.category.name}
           createdAt={idea.createdAt}
           likes={idea.likes}
