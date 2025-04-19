@@ -28,7 +28,6 @@ const UserIdeaList: React.FC = () => {
           page,
           limit: pageSize,
           userId,
-          status: "SHOW",
         };
 
         const response = await getAllIdeas(params);
@@ -81,6 +80,7 @@ const UserIdeaList: React.FC = () => {
           id={idea.id}
           title={idea.title}
           description={idea.description}
+          status={idea.status}
           ideaUserName={idea.user.name}
           ideaUserId={idea.userId}
           departmentId={idea.department.id}

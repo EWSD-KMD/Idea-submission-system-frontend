@@ -50,7 +50,10 @@ const Notification = () => {
       setLoading(true);
     }
     try {
-      const res: NotificationsResponseData = await getNotifications(page, limit);
+      const res: NotificationsResponseData = await getNotifications(
+        page,
+        limit
+      );
       const mappedNotifications: NotificationItem[] = res.notifications.map(
         (notif: any) => ({
           id: notif.id,
@@ -127,7 +130,9 @@ const Notification = () => {
   const notificationContent = (
     <div className="w-60 sm:w-80">
       <div className="flex justify-between items-center px-2 sm:px-3 py-2 border-b border-gray-200">
-        <h3 className="text-md sm:text-lg font-semibold text-gray-900">Notifications</h3>
+        <h3 className="text-md sm:text-lg font-semibold text-gray-900">
+          Notifications
+        </h3>
         <button
           onClick={handleMarkAllRead}
           className={
@@ -160,7 +165,9 @@ const Notification = () => {
           <InfiniteScroll
             dataLength={notifications.length}
             next={handleLoadMore}
-            hasMore={pagination ? notifications.length < pagination.total : false}
+            hasMore={
+              pagination ? notifications.length < pagination.total : false
+            }
             loader={
               <div className="flex justify-center p-3">
                 <div className="w-32 h-16">
@@ -193,13 +200,22 @@ const Notification = () => {
                     className="flex items-center gap-3 p-2 sm:p-3 cursor-pointer w-full min-h-[3rem]"
                     onClick={() => handleNotificationClick(notif)}
                   >
-                    <Avatar src={notif.userAvatar} size={40} />
+                    <Avatar
+                      label={
+                        notif.message.startsWith("Anonymous")
+                          ? "Anonymous"
+                          : notif.userName
+                      }
+                      size={40}
+                    />
                     <div className="flex-1">
                       <p className="text-[12px] sm:text-sm text-gray-900">
-                        <span className="font-semibold">{notif.userName}</span>{" "}
+                        {/* <span className="font-semibold">{notif.userName}</span>{" "} */}
                         {notif.message}
                       </p>
-                      <p className="text-[10px] sm:text-xs text-gray-500">{notif.time}</p>
+                      <p className="text-[10px] sm:text-xs text-gray-500">
+                        {notif.time}
+                      </p>
                     </div>
                   </div>
                 </List.Item>

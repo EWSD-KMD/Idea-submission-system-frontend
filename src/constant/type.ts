@@ -246,6 +246,7 @@ export interface CommentData {
   id: number;
   content: string;
   createdAt: string;
+  anonymous: boolean;
   updatedAt: string;
   user: User;
   idea: Idea;

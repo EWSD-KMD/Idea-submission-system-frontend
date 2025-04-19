@@ -25,24 +25,24 @@ const LikeAndDislikeButton = ({
   const [isDisliked, setIsDisliked] = useState(false);
 
   useEffect(() => {
-    const checkReactionState = async () => {
-      try {
-        // const hasLiked = await checkIfLike(ideaId, userId);
-        // const hasDisliked = await checkIfUnlike(ideaId, userId);
-        // setIsLiked(hasLiked);
-        // setIsDisliked(hasDisliked);
-      } catch (error) {
-        console.error("Error checking reaction state:", error);
-      }
-    };
-    checkReactionState();
+    // Optionally load initial liked/disliked state here.
   }, [ideaId, userId]);
 
   const handleLike = async () => {
-    // Optimistic update
+    if (!userId) {
+      message.error("Please log in to like.");
+      return;
+    }
+    // Save previous state for potential rollback
+    const prev = {
+      likeCount,
+      dislikeCount,
+      isLiked,
+      isDisliked,
+    };
+    // Optimistically update
     const newLikeCount = isLiked ? likeCount - 1 : likeCount + 1;
     const newDislikeCount = isDisliked ? dislikeCount - 1 : dislikeCount;
-
     setLikeCount(newLikeCount);
     setDislikeCount(newDislikeCount);
     setIsLiked(!isLiked);
@@ -50,25 +50,45 @@ const LikeAndDislikeButton = ({
 
     try {
       await LikeIdea(ideaId);
-    } catch (error) {
-      message.error("Failed to like idea");
+    } catch (err: any) {
+      // rollback on error
+      setLikeCount(prev.likeCount);
+      setDislikeCount(prev.dislikeCount);
+      setIsLiked(prev.isLiked);
+      setIsDisliked(prev.isDisliked);
+      message.error(err.message || "Failed to like idea");
     }
   };
 
   const handleDislike = async () => {
-    // Optimistic update
+    if (!userId) {
+      message.error("Please log in to dislike.");
+      return;
+    }
+    // Save previous state
+    const prev = {
+      likeCount,
+      dislikeCount,
+      isLiked,
+      isDisliked,
+    };
+    // Optimistically update
     const newDislikeCount = isDisliked ? dislikeCount - 1 : dislikeCount + 1;
     const newLikeCount = isLiked ? likeCount - 1 : likeCount;
-
-    setLikeCount(newLikeCount);
     setDislikeCount(newDislikeCount);
+    setLikeCount(newLikeCount);
     setIsDisliked(!isDisliked);
     setIsLiked(false);
 
     try {
       await DislikeIdea(ideaId);
-    } catch (error) {
-      message.error("Failed to dislike idea");
+    } catch (err: any) {
+      // rollback on error
+      setLikeCount(prev.likeCount);
+      setDislikeCount(prev.dislikeCount);
+      setIsLiked(prev.isLiked);
+      setIsDisliked(prev.isDisliked);
+      message.error(err.message || "Failed to dislike idea");
     }
   };
 
