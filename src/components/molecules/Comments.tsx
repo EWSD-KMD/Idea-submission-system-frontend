@@ -8,6 +8,8 @@ import { updateComment, deleteComment } from "@/lib/comment";
 import { CommentData, CommentUpdateResponse } from "@/constant/type";
 import { useAuth } from "@/contexts/AuthContext";
 import EllipsisDropDownCmt from "./EllipsisDropDownCmt";
+import { useUser } from "@/contexts/UserContext";
+import Tag from "../atoms/Tag";
 
 interface CommentsProps {
   comments: CommentData[];
@@ -19,6 +21,7 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments }) => {
   const [loading, setLoading] = useState(false);
   const [editedText, setEditedText] = useState<string>("");
   const { userId } = useAuth();
+  const { userName } = useUser();
 
   // Handle comment edit
   const handleEdit = (commentId: number, initialText: string) => {
@@ -42,6 +45,7 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments }) => {
             ? (comment = {
                 id: comment.id,
                 content: updatedComment.data.content,
+                anonymous: comment.anonymous,
                 createdAt: comment.createdAt,
                 updatedAt: comment.updatedAt,
                 user: comment.user,
@@ -105,7 +109,7 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments }) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <AvatarWithNameAndDept
-                name={comment.user.name}
+                name={comment.user.id === userId ? userName : comment.user.name}
                 department={comment.idea.department.name}
                 category={comment.idea.category.name}
                 time={new Date(comment.createdAt).toLocaleTimeString()}
@@ -113,6 +117,16 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments }) => {
                 size={40}
               />
             </div>
+            <div className="flex">
+            {comment.user.id === userId && comment.anonymous && (
+              <div>
+                <Tag
+                  label="Commented as Anonymous"
+                  color="blue"
+                  className="text-body-sm mb-1 rounded-lg border-none inline-block w-fit"
+                />
+              </div>
+            )}
             {userId === comment.user.id && (
               <EllipsisDropDownCmt
                 commentId={comment.id}
@@ -121,6 +135,7 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments }) => {
                 initialText={comment.content}
               />
             )}
+            </div>
           </div>
           {editCommentId === comment.id ? (
             <div className="flex flex-col rounded-lg border border-gray-300 ml-13">

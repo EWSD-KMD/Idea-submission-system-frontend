@@ -35,6 +35,7 @@ export interface PostCardProps
   > {
   ideaUserName: string;
   ideaUserId: number;
+  status?: string;
   departmentId: number;
   departmentName: string;
   categoryId: number;
@@ -48,6 +49,7 @@ const PostCard: React.FC<PostCardProps> = ({
   id,
   title,
   description,
+  status = "SHOW",
   ideaUserName,
   ideaUserId,
   departmentId,
@@ -83,7 +85,7 @@ const PostCard: React.FC<PostCardProps> = ({
   const memoizedFiles = useMemo(() => files, [JSON.stringify(files)]);
 
   // Define common image extensions.
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".mp4"];
 
   // Filter files into image and document files based on fileName (case insensitive)
   const imageFiles =
@@ -274,6 +276,16 @@ const PostCard: React.FC<PostCardProps> = ({
             />
           </div>
         </div>
+        {status === "HIDE" && (
+          <div className="bg-red-50 border border-red-300 text-red-800 rounded-lg p-4 mb-4">
+            <h3 className="font-semibold mb-1">Your idea has been hidden</h3>
+            <p className="text-sm">
+              Your idea has been hidden by the QA Manager due to multiple
+              reports from other users. While it is no longer visible to others,
+              you can still view your idea and its comments.
+            </p>
+          </div>
+        )}
 
         {/* Editable title */}
         {renderTitle()}

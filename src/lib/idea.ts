@@ -209,6 +209,7 @@ export async function LikeIdea(ideaId: number): Promise<LikeIdeaResponse> {
     const response = await post<null, LikeIdeaResponse>(url, null);
     return response;
   } catch (error: unknown) {
+    console.log("error:",error)
     if (isErrorWithMessage(error)) {
       throw new Error(error.message);
     }

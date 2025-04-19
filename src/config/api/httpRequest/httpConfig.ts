@@ -1,4 +1,5 @@
 import { refreshAccessToken } from "@/lib/auth";
+import { Modal } from "antd";
 import Cookies from "js-cookie";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -64,6 +65,19 @@ export const fetchRequest = async <TResponse, TRequest = unknown>(
     return await executeRequest(accessToken);
   } catch (error) {
     if ((error as ErrorType).status === 401) {
+      if (
+        (error as ErrorType).status === 401 &&
+        (error as ErrorType).message === "User is disabled."
+      ) {
+        Modal.error({
+          width: 500,
+          title: "Account Blocked",
+          content: "You no longer have access to the account!",
+          okText: "Close",
+          centered: true,
+        });
+      }
+      console.log("", error);
       let tokens = null;
       try {
         if (!isRefreshing) {

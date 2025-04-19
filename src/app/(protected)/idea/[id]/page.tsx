@@ -22,6 +22,8 @@ import TextArea from "antd/es/input/TextArea";
 import Button from "@/components/atoms/Button";
 import { getTruncatedText } from "@/utils/getTruncatedText";
 import { useResponsive } from "@/utils/responsive";
+import Tag from "@/components/atoms/Tag";
+import { useAuth } from "@/contexts/AuthContext";
 
 const DetailPage = () => {
   const params = useParams();
@@ -41,6 +43,8 @@ const DetailPage = () => {
   const [editedTitle, setEditedTitle] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
+  const { userName } = useUser();
+  const { userId } = useAuth();
 
   const handleCommentsReload = () => {
     setCommentReloadKey((prev) => prev + 1);
@@ -245,11 +249,25 @@ const DetailPage = () => {
         <div className="space-y-6">
           <div className="flex justify-between">
             <AvatarWithNameAndDept
-              name={idea.user?.name}
-              department={idea.department?.name}
-              category={idea.category?.name}
+              name={userId === idea.userId ? userName : idea.user.name}
+              department={idea.department.name}
+              category={idea.category.name}
               time={timeAgo(idea.createdAt)}
+              avatarSrc={
+                userId !== idea.userId && idea.user.name === "Anonymous"
+                  ? "/anonymous.svg"
+                  : ""
+              }
             />
+            {userId === idea.userId && idea.user.name === "Anonymous" && (
+              <div>
+                <Tag
+                  label="Posted as Anonymous"
+                  color="blue"
+                  className="text-body-sm mb-1 rounded-lg border-none inline-block w-fit"
+                />
+              </div>
+            )}
             <div>
               <EllipsisDropDownPost
                 ideaId={idea.id}
