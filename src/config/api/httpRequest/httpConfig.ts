@@ -1,5 +1,5 @@
 import { refreshAccessToken } from "@/lib/auth";
-import { Modal } from "antd";
+import { useErrorStore } from "@/utils/errorStore";
 import Cookies from "js-cookie";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -63,19 +63,12 @@ export const fetchRequest = async <TResponse, TRequest = unknown>(
 
   try {
     return await executeRequest(accessToken);
-  } catch (error) {
-    if ((error as ErrorType).status === 401) {
-      if (
-        (error as ErrorType).status === 401 &&
-        (error as ErrorType).message === "User is disabled."
-      ) {
-        Modal.error({
-          width: 500,
-          title: "Account Blocked",
-          content: "You no longer have access to the account!",
-          okText: "Close",
-          centered: true,
-        });
+  } catch (err) {
+    const error = err as ErrorType;
+    if (error.status === 401) {
+      if (error.status === 401 && error.message === "User is disabled.") {
+        useErrorStore.getState().setDisabledError(true);
+        return new Promise<never>(() => {});
       }
       console.log("", error);
       let tokens = null;
