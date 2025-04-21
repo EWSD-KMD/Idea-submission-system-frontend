@@ -138,6 +138,11 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
     );
   };
 
+  const videoExtensions = [".mp4", ".webm", ".ogg"];
+  const isVideo = (file: any) =>
+    file.fileType?.startsWith("video/") ||
+    videoExtensions.some((ext) => file.fileName.toLowerCase().endsWith(ext));
+
   const handleSubmitIdea = async () => {
     if (userId) {
       if (!title.trim() || !body.trim() || !selectedCategory) {
@@ -240,10 +245,31 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
               <div className="mt-4 flex flex-wrap gap-2">
                 {fileList.map((file) => (
                   <div key={file.previewUrl} className="w-full">
-                    {isImageFile(file) ? (
+                    {isVideo(file) ? (
                       <div className="relative w-full">
                         {file.loading ? (
-                          <Skeleton.Image active className="w-full"/>
+                          <Skeleton.Image active className="w-full" />
+                        ) : (
+                          <video
+                            src={file.previewUrl}
+                            controls
+                            className="w-full object-cover rounded-lg"
+                          />
+                        )}
+                        {!file.loading && (
+                          <Button
+                            icon={getIcon("trashWhite")}
+                            type="text"
+                            rounded
+                            onClick={() => handleRemove(file)}
+                            className="absolute top-1 right-1 bg-black bg-opacity-50 border-none p-1"
+                          />
+                        )}
+                      </div>
+                    ) : isImageFile(file) ? (
+                      <div className="relative w-full">
+                        {file.loading ? (
+                          <Skeleton.Image active className="w-full" />
                         ) : (
                           <Image
                             src={file.previewUrl}
@@ -305,7 +331,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
                   customRequest={handleUpload}
                   onRemove={handleRemove}
                   fileList={fileList}
-                  accept="image/*,application/pdf,.doc,.docx,.txt"
+                  accept="image/*,video/*,application/pdf,.doc,.docx,.txt"
                   multiple={true}
                   showUploadList={false}
                   beforeUpload={(file) => {
@@ -330,7 +356,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
                   customRequest={handleUpload}
                   onRemove={handleRemove}
                   fileList={fileList}
-                  accept="image/*,application/pdf,.doc,.docx,.txt"
+                  accept="image/*,video/*,application/pdf,.doc,.docx,.txt"
                   multiple={true}
                   showUploadList={false}
                   beforeUpload={(file) => {

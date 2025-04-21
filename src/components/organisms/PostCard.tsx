@@ -1,25 +1,32 @@
 "use client";
+
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, Divider, Input, message, Skeleton } from "antd";
 import AvatarWithNameAndDept from "../molecules/AvatarWithNameAndDept";
 import LikeAndDislikeButton from "../molecules/LikeAndDislikeButton";
 import CommentButton from "../molecules/CommentButton";
 import ViewCount from "../molecules/ViewCount";
-import { useState, useEffect, useMemo } from "react";
 import CommentSection from "./CommentUpload";
+import EllipsisDropDownPost from "../molecules/EllipsisDropDownPost";
+import Tag from "../atoms/Tag";
+import Button from "../atoms/Button";
+import TextArea from "antd/es/input/TextArea";
+import { getIcon } from "../atoms/Icon";
+import { useRouter } from "next/navigation";
 import timeAgo from "@/utils/timeago";
 import { useResponsive } from "@/utils/responsive";
 import { getTruncatedText } from "@/utils/getTruncatedText";
-import { Idea, IdeaFile, UpdateIdeaRequest } from "@/constant/type";
-import { useRouter } from "next/navigation";
-import EllipsisDropDownPost from "../molecules/EllipsisDropDownPost";
+import {
+  Idea,
+  IdeaFile,
+  PreviewItem,
+  UpdateIdeaRequest,
+} from "@/constant/type";
+import { getIdeaFile, updateIdea } from "@/lib/idea";
+import MediaGallery from "../molecules/MediaGallery";
+import DocumentGallery from "../molecules/DocumentGallery";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUser } from "@/contexts/UserContext";
-import Tag from "../atoms/Tag";
-import ImageGallery from "../molecules/ImageGallery";
-import DocumentGallery from "../molecules/DocumentGallery";
-import { getIdeaFile, updateIdea } from "@/lib/idea";
-import TextArea from "antd/es/input/TextArea";
-import Button from "../atoms/Button";
 
 export interface PostCardProps
   extends Pick<
@@ -60,77 +67,85 @@ const PostCard: React.FC<PostCardProps> = ({
   likes,
   dislikes,
   views,
-  files,
+  files = [],
   commentsCount: initialCommentsCount,
   onDelete,
 }) => {
   const router = useRouter();
-  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-  const [commentsCount, setCommentsCount] = useState(initialCommentsCount);
   const { isMobile, isTablet } = useResponsive();
   const { userId } = useAuth();
-  const { userName } = useUser();
+  const { userName, isFinalClosure } = useUser();
 
-  // States for inline editing for both title and description
+  // Inline‑edit state
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title);
   const [editedDescription, setEditedDescription] = useState(description);
-
-  // Local state to store preview URLs for image files and a loading flag.
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [imageLoading, setImageLoading] = useState(true);
   const [updateLoading, setUpdateLoading] = useState(false);
 
-  // Memoize the files prop for stability.
-  const memoizedFiles = useMemo(() => files, [JSON.stringify(files)]);
+  // Comments toggle
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [commentsCount, setCommentsCount] = useState(initialCommentsCount);
 
-  // Define common image extensions.
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".mp4"];
+  // Previews for image/video
+  const [previews, setPreviews] = useState<PreviewItem[]>([]);
+  const [loadingPreviews, setLoadingPreviews] = useState(true);
 
-  // Filter files into image and document files based on fileName (case insensitive)
-  const imageFiles =
-    memoizedFiles?.filter((file) => {
-      const lowerName = file.fileName.toLowerCase();
-      return imageExtensions.some((ext) => lowerName.endsWith(ext));
-    }) || [];
-  const documentFiles =
-    memoizedFiles?.filter((file) => {
-      const lowerName = file.fileName.toLowerCase();
-      return !imageExtensions.some((ext) => lowerName.endsWith(ext));
-    }) || [];
+  // Derive document files (everything not image/video by extension)
+  const mediaExt = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".webp",
+    ".mp4",
+    ".webm",
+    ".ogg",
+  ];
+  const documentFiles = useMemo(
+    () =>
+      files.filter(
+        (f) => !mediaExt.some((ext) => f.fileName.toLowerCase().endsWith(ext))
+      ),
+    [files]
+  );
 
-  // Fetch file blobs for image files and create preview URLs.
+  // Fetch blobs & build PreviewItem[]
   useEffect(() => {
-    let isSubscribed = true;
-    const loadImageFiles = async () => {
-      setImageLoading(true);
-      if (imageFiles.length > 0) {
-        try {
-          const urls = await Promise.all(
-            imageFiles.map(async (file) => {
-              const blob = await getIdeaFile(file.id);
-              return URL.createObjectURL(blob);
-            })
+    let mounted = true;
+    (async () => {
+      setLoadingPreviews(true);
+      if (!files.length) {
+        if (mounted) setPreviews([]);
+        setLoadingPreviews(false);
+        return;
+      }
+      try {
+        const items: PreviewItem[] = await Promise.all(
+          files.map(async (file) => {
+            const blob = await getIdeaFile(file.id);
+            const url = URL.createObjectURL(blob);
+            return { url, mime: blob.type };
+          })
+        );
+        if (mounted) {
+          setPreviews(
+            items.filter(
+              (it) =>
+                it.mime.startsWith("image/") || it.mime.startsWith("video/")
+            )
           );
-          if (isSubscribed) {
-            setImageUrls(urls);
-          }
-        } catch (error) {
-          console.error("Error loading image files:", error);
         }
-      } else {
-        setImageUrls([]);
+      } catch (err) {
+        console.error("Error loading previews:", err);
+      } finally {
+        if (mounted) setLoadingPreviews(false);
       }
-      if (isSubscribed) {
-        setImageLoading(false);
-      }
-    };
-    loadImageFiles();
+    })();
     return () => {
-      isSubscribed = false;
-      imageUrls.forEach((url) => URL.revokeObjectURL(url));
+      mounted = false;
+      previews.forEach((p) => URL.revokeObjectURL(p.url));
     };
-  }, [JSON.stringify(imageFiles)]);
+  }, [JSON.stringify(files)]);
 
   const handleCardClick = (e: React.MouseEvent) => {
     if (
@@ -253,11 +268,16 @@ const PostCard: React.FC<PostCardProps> = ({
           />
           {userId === ideaUserId && ideaUserName === "Anonymous" && (
             <div>
+              {/* full text on sm+ */}
               <Tag
                 label="Posted as Anonymous"
                 color="blue"
-                className="text-body-sm mb-1 rounded-lg border-none inline-block w-fit"
+                className="hidden sm:inline-block text-body-sm mb-1 rounded-lg border-none"
               />
+              {/* icon only on xs */}
+              <span className="inline-block sm:hidden px-2">
+                {getIcon("anonymous", 20)}
+              </span>
             </div>
           )}
           <div>
@@ -276,39 +296,40 @@ const PostCard: React.FC<PostCardProps> = ({
             />
           </div>
         </div>
+
+        {/* Hidden notice */}
         {status === "HIDE" && (
           <div className="bg-red-50 border border-red-300 text-red-800 rounded-lg p-4 mb-4">
             <h3 className="font-semibold mb-1">Your idea has been hidden</h3>
             <p className="text-sm">
               Your idea has been hidden by the QA Manager due to multiple
-              reports from other users. While it is no longer visible to others,
-              you can still view your idea and its comments.
+              reports. It’s no longer visible to others, but you can still view
+              it here.
             </p>
           </div>
         )}
 
-        {/* Editable title */}
+        {/* Title & Description */}
         {renderTitle()}
-
-        {/* Editable description */}
         {renderDescription()}
 
-        {/* Render document gallery for non-image files */}
+        {/* Documents */}
         {documentFiles.length > 0 && (
-          <div className="mb-4 w-full">
+          <div className="mb-4 interaction-buttons">
             <DocumentGallery files={documentFiles} />
           </div>
         )}
 
-        {/* Render image gallery for image files, with skeleton while loading */}
-        <div className="mb-4 w-full interaction-buttons">
-          {imageLoading ? (
+        {/* Media Gallery */}
+        <div className="mb-4 interaction-buttons">
+          {loadingPreviews ? (
             <Skeleton.Image active className="w-full h-24 rounded-lg" />
           ) : (
-            imageUrls.length > 0 && <ImageGallery images={imageUrls} />
+            previews.length > 0 && <MediaGallery media={previews} />
           )}
         </div>
 
+        {/* Actions */}
         <div className="flex justify-between items-center interaction-buttons">
           <div className="flex gap-2">
             <LikeAndDislikeButton
@@ -324,6 +345,7 @@ const PostCard: React.FC<PostCardProps> = ({
           <ViewCount viewCount={views} />
         </div>
 
+        {/* Comment Section */}
         {isCommentsOpen && (
           <div>
             <Divider />

@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import EllipsisDropDownCmt from "./EllipsisDropDownCmt";
 import { useUser } from "@/contexts/UserContext";
 import Tag from "../atoms/Tag";
+import { getIcon } from "../atoms/Icon";
 
 interface CommentsProps {
   comments: CommentData[];
@@ -118,23 +119,28 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments }) => {
               />
             </div>
             <div className="flex">
-            {comment.user.id === userId && comment.anonymous && (
-              <div>
-                <Tag
-                  label="Commented as Anonymous"
-                  color="blue"
-                  className="text-body-sm mb-1 rounded-lg border-none inline-block w-fit"
+              {comment.user.id === userId && comment.anonymous && (
+                <div>
+                  {/* full text on sm+ */}
+                  <Tag
+                    label="Commented as Anonymous"
+                    color="blue"
+                    className="hidden sm:inline-block text-body-sm mb-1 rounded-lg border-none"
+                  />
+                  {/* icon only on xs */}
+                  <span className="inline-block sm:hidden px-2">
+                    {getIcon("anonymous", 20)}
+                  </span>
+                </div>
+              )}
+              {userId === comment.user.id && (
+                <EllipsisDropDownCmt
+                  commentId={comment.id}
+                  onEdit={(id, text) => handleEdit(id, text)}
+                  onDelete={(id) => handleDelete(id)}
+                  initialText={comment.content}
                 />
-              </div>
-            )}
-            {userId === comment.user.id && (
-              <EllipsisDropDownCmt
-                commentId={comment.id}
-                onEdit={(id, text) => handleEdit(id, text)}
-                onDelete={(id) => handleDelete(id)}
-                initialText={comment.content}
-              />
-            )}
+              )}
             </div>
           </div>
           {editCommentId === comment.id ? (

@@ -2,9 +2,8 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
-import { Idea, UpdateIdeaRequest } from "@/constant/type";
+import { Idea, PreviewItem, UpdateIdeaRequest } from "@/constant/type";
 import { Card, Divider, Input, message, Skeleton } from "antd";
-import Loading from "@/app/loading";
 import AvatarWithNameAndDept from "@/components/molecules/AvatarWithNameAndDept";
 import LikeAndDislikeButton from "@/components/molecules/LikeAndDislikeButton";
 import CommentButton from "@/components/molecules/CommentButton";
@@ -15,8 +14,8 @@ import { getIdeaById, getIdeaFile, updateIdea } from "@/lib/idea";
 import EllipsisDropDownPost from "@/components/molecules/EllipsisDropDownPost";
 import NotFound from "@/app/not-found";
 import { useUser } from "@/contexts/UserContext";
-import ImageGallery from "@/components/molecules/ImageGallery";
-import DocumentGallery from "@/components/molecules/DocumentGallery"; // Make sure this component is available.
+import MediaGallery from "@/components/molecules/MediaGallery";
+import DocumentGallery from "@/components/molecules/DocumentGallery";
 import ViewCount from "@/components/molecules/ViewCount";
 import TextArea from "antd/es/input/TextArea";
 import Button from "@/components/atoms/Button";
@@ -24,27 +23,31 @@ import { getTruncatedText } from "@/utils/getTruncatedText";
 import { useResponsive } from "@/utils/responsive";
 import Tag from "@/components/atoms/Tag";
 import { useAuth } from "@/contexts/AuthContext";
+import { getIcon } from "@/components/atoms/Icon";
 
 const DetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const { isMobile, isTablet } = useResponsive();
+  const { userName, isFinalClosure } = useUser();
+  const { userId } = useAuth();
+
   const [idea, setIdea] = useState<Idea | null>(null);
-  // State for image preview URLs.
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [isCommentsOpen, setIsCommentsOpen] = useState(true);
-  const { isFinalClosure } = useUser();
-  // State to trigger comment reload.
   const [commentReloadKey, setCommentReloadKey] = useState(0);
-  const [imageLoading, setImageLoading] = useState(true);
+
+  // **New**: preview items + loading flag
+  const [previews, setPreviews] = useState<PreviewItem[]>([]);
+  const [loadingPreviews, setLoadingPreviews] = useState(true);
+
+  // Inline edit state
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
-  const { userName } = useUser();
-  const { userId } = useAuth();
 
   const handleCommentsReload = () => {
     setCommentReloadKey((prev) => prev + 1);
@@ -59,9 +62,9 @@ const DetailPage = () => {
           setEditedTitle(response.data.title);
           setEditedDescription(response.data.description);
         }
-      } catch (error) {
+      } catch (err) {
+        console.error(err);
         setError("Failed to load idea");
-        console.error("Error fetching idea:", error);
       } finally {
         setLoading(false);
       }
@@ -70,59 +73,60 @@ const DetailPage = () => {
     fetchIdea();
   }, [params.id]);
 
-  // Memoize files from the idea to prevent unnecessary re-renders.
-  const memoizedFiles = useMemo(
-    () => idea?.files,
-    [JSON.stringify(idea?.files)]
+  // pull out non‑media files
+  const mediaExt = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".webp",
+    ".mp4",
+    ".webm",
+    ".ogg",
+  ];
+  const documentFiles = useMemo(
+    () =>
+      idea?.files?.filter(
+        (f) => !mediaExt.some((ext) => f.fileName.toLowerCase().endsWith(ext))
+      ) ?? [],
+    [idea?.files]
   );
 
-  // Define common image extensions
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-
-  // Filter files into image and document files based on fileName (and optionally MIME type).
-  const imageFiles =
-    memoizedFiles?.filter((file) => {
-      const lowerName = file.fileName.toLowerCase();
-      return imageExtensions.some((ext) => lowerName.endsWith(ext));
-    }) || [];
-  const documentFiles =
-    memoizedFiles?.filter((file) => {
-      const lowerName = file.fileName.toLowerCase();
-      return !imageExtensions.some((ext) => lowerName.endsWith(ext));
-    }) || [];
-
-  // Fetch image files only – create blob preview URLs.
+  // fetch blobs → previews array
   useEffect(() => {
-    let isSubscribed = true;
-    const loadImageFiles = async () => {
-      setImageLoading(true);
-      if (imageFiles.length > 0) {
-        try {
-          const urls = await Promise.all(
-            imageFiles.map(async (file) => {
-              const blob = await getIdeaFile(file.id);
-              return URL.createObjectURL(blob);
-            })
+    let mounted = true;
+    (async () => {
+      setLoadingPreviews(true);
+      if (!idea?.files?.length) {
+        if (mounted) setPreviews([]);
+        return;
+      }
+      try {
+        const items = await Promise.all(
+          idea.files.map(async (f) => {
+            const blob = await getIdeaFile(f.id);
+            return { url: URL.createObjectURL(blob), mime: blob.type };
+          })
+        );
+        if (mounted) {
+          setPreviews(
+            items.filter(
+              (it) =>
+                it.mime.startsWith("image/") || it.mime.startsWith("video/")
+            )
           );
-          if (isSubscribed) {
-            setImageUrls(urls);
-          }
-        } catch (error) {
-          console.error("Error loading image files:", error);
         }
-      } else {
-        setImageUrls([]);
+      } catch (err) {
+        console.error("Error loading previews:", err);
+      } finally {
+        if (mounted) setLoadingPreviews(false);
       }
-      if (isSubscribed) {
-        setImageLoading(false);
-      }
-    };
-    loadImageFiles();
+    })();
     return () => {
-      isSubscribed = false;
-      imageUrls.forEach((url) => URL.revokeObjectURL(url));
+      mounted = false;
+      previews.forEach((p) => URL.revokeObjectURL(p.url));
     };
-  }, [JSON.stringify(imageFiles)]);
+  }, [idea?.files]);
 
   const handleComment = () => {
     setIsCommentsOpen((prev) => !prev);
@@ -261,12 +265,17 @@ const DetailPage = () => {
             />
             {userId === idea.userId && idea.user.name === "Anonymous" && (
               <div>
-                <Tag
-                  label="Posted as Anonymous"
-                  color="blue"
-                  className="text-body-sm mb-1 rounded-lg border-none inline-block w-fit"
-                />
-              </div>
+              {/* full text on sm+ */}
+              <Tag
+                label="Posted as Anonymous"
+                color="blue"
+                className="hidden sm:inline-block text-body-sm mb-1 rounded-lg border-none"
+              />
+              {/* icon only on xs */}
+              <span className="inline-block sm:hidden px-2">
+                {getIcon("anonymous", 20)}
+              </span>
+            </div>
             )}
             <div>
               <EllipsisDropDownPost
@@ -296,14 +305,14 @@ const DetailPage = () => {
             </div>
           )}
 
-          {/* Render image gallery if image previews exist */}
-          <div className="mb-4 w-full">
-            {imageLoading ? (
-              <Skeleton.Image active className="w-full h-24 rounded-lg" />
-            ) : (
-              imageUrls.length > 0 && <ImageGallery images={imageUrls} />
-            )}
-          </div>
+        {/* media */}
+        <div className="mb-4">
+          {loadingPreviews ? (
+            <Skeleton.Image active className="w-full h-24 rounded-lg" />
+          ) : (
+            <MediaGallery media={previews} />
+          )}
+        </div>
 
           <div className="flex justify-between items-center">
             <div className="flex gap-2">
