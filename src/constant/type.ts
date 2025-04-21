@@ -212,7 +212,7 @@ export interface FileUploadData {
 export interface FileUploadResponse {
   err: number;
   message: string;
-  data: FileUploadData[]; 
+  data: FileUploadData[];
 }
 
 // #endregion
@@ -352,4 +352,9 @@ export interface ErrorResponse {
   err: number;
   message: string;
   data: null;
+}
+
+export interface PreviewItem {
+  url: string;
+  mime: string;
 }
