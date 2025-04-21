@@ -24,6 +24,7 @@ import { getTruncatedText } from "@/utils/getTruncatedText";
 import { useResponsive } from "@/utils/responsive";
 import Tag from "@/components/atoms/Tag";
 import { useAuth } from "@/contexts/AuthContext";
+import { getIcon } from "@/components/atoms/Icon";
 
 const DetailPage = () => {
   const params = useParams();
@@ -261,12 +262,17 @@ const DetailPage = () => {
             />
             {userId === idea.userId && idea.user.name === "Anonymous" && (
               <div>
-                <Tag
-                  label="Posted as Anonymous"
-                  color="blue"
-                  className="text-body-sm mb-1 rounded-lg border-none inline-block w-fit"
-                />
-              </div>
+              {/* full text on sm+ */}
+              <Tag
+                label="Posted as Anonymous"
+                color="blue"
+                className="hidden sm:inline-block text-body-sm mb-1 rounded-lg border-none"
+              />
+              {/* icon only on xs */}
+              <span className="inline-block sm:hidden px-2">
+                {getIcon("anonymous", 20)}
+              </span>
+            </div>
             )}
             <div>
               <EllipsisDropDownPost

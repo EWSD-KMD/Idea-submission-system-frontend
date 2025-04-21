@@ -20,6 +20,7 @@ import DocumentGallery from "../molecules/DocumentGallery";
 import { getIdeaFile, updateIdea } from "@/lib/idea";
 import TextArea from "antd/es/input/TextArea";
 import Button from "../atoms/Button";
+import { getIcon } from "../atoms/Icon";
 
 export interface PostCardProps
   extends Pick<
@@ -253,11 +254,16 @@ const PostCard: React.FC<PostCardProps> = ({
           />
           {userId === ideaUserId && ideaUserName === "Anonymous" && (
             <div>
+              {/* full text on sm+ */}
               <Tag
                 label="Posted as Anonymous"
                 color="blue"
-                className="text-body-sm mb-1 rounded-lg border-none inline-block w-fit"
+                className="hidden sm:inline-block text-body-sm mb-1 rounded-lg border-none"
               />
+              {/* icon only on xs */}
+              <span className="inline-block sm:hidden px-2">
+                {getIcon("anonymous", 20)}
+              </span>
             </div>
           )}
           <div>
