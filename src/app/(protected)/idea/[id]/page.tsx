@@ -33,23 +33,25 @@ const DetailPage = () => {
   const { userId } = useAuth();
 
   const [idea, setIdea] = useState<Idea | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [isCommentsOpen, setIsCommentsOpen] = useState(true);
-  const [commentReloadKey, setCommentReloadKey] = useState(0);
+  const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(true);
+  const [commentReloadKey, setCommentReloadKey] = useState<number>(0);
 
   // **New**: preview items + loading flag
   const [previews, setPreviews] = useState<PreviewItem[]>([]);
-  const [loadingPreviews, setLoadingPreviews] = useState(true);
+  const [loadingPreviews, setLoadingPreviews] = useState<boolean>(true);
 
   // Inline edit state
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedTitle, setEditedTitle] = useState("");
-  const [editedDescription, setEditedDescription] = useState("");
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editedTitle, setEditedTitle] = useState<string>("");
+  const [editedDescription, setEditedDescription] = useState<string>("");
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
+  const [commentsCount, setCommentsCount] = useState<number>(0);
 
   const handleCommentsReload = () => {
+    setCommentsCount((commentsCount) => commentsCount + 1);
     setCommentReloadKey((prev) => prev + 1);
   };
 
@@ -61,6 +63,7 @@ const DetailPage = () => {
           setIdea(response.data);
           setEditedTitle(response.data.title);
           setEditedDescription(response.data.description);
+          setCommentsCount(response.data.comments.length);
         }
       } catch (err) {
         console.error(err);
@@ -99,6 +102,7 @@ const DetailPage = () => {
       setLoadingPreviews(true);
       if (!idea?.files?.length) {
         if (mounted) setPreviews([]);
+        setLoadingPreviews(false)
         return;
       }
       try {
@@ -127,10 +131,6 @@ const DetailPage = () => {
       previews.forEach((p) => URL.revokeObjectURL(p.url));
     };
   }, [idea?.files]);
-
-  const handleComment = () => {
-    setIsCommentsOpen((prev) => !prev);
-  };
 
   const handleSaveEdit = async () => {
     setUpdateLoading(true);
@@ -259,23 +259,23 @@ const DetailPage = () => {
               time={timeAgo(idea.createdAt)}
               avatarSrc={
                 userId !== idea.userId && idea.user.name === "Anonymous"
-                  ? "/anonymous.svg"
-                  : ""
+                  ? "anonymous"
+                  : null
               }
             />
             {userId === idea.userId && idea.user.name === "Anonymous" && (
               <div>
-              {/* full text on sm+ */}
-              <Tag
-                label="Posted as Anonymous"
-                color="blue"
-                className="hidden sm:inline-block text-body-sm mb-1 rounded-lg border-none"
-              />
-              {/* icon only on xs */}
-              <span className="inline-block sm:hidden px-2">
-                {getIcon("anonymous", 20)}
-              </span>
-            </div>
+                {/* full text on sm+ */}
+                <Tag
+                  label="Posted as Anonymous"
+                  color="blue"
+                  className="hidden sm:inline-block text-body-sm mb-1 rounded-lg border-none"
+                />
+                {/* icon only on xs */}
+                <span className="inline-block sm:hidden px-2">
+                  {getIcon("anonymous", 20)}
+                </span>
+              </div>
             )}
             <div>
               <EllipsisDropDownPost
@@ -305,14 +305,14 @@ const DetailPage = () => {
             </div>
           )}
 
-        {/* media */}
-        <div className="mb-4">
-          {loadingPreviews ? (
-            <Skeleton.Image active className="w-full h-24 rounded-lg" />
-          ) : (
-            <MediaGallery media={previews} />
-          )}
-        </div>
+          {/* media */}
+          <div className="mb-4">
+            {loadingPreviews ? (
+              <Skeleton.Image active className="w-full h-24 rounded-lg" />
+            ) : (
+              previews.length > 0 && <MediaGallery media={previews} />
+            )}
+          </div>
 
           <div className="flex justify-between items-center">
             <div className="flex gap-2">
@@ -320,11 +320,10 @@ const DetailPage = () => {
                 ideaId={idea.id}
                 likeCount={idea.likes}
                 dislikeCount={idea.dislikes}
+                isLiked={idea.likeInd}
+                isDisliked={idea.dislikeInd}
               />
-              <CommentButton
-                commentCount={idea.comments?.length || 0}
-                onClick={handleComment}
-              />
+              <CommentButton commentCount={commentsCount} />
             </div>
             <ViewCount viewCount={idea.views} />
           </div>

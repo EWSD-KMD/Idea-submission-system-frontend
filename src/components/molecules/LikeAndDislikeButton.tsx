@@ -11,18 +11,22 @@ interface LikeAndDislikeButtonProps {
   ideaId: number;
   likeCount: number;
   dislikeCount: number;
+  isLiked: boolean;
+  isDisliked: boolean;
 }
 
 const LikeAndDislikeButton = ({
   ideaId,
   likeCount: initialLikeCount,
   dislikeCount: initialDislikeCount,
+  isLiked: initialIsLiked,
+  isDisliked: initialIsDisliked,
 }: LikeAndDislikeButtonProps) => {
   const { userId } = useAuth();
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [dislikeCount, setDislikeCount] = useState(initialDislikeCount);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isDisliked, setIsDisliked] = useState(false);
+  const [isLiked, setIsLiked] = useState(initialIsLiked);
+  const [isDisliked, setIsDisliked] = useState(initialIsDisliked);
 
   useEffect(() => {
     // Optionally load initial liked/disliked state here.
@@ -32,6 +36,9 @@ const LikeAndDislikeButton = ({
     if (!userId) {
       message.error("Please log in to like.");
       return;
+    }
+    if(isLiked){
+      return
     }
     // Save previous state for potential rollback
     const prev = {
@@ -64,6 +71,9 @@ const LikeAndDislikeButton = ({
     if (!userId) {
       message.error("Please log in to dislike.");
       return;
+    }
+    if(isDisliked){
+      return
     }
     // Save previous state
     const prev = {

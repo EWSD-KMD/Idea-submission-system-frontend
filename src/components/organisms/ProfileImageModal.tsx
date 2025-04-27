@@ -1,27 +1,40 @@
 "use client";
 
-import React, { useState } from "react";
-import { Divider, Modal, Upload, message } from "antd";
+import React, { useState, useEffect } from "react";
+import { Modal, Divider, Upload, message, Spin } from "antd";
 import Avatar from "../atoms/Avatar";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
+import { updateProfileImage } from "@/lib/user";
 
 interface ProfileImageModalProps {
   visible: boolean;
   onCancel: () => void;
-  onSave: (image?: string | File) => void;
-  currentImage?: string;
+  /** Called with new object-URL or `null` if deleted */
+  onSave: (newImageUrl: string | null) => void;
+  currentImage: string;
 }
 
 const { confirm } = Modal;
 
-const ProfileImageModal = ({
+const ProfileImageModal: React.FC<ProfileImageModalProps> = ({
   visible,
   onCancel,
   onSave,
-  currentImage = "/Media.jpg",
-}: ProfileImageModalProps) => {
-  const [image, setImage] = useState<string | File | null>(currentImage);
+  currentImage,
+}) => {
+  const [preview, setPreview] = useState<string>(currentImage);
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  // Reset when opened/closed
+  useEffect(() => {
+    if (!visible) {
+      setPreview(currentImage);
+      setFile(null);
+      setUploading(false);
+    }
+  }, [visible, currentImage]);
 
   const showDeleteConfirm = () => {
     confirm({
@@ -31,63 +44,43 @@ const ProfileImageModal = ({
       cancelText: "No",
       centered: true,
       onOk() {
-        handleDelete();
-      },
-      onCancel() {
-        console.log("Cancel");
+        setPreview("/default.png");
+        setFile(null);
       },
     });
   };
 
-  const handleChange = (info: any) => {
-    const file = info.file.originFileObj;
-
-    const allowedMimeTypes = ["image/jpeg", "image/png"];
-    const allowedExtensions = [".jpg", ".jpeg", ".png"];
-
-    const isValidImage =
-      allowedMimeTypes.includes(file.type) ||
-      allowedExtensions.some((ext) =>
-        file.name.toLowerCase().endsWith(ext.toLowerCase())
-      );
-
-    if (info.file.status === "done") {
-      if (file && isValidImage) {
-        console.log(file);
-        const previewUrl = URL.createObjectURL(file);
-        setImage(previewUrl);
-        message.success(`Uploaded image: ${file.name}`);
-      } else {
-        message.error("Please upload a valid image file.");
-      }
+  const onFileChange = ({ file: info }: any) => {
+    const f: File = info.originFileObj;
+    const ok = ["image/jpeg", "image/png"].includes(f.type);
+    if (!ok) {
+      return message.error("Only JPG/PNG images allowed");
     }
+    const obj = URL.createObjectURL(f);
+    setPreview(obj);
+    setFile(f);
   };
 
-  const handleDelete = () => {
-    setImage(null);
-    message.success("Image deleted");
-  };
-
-  const handleSave = () => {
-    onSave(image as string | File);
-    message.success("Image successfully saved");
-    onCancel();
-  };
-
-  const handleCancel = () => {
-    setImage(currentImage);
-    onCancel();
-  };
-
-  const uploadProps = {
-    name: "file",
-    multiple: false,
-    accept: "image/*",
-    showUploadList: false,
-    customRequest: ({ file, onSuccess }: any) => {
-      onSuccess("ok");
-    },
-    onChange: handleChange,
+  const handleSave = async () => {
+    if (file) {
+      setUploading(true);
+      try {
+        console.log("profile image", file)
+        await updateProfileImage(file);
+        message.success("Profile image uploaded");
+        onSave(preview);
+        onCancel();
+      } catch (err: any) {
+        console.error(err);
+        message.error(err.message || "Upload failed");
+      } finally {
+        setUploading(false);
+      }
+    } else {
+      // deletion
+      onSave(null);
+      onCancel();
+    }
   };
 
   return (
@@ -105,8 +98,9 @@ const ProfileImageModal = ({
           label="Cancel"
           key="cancel"
           rounded
-          onClick={handleCancel}
+          onClick={onCancel}
           className="mr-2 text-blue-600"
+          disabled={uploading}
         />,
         <Button
           label="Save"
@@ -115,6 +109,7 @@ const ProfileImageModal = ({
           rounded
           onClick={handleSave}
           className="bg-blue-500 text-white"
+          disabled={uploading}
         />,
       ]}
       title="Profile Image"
@@ -122,28 +117,33 @@ const ProfileImageModal = ({
     >
       <Divider />
       <div className="flex flex-col items-center gap-3 p-3">
-        <Avatar size={140} src={image ? (typeof image === "string" ? image : URL.createObjectURL(image)) : currentImage} className="mb-3" />
+      <Avatar size={140} src={preview} className="rounded-full mb-3" />
         <p className="text-center text-sm">
           Upload a clear and high-quality image to personalize your profile.
         </p>
-        <div className="flex gap-3">
-          <Upload {...uploadProps}>
+        <div className="flex gap-2">
+          <Upload
+            accept="image/*"
+            showUploadList={false}
+            onChange={onFileChange}
+            disabled={uploading}
+          >
             <Button
               type="dashed"
-              label="Change"
               icon={getIcon("refresh")}
+              label="Change"
               rounded
               className="border border-gray-300 px-4 py-2"
+              disabled={uploading}
             />
           </Upload>
           <Button
             type="dashed"
-            label="Delete"
             icon={getIcon("trash")}
-            onClick={showDeleteConfirm}
+            label="Delete"
             rounded
-            disabled={!image}
-            className="border border-gray-300 px-4 py-2"
+            disabled={preview === "/default.png" || uploading}
+            onClick={showDeleteConfirm}
           />
         </div>
       </div>

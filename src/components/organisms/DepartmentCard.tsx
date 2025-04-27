@@ -20,7 +20,7 @@ interface DepartmentCardProps {
 
 const DepartmentCard = ({
   image = "/classroom.png",
-  department = "Department",
+  department,
   academicYear,
   submissionDate,
   finalClosureDate,
@@ -35,11 +35,13 @@ const DepartmentCard = ({
     >
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <Tag
-            label={department}
-            color="blue"
-            className="text-body-sm mb-1 rounded-lg border-none inline-block w-fit"
-          />
+          <div className="flex flex-col items-center ml-2">
+            <Tag
+              label={department}
+              color="blue"
+              className="text-body-sm mb-1 rounded-lg border-none inline-block w-fit"
+            />
+          </div>
           <span className="font-semibold text-primary text-body-xl">
             {academicYear && `${academicYear}/${academicYear + 1}`}
           </span>

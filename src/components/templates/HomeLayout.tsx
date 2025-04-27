@@ -22,6 +22,7 @@ const HomeLayout = () => {
   const currentPage = Number(searchParams.get("page")) || 1;
 
   const {
+    departmentName,
     academicYear,
     submissionDate,
     finalClosureDate,
@@ -93,6 +94,7 @@ const HomeLayout = () => {
               <Col xs={0} sm={0} md={0} lg={4}>
                 <div className="sticky top-24">
                   <DepartmentCard
+                    department={departmentName ?? undefined}
                     academicYear={academicYear}
                     submissionDate={submissionDate}
                     finalClosureDate={finalClosureDate}

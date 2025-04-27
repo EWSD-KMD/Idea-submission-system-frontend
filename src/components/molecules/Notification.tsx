@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { getIcon } from "../atoms/Icon";
 import Avatar from "../atoms/Avatar";
-import { Divider, List, message, Skeleton } from "antd";
+import { Divider, List, message } from "antd";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { useRouter } from "next/navigation";
 import {
@@ -42,31 +42,28 @@ const Notification = () => {
     total: number;
     totalPages: number;
   } | null>(null);
+
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const router = useRouter();
 
-  // Fetch notifications from the API
   const fetchNotifications = async (page: number, limit: number) => {
-    if (page === 1) {
-      setLoading(true);
-    }
+    if (page === 1) setLoading(true);
     try {
       const res: NotificationsResponseData = await getNotifications(
         page,
         limit
       );
-      const mappedNotifications: NotificationItem[] = res.notifications.map(
-        (notif: any) => ({
-          id: notif.id,
-          userName: notif.fromUser?.name || "Unknown",
-          userAvatar: "", // Adjust if API returns an avatar URL
-          message: notif.message,
-          time: new Date(notif.createdAt).toLocaleTimeString(),
-          read: notif.isRead,
-          ideaId: notif.idea?.id || null,
-        })
-      );
-      setNotifications((prev) =>
-        page === 1 ? mappedNotifications : [...prev, ...mappedNotifications]
+      const mapped: NotificationItem[] = res.notifications.map((notif: any) => ({
+        id: notif.id,
+        userName: notif.fromUser?.name || "Unknown",
+        userAvatar: "",
+        message: notif.message,
+        time: new Date(notif.createdAt).toLocaleTimeString(),
+        read: notif.isRead,
+        ideaId: notif.idea?.id || null,
+      }));
+      setNotifications(prev =>
+        page === 1 ? mapped : [...prev, ...mapped]
       );
       setPagination({
         page: res.page,
@@ -74,21 +71,23 @@ const Notification = () => {
         total: res.total,
         totalPages: res.totalPages,
       });
-    } catch (error: any) {
-      message.error(error.message || "Failed to load notifications");
+    } catch (err: any) {
+      message.error(err.message || "Failed to load notifications");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchNotifications(1, 10);
-  }, []);
+  // only load page 1 once, the first time popover opens
+  const handlePopoverOpenChange = (open: boolean) => {
+    setPopoverOpen(open);
+    if (open && notifications.length === 0) {
+      fetchNotifications(1, 10);
+    }
+  };
 
-  // Count unread notifications
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.read).length;
 
-  // Mark all notifications as read
   const handleMarkAllRead = async () => {
     try {
       await markAllNotificationsAsRead();
@@ -101,13 +100,12 @@ const Notification = () => {
     }
   };
 
-  // Handle notification click: mark as read and route to idea detail if available.
   const handleNotificationClick = async (notif: NotificationItem) => {
     if (!notif.read) {
       try {
         await markNotificationAsRead(notif.id);
-        setNotifications((prev) =>
-          prev.map((n) => (n.id === notif.id ? { ...n, read: true } : n))
+        setNotifications(prev =>
+          prev.map(n => (n.id === notif.id ? { ...n, read: true } : n))
         );
       } catch (error: any) {
         message.error(error.message || "Failed to mark notification as read");
@@ -122,10 +120,17 @@ const Notification = () => {
 
   // Load more notifications when scrolled to bottom
   const handleLoadMore = async () => {
-    if (pagination && pagination.page < pagination.totalPages) {
+    console.log("pagination:", pagination)
+    console.log("pagination page:", pagination?.page)
+    console.log("pagination total:", pagination?.totalPages)
+    if (pagination && (pagination.page < pagination.totalPages)) {
       await fetchNotifications(pagination.page + 1, pagination.limit);
     }
   };
+
+  useEffect(() => {
+    fetchNotifications(1,10)
+  },[])
 
   const notificationContent = (
     <div className="w-60 sm:w-80">
@@ -135,12 +140,12 @@ const Notification = () => {
         </h3>
         <button
           onClick={handleMarkAllRead}
+          disabled={unreadCount === 0}
           className={
             unreadCount === 0
               ? "text-gray-300 text-[10px] sm:text-sm font-medium"
               : "text-[10px] sm:text-sm font-medium hover:underline"
           }
-          disabled={unreadCount === 0}
         >
           Mark all read
         </button>
@@ -165,9 +170,7 @@ const Notification = () => {
           <InfiniteScroll
             dataLength={notifications.length}
             next={handleLoadMore}
-            hasMore={
-              pagination ? notifications.length < pagination.total : false
-            }
+            hasMore={!!(pagination && notifications.length < pagination.total)}
             loader={
               <div className="flex justify-center p-3">
                 <div className="w-32 h-16">
@@ -201,6 +204,9 @@ const Notification = () => {
                     onClick={() => handleNotificationClick(notif)}
                   >
                     <Avatar
+                      src={notif.message.startsWith("Anonymous")
+                        ? "anonymous"
+                        : null}
                       label={
                         notif.message.startsWith("Anonymous")
                           ? "Anonymous"
@@ -240,13 +246,15 @@ const Notification = () => {
   );
 
   return (
-    <AntBadge size="small" count={unreadCount}>
+    <AntBadge count={unreadCount > 9 ? "9+" : unreadCount} size="small">
       <AntPopover
         content={notificationContent}
-        arrow
-        placement="bottomLeft"
         trigger="click"
+        open={popoverOpen}
+        onOpenChange={handlePopoverOpenChange}
+        placement="bottomLeft"
         autoAdjustOverflow
+        arrow
       >
         <button className="bg-opacity-30 bg-gray-600 text-white rounded-full p-2">
           {getIcon("bell")}

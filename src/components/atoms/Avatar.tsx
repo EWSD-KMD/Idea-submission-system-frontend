@@ -2,13 +2,14 @@
 import { AvatarProps } from "antd";
 import dynamic from "next/dynamic";
 import { CSSProperties } from "react";
+import { getIcon } from "./Icon";
 
 const AntAvatar = dynamic(() => import("antd").then((mod) => mod.Avatar), {
   ssr: false,
 });
 
 interface CustomAvatarProps extends AvatarProps {
-  src?: string;
+  src?: string | null;
   alt?: string;
   size?: number;
   label?: string | null; // Add label prop for fallback text
@@ -28,7 +29,7 @@ const Avatar = ({
     minWidth: size,
     aspectRatio: "1 / 1",
     objectFit: "cover",
-    backgroundColor: src ? undefined : "#E6ECFF",
+    backgroundColor: "#E6ECFF",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -36,17 +37,20 @@ const Avatar = ({
 
   // Get first letter and capitalize it
   const firstLetter = label ? label.charAt(0).toUpperCase() : "";
+  const isAnonymous = src === "anonymous";
 
   return (
     <AntAvatar
-      src={src}
+      src={isAnonymous ? undefined : src ?? undefined}
       alt={alt}
       size={size}
       style={avatarStyle}
       className={`rounded-full overflow-hidden ${className} text-primary font-bold`}
       {...props}
     >
-      {!src && firstLetter}
+      {isAnonymous
+        ? getIcon("anonymous")               // render your anonymous SVG
+        : src === null && firstLetter}                                         
     </AntAvatar>
   );
 };
