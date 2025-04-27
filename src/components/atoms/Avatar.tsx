@@ -49,8 +49,15 @@ const Avatar = ({
       {...props}
     >
       {isAnonymous
-        ? getIcon("anonymous")               // render your anonymous SVG
-        : src === null && firstLetter}                                         
+        ? getIcon("anonymous") // render your anonymous SVG
+        : src === null && (
+            <span
+              style={{ fontSize: size * 0.5, lineHeight: 1 }}
+              className="leading-none"
+            >
+              {firstLetter}
+            </span>
+          )}
     </AntAvatar>
   );
 };

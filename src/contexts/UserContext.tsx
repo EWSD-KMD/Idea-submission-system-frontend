@@ -24,6 +24,8 @@ interface UserContextType {
   finalClosureDate: string | null;
   isSubmissionClose: boolean;
   isFinalClosure: boolean;
+  /** Force a re-fetch of profile & image */
+  refreshProfile: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -46,97 +48,81 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const [profileImageLoading, setProfileImageLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    let isMounted = true;
-    let previousObjectUrl: string | null = null;
+  // We keep track of the last object URL so we can revoke it
+  let previousObjectUrl: string | null = null;
 
-    if (!accessToken) {
-      // Clear all state on logout
-      setEmail(null);
-      setUserName(null);
-      setLastLoginTime(null);
-      setDepartmentName(null);
-      setAcademicYear(null);
-      setAcademicYearStartDate(null);
-      setSubmissionDate(null);
-      setFinalClosureDate(null);
-      setIsSubmissionClose(false);
-      setIsFinalClosure(false);
-      setProfileImageUrl(null);
-      setProfileImageLoading(false);
-      return;
-    }
+  const refreshProfile = async () => {
+    if (!accessToken) return;
 
-    (async () => {
-      try {
-        const res = await getProfile();
-        if (res.err === 0 && res.data) {
-          const {
-            email,
-            name,
-            profileImage,          // this is the fileId or null
-            lastLoginTime,
-            department,
-            currentAcademicYear,
-          } = res.data;
+    try {
+      const res = await getProfile();
+      if (res.err !== 0 || !res.data) return;
 
-          if (!isMounted) return;
+      const {
+        email,
+        name,
+        profileImage,          // string fileId or null
+        lastLoginTime,
+        department,
+        currentAcademicYear,
+      } = res.data;
 
-          setEmail(email);
-          setUserName(name);
-          setLastLoginTime(lastLoginTime);
-          setDepartmentName(department?.name ?? null);
+      // basic fields
+      setEmail(email);
+      setUserName(name);
+      setLastLoginTime(lastLoginTime);
+      setDepartmentName(department?.name ?? null);
 
-          const {
-            year,
-            startDate,
-            closureDate,
-            finalClosureDate,
-          } = currentAcademicYear || {};
+      // year
+      const {
+        year,
+        startDate,
+        closureDate,
+        finalClosureDate,
+      } = currentAcademicYear || {};
 
-          setAcademicYear(year ?? null);
-          setAcademicYearStartDate(startDate ?? null);
-          setSubmissionDate(closureDate ?? null);
-          setFinalClosureDate(finalClosureDate ?? null);
+      setAcademicYear(year ?? null);
+      setAcademicYearStartDate(startDate ?? null);
+      setSubmissionDate(closureDate ?? null);
+      setFinalClosureDate(finalClosureDate ?? null);
 
-          const now = new Date();
-          if (closureDate) {
-            setIsSubmissionClose(now >= new Date(closureDate));
-          }
-          if (finalClosureDate) {
-            setIsFinalClosure(now >= new Date(finalClosureDate));
-          }
+      const now = new Date();
+      setIsSubmissionClose(closureDate ? now >= new Date(closureDate) : false);
+      setIsFinalClosure(finalClosureDate ? now >= new Date(finalClosureDate) : false);
 
-          // Fetch the actual image blob and convert to URL
-          if (profileImage) {
-            setProfileImageLoading(true);
-            try {
-              const url = await getProfileImageURL();
-              console.log("url", url)
-              if (!isMounted) return;
-              previousObjectUrl = url;
-              setProfileImageUrl(url);
-            } catch (err) {
-              console.error("Failed to fetch profile image blob:", err);
-              setProfileImageUrl(null);
-            } finally {
-              if (isMounted) setProfileImageLoading(false);
-            }
-          } else {
-            setProfileImageUrl(null);
-            setProfileImageLoading(false);
-          }
+      // if user has an image, fetch it:
+      if (profileImage) {
+        setProfileImageLoading(true);
+        try {
+          const url = await getProfileImageURL();
+          // revoke old
+          if (previousObjectUrl) URL.revokeObjectURL(previousObjectUrl);
+          previousObjectUrl = url;
+          setProfileImageUrl(url);
+        } catch (err) {
+          console.error("Failed to fetch profile image:", err);
+          setProfileImageUrl(null);
+        } finally {
+          setProfileImageLoading(false);
         }
-      } catch (err) {
-        console.error("Failed to fetch profile:", err);
+      } else {
+        // no image -> clear
+        if (previousObjectUrl) URL.revokeObjectURL(previousObjectUrl);
+        previousObjectUrl = null;
+        setProfileImageUrl(null);
+        setProfileImageLoading(false);
       }
-    })();
+    } catch (err) {
+      console.error("Error in refreshProfile()", err);
+    }
+  };
 
+  // On token change, refresh once
+  useEffect(() => {
+    refreshProfile();
+    // on unmount revoke
     return () => {
-      isMounted = false;
-      if (previousObjectUrl) {
-        URL.revokeObjectURL(previousObjectUrl);
-      }
+      if (previousObjectUrl) URL.revokeObjectURL(previousObjectUrl);
     };
   }, [accessToken]);
 
@@ -155,6 +141,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         finalClosureDate,
         isSubmissionClose,
         isFinalClosure,
+        refreshProfile,
       }}
     >
       {children}
