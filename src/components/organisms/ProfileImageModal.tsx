@@ -6,13 +6,14 @@ import Avatar from "../atoms/Avatar";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
 import { updateProfileImage } from "@/lib/user";
+import { useUser } from "@/contexts/UserContext";
 
 interface ProfileImageModalProps {
   visible: boolean;
   onCancel: () => void;
   /** Called with new object-URL or `null` if deleted */
   onSave: (newImageUrl: string | null) => void;
-  currentImage: string;
+  currentImage: string | null;
 }
 
 const { confirm } = Modal;
@@ -23,9 +24,10 @@ const ProfileImageModal: React.FC<ProfileImageModalProps> = ({
   onSave,
   currentImage,
 }) => {
-  const [preview, setPreview] = useState<string>(currentImage);
+  const [preview, setPreview] = useState<string | null>(currentImage);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const { userName, refreshProfile } = useUser();
 
   // Reset when opened/closed
   useEffect(() => {
@@ -44,7 +46,7 @@ const ProfileImageModal: React.FC<ProfileImageModalProps> = ({
       cancelText: "No",
       centered: true,
       onOk() {
-        setPreview("/default.png");
+        setPreview(null);
         setFile(null);
       },
     });
@@ -65,8 +67,9 @@ const ProfileImageModal: React.FC<ProfileImageModalProps> = ({
     if (file) {
       setUploading(true);
       try {
-        console.log("profile image", file)
+        console.log("profile image", file);
         await updateProfileImage(file);
+        await refreshProfile();
         message.success("Profile image uploaded");
         onSave(preview);
         onCancel();
@@ -117,7 +120,7 @@ const ProfileImageModal: React.FC<ProfileImageModalProps> = ({
     >
       <Divider />
       <div className="flex flex-col items-center gap-3 p-3">
-      <Avatar size={140} src={preview} className="rounded-full mb-3" />
+        <Avatar size={140} src={preview} label={userName} className="rounded-full mb-3" />
         <p className="text-center text-sm">
           Upload a clear and high-quality image to personalize your profile.
         </p>

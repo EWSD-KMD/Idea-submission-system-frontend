@@ -53,18 +53,18 @@ const Notification = () => {
         page,
         limit
       );
-      const mapped: NotificationItem[] = res.notifications.map((notif: any) => ({
-        id: notif.id,
-        userName: notif.fromUser?.name || "Unknown",
-        userAvatar: "",
-        message: notif.message,
-        time: new Date(notif.createdAt).toLocaleTimeString(),
-        read: notif.isRead,
-        ideaId: notif.idea?.id || null,
-      }));
-      setNotifications(prev =>
-        page === 1 ? mapped : [...prev, ...mapped]
+      const mapped: NotificationItem[] = res.notifications.map(
+        (notif: any) => ({
+          id: notif.id,
+          userName: notif.fromUser?.name || "Unknown",
+          userAvatar: "",
+          message: notif.message,
+          time: new Date(notif.createdAt).toLocaleTimeString(),
+          read: notif.isRead,
+          ideaId: notif.idea?.id || null,
+        })
       );
+      setNotifications((prev) => (page === 1 ? mapped : [...prev, ...mapped]));
       setPagination({
         page: res.page,
         limit: res.limit,
@@ -86,7 +86,7 @@ const Notification = () => {
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const handleMarkAllRead = async () => {
     try {
@@ -104,8 +104,8 @@ const Notification = () => {
     if (!notif.read) {
       try {
         await markNotificationAsRead(notif.id);
-        setNotifications(prev =>
-          prev.map(n => (n.id === notif.id ? { ...n, read: true } : n))
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === notif.id ? { ...n, read: true } : n))
         );
       } catch (error: any) {
         message.error(error.message || "Failed to mark notification as read");
@@ -120,17 +120,14 @@ const Notification = () => {
 
   // Load more notifications when scrolled to bottom
   const handleLoadMore = async () => {
-    console.log("pagination:", pagination)
-    console.log("pagination page:", pagination?.page)
-    console.log("pagination total:", pagination?.totalPages)
-    if (pagination && (pagination.page < pagination.totalPages)) {
+    if (pagination && pagination.page < pagination.totalPages) {
       await fetchNotifications(pagination.page + 1, pagination.limit);
     }
   };
 
   useEffect(() => {
-    fetchNotifications(1,10)
-  },[])
+    fetchNotifications(1, 10);
+  }, []);
 
   const notificationContent = (
     <div className="w-60 sm:w-80">
@@ -204,9 +201,11 @@ const Notification = () => {
                     onClick={() => handleNotificationClick(notif)}
                   >
                     <Avatar
-                      src={notif.message.startsWith("Anonymous")
-                        ? "anonymous"
-                        : null}
+                      src={
+                        notif.message.startsWith("Anonymous")
+                          ? "anonymous"
+                          : null
+                      }
                       label={
                         notif.message.startsWith("Anonymous")
                           ? "Anonymous"
@@ -216,8 +215,19 @@ const Notification = () => {
                     />
                     <div className="flex-1">
                       <p className="text-[12px] sm:text-sm text-gray-900">
-                        {/* <span className="font-semibold">{notif.userName}</span>{" "} */}
-                        {notif.message}
+                        {notif.message.startsWith("Anonymous") ? (
+                          <>
+                            <span className="font-semibold">Anonymous</span>
+                            {notif.message.slice("Anonymous".length)}
+                          </>
+                        ) : (
+                          <>
+                            <span className="font-semibold">
+                              {notif.userName}
+                            </span>{" "}
+                            {notif.message}
+                          </>
+                        )}
                       </p>
                       <p className="text-[10px] sm:text-xs text-gray-500">
                         {notif.time}

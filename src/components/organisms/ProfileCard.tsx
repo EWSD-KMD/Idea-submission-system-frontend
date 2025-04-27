@@ -16,22 +16,15 @@ const AntCard = dynamic(() => import("antd").then((mod) => mod.Card), {
   ssr: false,
 });
 
-interface ProfileCardProps { }
+interface ProfileCardProps {}
 
 const ProfileCard: React.FC<ProfileCardProps> = () => {
   const { isMobile } = useResponsive();
-  const {
-    profileImageUrl,
-    userName,
-    email,
-    lastLoginTime,
-    departmentName,
-  } = useUser();
+  const { profileImageUrl, userName, email, lastLoginTime, departmentName } =
+    useUser();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentImage, setCurrentImage] = useState(
-    profileImageUrl || "/default.png"
-  );
+  const [currentImage, setCurrentImage] = useState(profileImageUrl);
 
   // Format last login
   const formattedLoginTime = lastLoginTime
@@ -57,20 +50,20 @@ const ProfileCard: React.FC<ProfileCardProps> = () => {
         {isMobile ? (
           <div className="flex gap-4">
             <div className="flex flex-col items-center mb-3">
-             <Skeleton.Avatar size={80} active/>
+              <Skeleton.Avatar size={80} active />
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-2">
-                <Skeleton.Input block active/>
-                <Skeleton.Input size="small" active/>
+                <Skeleton.Input block active />
+                <Skeleton.Input size="small" active />
               </div>
               <div className="flex flex-col">
                 <span className="text-500 text-body-xs">Email</span>
-                <Skeleton.Input size="small" block active/>
+                <Skeleton.Input size="small" block active />
               </div>
               <div className="flex flex-col">
                 <span className="text-500 text-body-xs">Last Login</span>
-                <Skeleton.Input size="small" block active/>
+                <Skeleton.Input size="small" block active />
               </div>
             </div>
           </div>
@@ -78,22 +71,22 @@ const ProfileCard: React.FC<ProfileCardProps> = () => {
           <div className="flex flex-col gap-4">
             <div className="text-center">
               <div className="flex flex-col items-center mb-3">
-                <Skeleton.Avatar size={120} active/>
+                <Skeleton.Avatar size={120} active />
               </div>
               <div className="flex flex-col gap-1">
-                <Skeleton.Input block active/>
+                <Skeleton.Input block active />
 
-                <Skeleton.Input size="small" active/>
+                <Skeleton.Input size="small" active />
               </div>
             </div>
             <div className="flex flex-col">
               <span className="text-500 text-body-xs">Email</span>
-              <Skeleton.Input size="small" block active/>
+              <Skeleton.Input size="small" block active />
             </div>
 
             <div className="flex flex-col">
               <span className="text-500 text-body-xs">Last Login</span>
-              <Skeleton.Input size="small" block active/>
+              <Skeleton.Input size="small" block active />
             </div>
           </div>
         )}
@@ -114,7 +107,7 @@ const ProfileCard: React.FC<ProfileCardProps> = () => {
       const previewUrl = URL.createObjectURL(newImage);
       setCurrentImage(previewUrl);
     } else if (newImage === null) {
-      setCurrentImage("/default.png");
+      setCurrentImage(null);
     } else {
       setCurrentImage(currentImage);
     }
@@ -125,7 +118,7 @@ const ProfileCard: React.FC<ProfileCardProps> = () => {
       {isMobile ? (
         <div className="flex gap-4">
           <div className="flex flex-col items-center mb-3">
-            <Avatar size={80} src={profileImageUrl ?? "/default.png"} className="z-10" />
+            <Avatar size={80} src={profileImageUrl} label={userName} className="z-10" />
             <Button
               icon={getIcon("pencil", 16)}
               size="small"
@@ -159,7 +152,7 @@ const ProfileCard: React.FC<ProfileCardProps> = () => {
         <div className="flex flex-col gap-4">
           <div className="text-center">
             <div className="flex flex-col items-center mb-3">
-              <Avatar size={120} src={profileImageUrl ?? "/default.png"} className="z-10" />
+              <Avatar size={120} src={profileImageUrl} label={userName} className="z-10" />
               <Button
                 icon={getIcon("pencil", 16)}
                 size="small"
@@ -193,7 +186,7 @@ const ProfileCard: React.FC<ProfileCardProps> = () => {
         visible={isModalOpen}
         onCancel={handleCancel}
         onSave={(newUrl) => {
-          setCurrentImage(newUrl ?? "/default.png");
+          setCurrentImage(newUrl);
         }}
         currentImage={currentImage}
       />
