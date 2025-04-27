@@ -13,7 +13,7 @@ interface AnonymousDropdownProps {
   name: string | null;
   onAnonymousChange: (isAnon: boolean) => void
   showName?: boolean;
-  photo?: string;
+  photo?: string | null;
   size?: number;
 }
 
@@ -66,7 +66,7 @@ const AnonymousDropdown = ({
     {
       key: "name",
       label: (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between interaction-buttons">
           <div className="flex items-center ">
             <Avatar size={size || 30} src={photo} label={name} />
             <span className="ml-2 text-black">{name}</span>
@@ -81,7 +81,7 @@ const AnonymousDropdown = ({
     {
       key: "anonymous",
       label: (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between interaction-buttons">
           <div className="flex items-center ">
             <Avatar
               size={size || 30}

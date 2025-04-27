@@ -2,62 +2,43 @@
 
 import React, { useEffect, useState } from "react";
 import PostCard from "../organisms/PostCard";
-import { Pagination, message } from "antd";
-import { getAllIdeas } from "@/lib/idea";
 import { Idea } from "@/constant/type";
-import { useAuth } from "@/contexts/AuthContext"; // Assumes this provides user info
 import Image from "../atoms/Image";
 import PostLoading from "../molecules/PostLoading";
+import { getProfileIdeas } from "@/lib/user";
 
 const UserIdeaList: React.FC = () => {
   const [ideas, setIdeas] = useState<Idea[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalIdeas, setTotalIdeas] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const pageSize = 5;
-  const { userId } = useAuth(); // This hook should return the logged in user's info
 
   // Fetch ideas from the API
 
-  const fetchIdeas = async (page: number) => {
+  const fetchIdeas = async () => {
     setLoading(true);
-    if (userId) {
-      try {
-        const params = {
-          page,
-          limit: pageSize,
-          userId,
-        };
+    try {
+      const response = await getProfileIdeas();
 
-        const response = await getAllIdeas(params);
-        console.log("response", response);
-
-        if (response.err === 0) {
-          setIdeas(response.data.ideas);
-          setTotalIdeas(response.data.total);
-        } else {
-          throw new Error(response.message);
-        }
-      } catch (err: any) {
-        setError(err.message || "Failed to load ideas");
-      } finally {
-        setLoading(false);
+      if (response.err === 0) {
+        setIdeas(response.data);
+        console.log("ideas",ideas)
+      } else {
+        throw new Error(response.message);
       }
+    } catch (err: any) {
+      setError(err.message || "Failed to load ideas");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchIdeas(currentPage);
-  }, [currentPage]);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+    fetchIdeas();
+  }, []);
 
   if (loading) return <PostLoading />;
   if (error) return <div>Error: {error}</div>;
-  if (!ideas.length)
+  if (!ideas?.length)
     return (
       <div className="flex flex-col items-center justify-center p-4 mt-40">
         <Image
@@ -81,6 +62,7 @@ const UserIdeaList: React.FC = () => {
           title={idea.title}
           description={idea.description}
           status={idea.status}
+          anonymous={idea.anonymous}
           ideaUserName={idea.user.name}
           ideaUserId={idea.userId}
           departmentId={idea.department.id}
@@ -92,21 +74,11 @@ const UserIdeaList: React.FC = () => {
           dislikes={idea.dislikes}
           views={idea.views}
           files={idea.files}
+          likeInd={idea.likeInd}
+          disLikeInd={idea.dislikeInd}
           commentsCount={idea.comments.length}
         />
       ))}
-
-      <div className="py-4 sm:py-10 flex justify-center">
-        <Pagination
-          current={currentPage}
-          total={totalIdeas}
-          pageSize={pageSize}
-          onChange={handlePageChange}
-          showSizeChanger={false}
-          showQuickJumper={false}
-          className="ant-pagination-custom"
-        />
-      </div>
     </div>
   );
 };

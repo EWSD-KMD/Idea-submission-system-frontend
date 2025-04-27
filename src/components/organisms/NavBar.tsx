@@ -6,7 +6,7 @@ import Button from "../atoms/Button";
 import AvatarDropdown from "./AvatarDropdown";
 import Notification from "../molecules/Notification";
 import { useRouter } from "next/navigation";
-import { RefObject } from "react";
+import { RefObject, useState } from "react";
 import { CreatePostIdeaRef } from "../templates/CreatePostIdea";
 import { useUser } from "@/contexts/UserContext";
 import { Tooltip } from "antd";
@@ -15,9 +15,13 @@ interface NavBarProps {
   createPostIdeaRef?: RefObject<CreatePostIdeaRef>;
 }
 
-const NavBar = ({ createPostIdeaRef }: NavBarProps) => {
+const NavBar = (
+  { createPostIdeaRef }: NavBarProps,
+  avatarSrc: string | null
+) => {
   const router = useRouter();
   const { isSubmissionClose } = useUser();
+  const [src, setSrc] = useState<string | null>(null);
 
   const handleHomeClick = () => {
     router.push("/");

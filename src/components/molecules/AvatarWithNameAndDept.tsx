@@ -6,7 +6,7 @@ interface AvatarWithNameAndDeptProps {
   department: string;
   category: string;
   time: string;
-  avatarSrc?: string;
+  avatarSrc?: string | null;
   size?: number;
   className?: string;
 }
@@ -29,7 +29,7 @@ const AvatarWithNameAndDept = ({
 
   return (
     <div className={`flex items-center justify-between w-full ${className}`}>
-      <Avatar size={avatarSize} label={name} />
+      <Avatar src={avatarSrc} size={avatarSize} label={name} />
       <div className="flex flex-col flex-grow ml-2 sm:ml-3">
         <span className={`font-bold ${nameSize}`}>{name}</span>
         <div className="flex flex-wrap items-center gap-1">

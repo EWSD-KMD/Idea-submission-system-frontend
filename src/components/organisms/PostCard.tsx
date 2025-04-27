@@ -43,12 +43,15 @@ export interface PostCardProps
   ideaUserName: string;
   ideaUserId: number;
   status?: string;
+  anonymous: boolean;
   departmentId: number;
   departmentName: string;
   categoryId: number;
   category: string;
   files?: IdeaFile[];
   commentsCount: number;
+  likeInd: boolean;
+  disLikeInd: boolean;
   onDelete?: (id: number) => void;
 }
 
@@ -56,7 +59,8 @@ const PostCard: React.FC<PostCardProps> = ({
   id,
   title,
   description,
-  status = "SHOW",
+  status,
+  anonymous,
   ideaUserName,
   ideaUserId,
   departmentId,
@@ -69,6 +73,8 @@ const PostCard: React.FC<PostCardProps> = ({
   views,
   files = [],
   commentsCount: initialCommentsCount,
+  likeInd,
+  disLikeInd,
   onDelete,
 }) => {
   const router = useRouter();
@@ -81,6 +87,7 @@ const PostCard: React.FC<PostCardProps> = ({
   const [editedTitle, setEditedTitle] = useState(title);
   const [editedDescription, setEditedDescription] = useState(description);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(anonymous);
 
   // Comments toggle
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
@@ -261,12 +268,12 @@ const PostCard: React.FC<PostCardProps> = ({
             category={category}
             time={timeAgo(createdAt)}
             avatarSrc={
-              userId !== ideaUserId && ideaUserName === "Anonymous"
-                ? "/anonymous.svg"
-                : ""
+              userId !== ideaUserId && isAnonymous
+                ? "anonymous"
+                : null
             }
           />
-          {userId === ideaUserId && ideaUserName === "Anonymous" && (
+          {userId === ideaUserId && isAnonymous && (
             <div>
               {/* full text on sm+ */}
               <Tag
@@ -336,6 +343,8 @@ const PostCard: React.FC<PostCardProps> = ({
               ideaId={id}
               likeCount={likes}
               dislikeCount={dislikes}
+              isLiked={likeInd}
+              isDisliked={disLikeInd}
             />
             <CommentButton
               commentCount={commentsCount}

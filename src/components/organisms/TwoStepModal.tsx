@@ -8,10 +8,10 @@ import { getIcon } from "../atoms/Icon";
 import CategoryModal from "../molecules/CategoryModal";
 import Image from "../atoms/Image";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserById } from "@/lib/user";
 import { createIdea, uploadIdeaFile } from "@/lib/idea"; // Your API calls
 import { useRouter } from "next/navigation";
 import { Category, CreateIdeaRequest } from "@/constant/type";
+import { useUser } from "@/contexts/UserContext";
 
 interface TwoStepModalProps {
   visible: boolean;
@@ -30,8 +30,8 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
   // fileList now stores objects that include previewUrl and a loading flag
   const [fileList, setFileList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState<string>("");
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
+  const { userName, profileImageUrl } = useUser();
 
   const nextStep = () => setCurrentStep(currentStep + 1);
   const prevStep = () => setCurrentStep(currentStep - 1);
@@ -43,21 +43,6 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
     router.push("/");
     router.refresh();
   };
-
-  useEffect(() => {
-    const fetchUsername = async () => {
-      if (userId) {
-        try {
-          const user = await getUserById(userId);
-          setUsername(user.name);
-        } catch (error: any) {
-          console.error("Error fetching username:", error);
-          message.error("Failed to fetch username");
-        }
-      }
-    };
-    fetchUsername();
-  }, [userId]);
 
   // Update anonymity state from AnonymousDropdown
   const handleAnonymousChange = (anonymous: boolean) => {
@@ -218,10 +203,10 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
         {currentStep === 0 ? (
           <div className="flex flex-col">
             <AnonymousDropdown
-              name={username}
+              name={userName}
               onAnonymousChange={handleAnonymousChange}
               showName
-              photo=""
+              photo={profileImageUrl}
               size={40}
             />
             <Divider className="w-full my-3" />

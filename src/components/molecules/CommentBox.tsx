@@ -16,7 +16,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ onCommentSubmit }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
-  const { userName } = useUser();
+  const { userName, profileImageUrl } = useUser();
 
   // Receive the anonymous flag from the dropdown
   const handleAnonymousChange = (anonymous: boolean) => {
@@ -47,7 +47,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ onCommentSubmit }) => {
   return (
     <div className="flex gap-3 w-full">
       {/* AnonymousDropdown remains inside CommentBox and updates the local isAnonymous state */}
-      <AnonymousDropdown name={userName} onAnonymousChange={handleAnonymousChange}/>
+      <AnonymousDropdown photo={profileImageUrl} name={userName} onAnonymousChange={handleAnonymousChange}/>
       <div className="flex flex-col w-full rounded-lg border border-gray-300">
         <div className="flex flex-col w-full items-end">
           <TextArea

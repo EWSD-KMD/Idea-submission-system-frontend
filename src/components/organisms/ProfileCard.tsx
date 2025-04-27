@@ -1,4 +1,5 @@
 "use client";
+
 import dynamic from "next/dynamic";
 import Tag from "../atoms/Tag";
 import Avatar from "../atoms/Avatar";
@@ -9,32 +10,48 @@ import { useState } from "react";
 import ProfileImageModal from "./ProfileImageModal";
 import { useResponsive } from "@/utils/responsive";
 import { Skeleton } from "antd";
+import { useUser } from "@/contexts/UserContext";
 
 const AntCard = dynamic(() => import("antd").then((mod) => mod.Card), {
   ssr: false,
 });
 
-interface ProfileCardProps {
-  image?: string;
-  name: string | null;
-  department: string | null;
-  email: string | null;
-  last_login: Date;
-}
+interface ProfileCardProps { }
 
-const ProfileCard = ({
-  image = "/Media.jpg",
-  name,
-  department,
-  email,
-  last_login,
-}: ProfileCardProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentImage, setCurrentImage] = useState(image);
-
+const ProfileCard: React.FC<ProfileCardProps> = () => {
   const { isMobile } = useResponsive();
+  const {
+    profileImageUrl,
+    userName,
+    email,
+    lastLoginTime,
+    departmentName,
+  } = useUser();
 
-  if (!name || !email) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentImage, setCurrentImage] = useState(
+    profileImageUrl || "/default.png"
+  );
+
+  // Format last login
+  const formattedLoginTime = lastLoginTime
+    ? (() => {
+        const d = new Date(lastLoginTime);
+        const dateStr = d.toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        });
+        const timeStr = d.toLocaleTimeString(undefined, {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return `${dateStr} ${timeStr}`;
+      })()
+    : "—";
+
+  // Loading skeleton
+  if (!userName || !email) {
     return (
       <AntCard className="overflow-hidden">
         {isMobile ? (
@@ -108,7 +125,7 @@ const ProfileCard = ({
       {isMobile ? (
         <div className="flex gap-4">
           <div className="flex flex-col items-center mb-3">
-            <Avatar size={80} src={image} className="z-10" />
+            <Avatar size={80} src={profileImageUrl ?? "/default.png"} className="z-10" />
             <Button
               icon={getIcon("pencil", 16)}
               size="small"
@@ -119,9 +136,9 @@ const ProfileCard = ({
           </div>
           <div className="flex flex-col gap-2">
             <div>
-              <h5 className="font-semibold text-lg">{name}</h5>
+              <h5 className="font-semibold text-lg">{userName}</h5>
               <Tag
-                label={department || ""}
+                label={departmentName || ""}
                 color="blue"
                 className="text-body-xs mb-1 rounded-lg border-none"
               />
@@ -133,7 +150,7 @@ const ProfileCard = ({
             <div className="flex flex-col">
               <span className="text-500 text-body-xs">Last Login</span>
               <span className="font-semibold text-body-lg">
-                {last_login.toLocaleString()}
+                {formattedLoginTime}
               </span>
             </div>
           </div>
@@ -142,7 +159,7 @@ const ProfileCard = ({
         <div className="flex flex-col gap-4">
           <div className="text-center">
             <div className="flex flex-col items-center mb-3">
-              <Avatar size={120} src={image} className="z-10" />
+              <Avatar size={120} src={profileImageUrl ?? "/default.png"} className="z-10" />
               <Button
                 icon={getIcon("pencil", 16)}
                 size="small"
@@ -151,10 +168,9 @@ const ProfileCard = ({
                 onClick={showModal}
               />
             </div>
-            <Title level={4}>{name}</Title>
-
+            <Title level={4}>{userName}</Title>
             <Tag
-              label={department || ""}
+              label={departmentName || ""}
               color="blue"
               className="text-body-xs mb-1 rounded-lg border-none"
             />
@@ -167,7 +183,7 @@ const ProfileCard = ({
           <div className="flex flex-col">
             <span className="text-500 text-body-xs">Last Login</span>
             <span className="font-semibold text-body-lg">
-              {last_login.toLocaleString()}
+              {formattedLoginTime}
             </span>
           </div>
         </div>
@@ -176,7 +192,9 @@ const ProfileCard = ({
       <ProfileImageModal
         visible={isModalOpen}
         onCancel={handleCancel}
-        onSave={handleSave}
+        onSave={(newUrl) => {
+          setCurrentImage(newUrl ?? "/default.png");
+        }}
         currentImage={currentImage}
       />
     </AntCard>

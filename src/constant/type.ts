@@ -127,6 +127,7 @@ export interface Idea {
   title: string;
   description: string;
   status: string;
+  anonymous: boolean;
   categoryId: number;
   departmentId: number;
   userId: number;
@@ -140,6 +141,8 @@ export interface Idea {
   user: User;
   comments: CommentData[];
   files?: IdeaFile[];
+  likeInd: boolean;
+  dislikeInd: boolean;
 }
 
 export interface IdeasResponseData {
@@ -149,6 +152,7 @@ export interface IdeasResponseData {
   total: number;
   totalPages: number;
 }
+
 export interface CreateIdeaRequest {
   title: string;
   description: string;
@@ -173,6 +177,13 @@ export interface IdeasResponse {
   message: string;
   data: IdeasResponseData;
 }
+
+export interface ProfileIdeasResponse {
+  err: number;
+  message: string;
+  data: Idea[];
+}
+
 export interface IdeaDetailResponse {
   err: number;
   message: string;
@@ -311,10 +322,10 @@ export interface MarkAsReadResponse {
 
 //region AcademicYears Type
 export interface AcademicYear {
-  id: number;
-  year: number;
+  startDate: string;
   closureDate: string;
   finalClosureDate: string;
+  year: number;
 }
 
 export interface AcademicYearsResponse {
@@ -347,6 +358,23 @@ export interface ReportIdeaResponse {
   data: Report;
 }
 // #endregion
+
+//region Profile
+export interface ProfileResponse {
+  err: number;
+  message: string;
+  data: Profile;
+}
+
+export interface Profile {
+  email: string;
+  name: string;
+  profileImage: string;
+  lastLoginTime: string;
+  department: Department;
+  currentAcademicYear: AcademicYear;
+}
+//end region
 
 export interface ErrorResponse {
   err: number;

@@ -17,22 +17,30 @@ const AntDropdown = dynamic(() => import("antd").then((mod) => mod.Dropdown), {
   ssr: false,
 });
 
-const renderProfileItem = (userName: string | null) => {
+const renderProfileItem = (
+  userName: string | null,
+  department: string | null,
+  avatarSrc: string | null
+) => {
   return (
     <div className="flex items-center gap-2">
-      <Avatar size={32} label={userName} />
+      <Avatar src={avatarSrc} size={32} label={userName} />
       <div className="flex flex-col">
         <span className="font-medium">{userName}</span>
-        <span className="text-xs text-gray-500">Department Name</span>
+        <span className="text-xs text-gray-500">{department}</span>
       </div>
     </div>
   );
 };
 
-const getDropdownItems = (userName: string | null): MenuProps["items"] => [
+const getDropdownItems = (
+  userName: string | null,
+  department: string | null,
+  avatarSrc: string | null,
+): MenuProps["items"] => [
   {
     key: "profile",
-    label: renderProfileItem(userName),
+    label: renderProfileItem(userName, department, avatarSrc),
   },
   {
     type: "divider",
@@ -54,7 +62,7 @@ const getDropdownItems = (userName: string | null): MenuProps["items"] => [
 
 const AvatarDropdown = () => {
   const { logoutUser } = useAuth();
-  const { userName } = useUser();
+  const { userName, departmentName, profileImageUrl } = useUser();
   const router = useRouter();
   const [changePasswordModal, setChangePasswordModal] = useState(false);
   const handleMenuClick = ({ key }: { key: string }) => {
@@ -81,7 +89,7 @@ const AvatarDropdown = () => {
     <>
       <AntDropdown
         menu={{
-          items: getDropdownItems(userName),
+          items: getDropdownItems(userName, departmentName, profileImageUrl),
           onClick: handleMenuClick,
         }}
         placement="bottomRight"
@@ -103,7 +111,7 @@ const AvatarDropdown = () => {
               </div>
             }
           >
-            <Avatar label={userName} />
+            <Avatar src={profileImageUrl} label={userName} />
           </AntBadge>
         </div>
       </AntDropdown>

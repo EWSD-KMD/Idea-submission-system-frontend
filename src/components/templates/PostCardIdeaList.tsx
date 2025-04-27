@@ -146,6 +146,7 @@ const PostCardIdeaList = ({
             id={idea.id}
             title={idea.title}
             description={idea.description}
+            anonymous={idea.anonymous}
             ideaUserName={idea.user.name}
             ideaUserId={idea.userId}
             departmentId={idea.department.id}
@@ -158,6 +159,8 @@ const PostCardIdeaList = ({
             views={idea.views}
             files={idea.files || undefined}
             commentsCount={idea.comments.length}
+            likeInd={idea.likeInd}
+            disLikeInd={idea.dislikeInd}
             onDelete={handleDeletePost}
           />
         </div>
