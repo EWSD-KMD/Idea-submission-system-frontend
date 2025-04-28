@@ -30,6 +30,7 @@ import thumbsDownFillIcon from "./general/thumbs-down-fill.svg";
 import plusDisabledIcon from "./general/plus_disabled.svg";
 import messageCircleMoreDisabledIcon from "./general/messageCircleMoreDisabled.svg"
 import downloadIcon from "./general/arrow-down-to-line.svg"
+import trashDisabledIcon from "./general/trashDisabled.svg"
 
 export {
   plusIcon,
@@ -64,5 +65,5 @@ export {
   plusDisabledIcon,
   messageCircleMoreDisabledIcon,
   downloadIcon,
-
+  trashDisabledIcon,
 };

@@ -102,17 +102,6 @@ const ProfileCard: React.FC<ProfileCardProps> = () => {
     setIsModalOpen(false);
   };
 
-  const handleSave = (newImage?: string | File) => {
-    if (newImage instanceof File) {
-      const previewUrl = URL.createObjectURL(newImage);
-      setCurrentImage(previewUrl);
-    } else if (newImage === null) {
-      setCurrentImage(null);
-    } else {
-      setCurrentImage(currentImage);
-    }
-  };
-
   return (
     <AntCard className="overflow-hidden">
       {isMobile ? (
@@ -188,7 +177,7 @@ const ProfileCard: React.FC<ProfileCardProps> = () => {
         onSave={(newUrl) => {
           setCurrentImage(newUrl);
         }}
-        currentImage={currentImage}
+        currentImage={profileImageUrl}
       />
     </AntCard>
   );
