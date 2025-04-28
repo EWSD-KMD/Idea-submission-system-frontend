@@ -5,7 +5,7 @@ import { Modal, Divider, Upload, message, Spin } from "antd";
 import Avatar from "../atoms/Avatar";
 import Button from "../atoms/Button";
 import { getIcon } from "../atoms/Icon";
-import { updateProfileImage } from "@/lib/user";
+import { deleteProfileImage, updateProfileImage } from "@/lib/user";
 import { useUser } from "@/contexts/UserContext";
 
 interface ProfileImageModalProps {
@@ -27,7 +27,7 @@ const ProfileImageModal: React.FC<ProfileImageModalProps> = ({
   const [preview, setPreview] = useState<string | null>(currentImage);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const { userName, refreshProfile } = useUser();
+  const { userName, profileImageUrl, refreshProfile } = useUser();
 
   // Reset when opened/closed
   useEffect(() => {
@@ -80,9 +80,18 @@ const ProfileImageModal: React.FC<ProfileImageModalProps> = ({
         setUploading(false);
       }
     } else {
-      // deletion
-      onSave(null);
-      onCancel();
+      setUploading(true);
+      try {
+        await deleteProfileImage();
+        await refreshProfile();
+        message.success("Profile image deleted");
+        onSave(null);
+        onCancel();
+      } catch (err: any) {
+        message.error(err.message || "Delete failed");
+      } finally {
+        setUploading(false);
+      }
     }
   };
 
@@ -120,13 +129,18 @@ const ProfileImageModal: React.FC<ProfileImageModalProps> = ({
     >
       <Divider />
       <div className="flex flex-col items-center gap-3 p-3">
-        <Avatar size={140} src={preview} label={userName} className="rounded-full mb-3" />
+        <Avatar
+          size={140}
+          src={preview}
+          label={userName}
+          className="rounded-full mb-3"
+        />
         <p className="text-center text-sm">
           Upload a clear and high-quality image to personalize your profile.
         </p>
         <div className="flex gap-2">
           <Upload
-            accept="image/*"
+            accept="image/jpeg,image/png"
             showUploadList={false}
             onChange={onFileChange}
             disabled={uploading}
@@ -142,10 +156,16 @@ const ProfileImageModal: React.FC<ProfileImageModalProps> = ({
           </Upload>
           <Button
             type="dashed"
-            icon={getIcon("trash")}
+            icon={
+              profileImageUrl === null
+                ? !uploading
+                  ? getIcon("trashDisabled")
+                  : getIcon("trash")
+                : getIcon("trash")
+            }
             label="Delete"
             rounded
-            disabled={preview === "/default.png" || uploading}
+            disabled={profileImageUrl === null || uploading}
             onClick={showDeleteConfirm}
           />
         </div>

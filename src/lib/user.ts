@@ -1,12 +1,16 @@
-import { get, post } from "@/config/api/httpRequest/httpMethod";
+import { get, post, remove } from "@/config/api/httpRequest/httpMethod";
 import {
   ChangePasswordRequest,
   ChangePasswordResponse,
+  DeleteProfileImageResponse,
   ProfileIdeasResponse,
   ProfileResponse,
 } from "@/constant/type";
 import { isErrorWithMessage } from "@/utils/errorWithMessage";
 import Cookies from "js-cookie";
+
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const token = Cookies.get("accessToken");
 
 export interface UploadImageResponse {
   err: number;
@@ -20,8 +24,8 @@ export interface UploadImageResponse {
 export async function updateProfileImage(file: File) {
   try {
     const form = new FormData();
-    form.append("file", file);
-    console.log("profile form:", form)
+    form.append("profileImage", file);
+    console.log("profile form:", form);
     const url = "/auth/profile/image";
     const response = await post<FormData, UploadImageResponse>(url, form);
     console.log("res : ", response);
@@ -34,9 +38,21 @@ export async function updateProfileImage(file: File) {
   }
 }
 
+export async function deleteProfileImage(): Promise<DeleteProfileImageResponse> {
+  try {
+    const url = `/auth/profile/image`;
+    const response = await remove<DeleteProfileImageResponse>(url);
+    console.log("remove", response)
+    return response;
+  } catch (error: unknown) {
+    if (isErrorWithMessage(error)) {
+      throw new Error(error.message);
+    }
+    throw new Error("Failed to delete profile image");
+  }
+}
+
 export async function fetchProfileImage(): Promise<Blob> {
-  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-  const token = Cookies.get("accessToken");
   if (!token) throw new Error("Not authenticated");
 
   const resp = await fetch(`${API_URL}/auth/profile/image`, {

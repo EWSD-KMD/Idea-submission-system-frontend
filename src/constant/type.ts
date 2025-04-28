@@ -184,6 +184,12 @@ export interface ProfileIdeasResponse {
   data: Idea[];
 }
 
+export interface DeleteProfileImageResponse {
+  err: number;
+  message: string;
+  data: null
+}
+
 export interface IdeaDetailResponse {
   err: number;
   message: string;
