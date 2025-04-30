@@ -42,6 +42,7 @@ const Login = () => {
         duration: 3,
       });
       router.push("/");
+      window.location.reload();
     } catch (err: any) {
       const errorMessage =
         err?.message === "Login failed"

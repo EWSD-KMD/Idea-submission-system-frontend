@@ -19,7 +19,7 @@ interface PostCardIdeaListProps {
 const PostCardIdeaList = ({
   departmentId,
   categoryId,
-  sortBy = "latest",
+  sortBy,
 }: PostCardIdeaListProps) => {
   const router = useRouter();
   const { userId } = useAuth();
@@ -39,7 +39,7 @@ const PostCardIdeaList = ({
         const params = {
           page,
           limit: pageSize,
-          sortBy,
+          ...(sortBy && sortBy !== "latest" && { sortBy }),
           ...(departmentId && departmentId !== "allDept" && { departmentId }),
           ...(categoryId && categoryId !== "allCtg" && { categoryId }),
           status: "SHOW",
@@ -72,6 +72,12 @@ const PostCardIdeaList = ({
     params.set("page", page.toString());
 
     // Update filters only if they're not default values
+    if (sortBy && sortBy !== "latest") {
+      params.set("sortBy", sortBy);
+    } else {
+      params.delete("sortBy");
+    }
+    
     if (departmentId && departmentId !== "allDept") {
       params.set("departmentId", departmentId);
     } else {
@@ -82,12 +88,6 @@ const PostCardIdeaList = ({
       params.set("categoryId", categoryId);
     } else {
       params.delete("categoryId");
-    }
-
-    if (sortBy && sortBy !== "latest") {
-      params.set("sortBy", sortBy);
-    } else {
-      params.delete("sortBy");
     }
 
     router.push(`/?${params.toString()}`);

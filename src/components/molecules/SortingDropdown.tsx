@@ -66,6 +66,7 @@ const SortingDropdown: React.FC<SortingDropdownProps> = ({ onFiltersChange }) =>
       onClick={({ key }) => updateFilters({ sorting: key })}
       items={[
         { key: "latest", label: "Latest" },
+        { key: "latestComment", label: "Latest Comment" },
         { key: "popular", label: "Most Popular" },
         { key: "mostViewed", label: "Most Viewed" },
       ]}

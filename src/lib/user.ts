@@ -52,10 +52,10 @@ export async function deleteProfileImage(): Promise<DeleteProfileImageResponse> 
   }
 }
 
-export async function fetchProfileImage(): Promise<Blob> {
+export async function fetchProfileImage(userId: number | null): Promise<Blob> {
   if (!token) throw new Error("Not authenticated");
 
-  const resp = await fetch(`${API_URL}/auth/profile/image`, {
+  const resp = await fetch(`${API_URL}/auth/profile/image/${userId}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -72,8 +72,8 @@ export async function fetchProfileImage(): Promise<Blob> {
 /**
  * Convenience: get an object-URL you can pass to <img src=…>
  */
-export async function getProfileImageURL(): Promise<string> {
-  const blob = await fetchProfileImage();
+export async function getProfileImageURL(userId: number | null): Promise<string> {
+  const blob = await fetchProfileImage(userId);
   return URL.createObjectURL(blob);
 }
 

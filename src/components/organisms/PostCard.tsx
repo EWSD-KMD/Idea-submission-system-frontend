@@ -27,6 +27,7 @@ import MediaGallery from "../molecules/MediaGallery";
 import DocumentGallery from "../molecules/DocumentGallery";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUser } from "@/contexts/UserContext";
+import { getProfileImage } from "@/utils/getProfileImage";
 
 export interface PostCardProps
   extends Pick<
@@ -80,7 +81,8 @@ const PostCard: React.FC<PostCardProps> = ({
   const router = useRouter();
   const { isMobile, isTablet } = useResponsive();
   const { userId } = useAuth();
-  const { userName, isFinalClosure } = useUser();
+  const { userName } = useUser();
+  const { url: ownerProfileUrl } = getProfileImage(ideaUserId);
 
   // Inline‑edit state
   const [isEditing, setIsEditing] = useState(false);
@@ -270,7 +272,7 @@ const PostCard: React.FC<PostCardProps> = ({
             avatarSrc={
               userId !== ideaUserId && isAnonymous
                 ? "anonymous"
-                : null
+                : ownerProfileUrl
             }
           />
           {userId === ideaUserId && isAnonymous && (

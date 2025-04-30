@@ -6,6 +6,7 @@ import { Category, Department } from "@/constant/type";
 import { getDepartments } from "@/lib/department";
 
 interface SelectedState {
+  sorting: string;
   department: string;
   category: string;
 }
@@ -18,6 +19,7 @@ const SortingMenu = ({ onSelectionChange }: SortingMenuProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [selected, setSelected] = useState<SelectedState>({
+    sorting: "latest",
     department: "allDept",
     category: "allCtg",
   });
@@ -45,8 +47,10 @@ const SortingMenu = ({ onSelectionChange }: SortingMenuProps) => {
 
   const handleSelectionChange = (key: string) => {
     let newSelected = { ...selected };
-
-    if (key.startsWith("department-")) {
+    if (key.startsWith("sort-")) {
+      const sortMethod = key.replace("sort-", "");
+      newSelected = { ...newSelected, sorting: sortMethod };
+    } else if (key.startsWith("department-")) {
       const deptId = key.replace("department-", "");
       newSelected = { ...newSelected, department: deptId };
     } else if (key.startsWith("category-")) {
@@ -59,6 +63,7 @@ const SortingMenu = ({ onSelectionChange }: SortingMenuProps) => {
   };
 
   const currentlySelectedKeys = [
+    `sort-${selected.sorting}`,
     `department-${selected.department}`,
     `category-${selected.category}`,
   ];
@@ -70,9 +75,10 @@ const SortingMenu = ({ onSelectionChange }: SortingMenuProps) => {
       key: "sorting",
       label: "Sort By",
       children: [
-        { key: "latest", label: "Latest" },
-        { key: "popular", label: "Most Popular" },
-        { key: "viewed", label: "Most Viewed" },
+        { key: "sort-latest", label: "Latest" },
+        { key: "sort-latestComment", label: "Latest Comment" },
+        { key: "sort-popular", label: "Most Popular" },
+        { key: "sort-mostViewed", label: "Most Viewed" },
       ],
     },
     {

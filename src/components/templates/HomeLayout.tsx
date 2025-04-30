@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Col, Grid, Row } from "antd";
 import DepartmentCard from "@/components/organisms/DepartmentCard";
 import CreatePostIdea, {
@@ -20,7 +20,6 @@ const HomeLayout = () => {
   const screens = useBreakpoint();
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
-
   const {
     departmentName,
     academicYear,
@@ -31,16 +30,18 @@ const HomeLayout = () => {
   } = useUser();
 
   const [selectedFilters, setSelectedFilters] = useState({
+    sorting: "latest",
     department: "allDept",
     category: "allCtg",
   });
 
   const handleSelectionChange = (selected: {
-    // sorting: string;
+    sorting: string;
     department: string;
     category: string;
   }) => {
     setSelectedFilters({
+      sorting: selected.sorting,
       department: selected.department,
       category: selected.category,
     });
@@ -71,10 +72,15 @@ const HomeLayout = () => {
                 )}
                 {!screens.md && (
                   <div className="flex justify-start py-1">
-                    <SortingDropdown onFiltersChange={handleSelectionChange}/>
+                    <SortingDropdown onFiltersChange={handleSelectionChange} />
                   </div>
                 )}
                 <PostCardIdeaList
+                  sortBy={
+                    selectedFilters.sorting === "latest"
+                      ? undefined
+                      : selectedFilters.sorting
+                  }
                   departmentId={
                     selectedFilters.department === "allDept"
                       ? undefined

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { logo, navigationBackground } from "../../assets/images";
 import Button from "../atoms/Button";
 import AvatarDropdown from "./AvatarDropdown";
-import Notification from "../molecules/Notification";
+import NotificationBox from "../molecules/NotificationBox";
 import { useRouter } from "next/navigation";
 import { RefObject, useState } from "react";
 import { CreatePostIdeaRef } from "../templates/CreatePostIdea";
@@ -84,7 +84,7 @@ const NavBar = (
               onClick={handleClick}
             />
           )}
-          <Notification />
+          <NotificationBox />
           <AvatarDropdown />
         </div>
       </div>

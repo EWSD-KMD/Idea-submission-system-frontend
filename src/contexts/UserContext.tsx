@@ -31,7 +31,7 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { accessToken } = useAuth();
+  const { accessToken, userId } = useAuth();
 
   const [email, setEmail] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
@@ -39,14 +39,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [departmentName, setDepartmentName] = useState<string | null>(null);
 
   const [academicYear, setAcademicYear] = useState<number | null>(null);
-  const [academicYearStartDate, setAcademicYearStartDate] = useState<string | null>(null);
+  const [academicYearStartDate, setAcademicYearStartDate] = useState<
+    string | null
+  >(null);
   const [submissionDate, setSubmissionDate] = useState<string | null>(null);
   const [finalClosureDate, setFinalClosureDate] = useState<string | null>(null);
   const [isSubmissionClose, setIsSubmissionClose] = useState<boolean>(false);
   const [isFinalClosure, setIsFinalClosure] = useState<boolean>(false);
 
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
-  const [profileImageLoading, setProfileImageLoading] = useState<boolean>(false);
+  const [profileImageLoading, setProfileImageLoading] =
+    useState<boolean>(false);
 
   // We keep track of the last object URL so we can revoke it
   let previousObjectUrl: string | null = null;
@@ -61,7 +64,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const {
         email,
         name,
-        profileImage,          // string fileId or null
+        profileImage, // string fileId or null
         lastLoginTime,
         department,
         currentAcademicYear,
@@ -74,12 +77,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setDepartmentName(department?.name ?? null);
 
       // year
-      const {
-        year,
-        startDate,
-        closureDate,
-        finalClosureDate,
-      } = currentAcademicYear || {};
+      const { year, startDate, closureDate, finalClosureDate } =
+        currentAcademicYear || {};
 
       setAcademicYear(year ?? null);
       setAcademicYearStartDate(startDate ?? null);
@@ -88,13 +87,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       const now = new Date();
       setIsSubmissionClose(closureDate ? now >= new Date(closureDate) : false);
-      setIsFinalClosure(finalClosureDate ? now >= new Date(finalClosureDate) : false);
+      setIsFinalClosure(
+        finalClosureDate ? now >= new Date(finalClosureDate) : false
+      );
 
       // if user has an image, fetch it:
       if (profileImage) {
         setProfileImageLoading(true);
         try {
-          const url = await getProfileImageURL();
+          const url = await getProfileImageURL(userId);
           // revoke old
           if (previousObjectUrl) URL.revokeObjectURL(previousObjectUrl);
           previousObjectUrl = url;
@@ -120,6 +121,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   // On token change, refresh once
   useEffect(() => {
     refreshProfile();
+
     // on unmount revoke
     return () => {
       if (previousObjectUrl) URL.revokeObjectURL(previousObjectUrl);

@@ -54,7 +54,7 @@ const SortingMenuTab = ({
       item.children?.some((child) => child.key === clickedKey)
     );
 
-    if (
+    if (clickedKey.startsWith("sort-") ||
       clickedKey.startsWith("department-") ||
       clickedKey.startsWith("category-")
     ) {
