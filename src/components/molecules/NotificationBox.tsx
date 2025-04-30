@@ -1,6 +1,7 @@
+// NotificationBox.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, UIEvent } from "react";
 import dynamic from "next/dynamic";
 import { getIcon } from "../atoms/Icon";
 import { Divider, List, message } from "antd";
@@ -13,7 +14,6 @@ import {
 } from "@/lib/notification";
 import { NotificationsResponseData } from "@/constant/type";
 import Image from "../atoms/Image";
-import InfiniteScroll from "react-infinite-scroll-component";
 import Notification from "./Notification";
 
 const AntBadge = dynamic(() => import("antd").then((mod) => mod.Badge), {
@@ -25,7 +25,7 @@ const AntPopover = dynamic(() => import("antd").then((mod) => mod.Popover), {
 
 interface NotificationItem {
   id: number;
-  fromUserId: number; // ← carry the userId
+  fromUserId: number;
   userName: string;
   message: string;
   time: string;
@@ -33,21 +33,21 @@ interface NotificationItem {
   ideaId: number | null;
 }
 
-const NotificationBox = () => {
+export default function NotificationBox() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState<{
     page: number;
     limit: number;
-    total: number;
     totalPages: number;
   } | null>(null);
-
   const [popoverOpen, setPopoverOpen] = useState(false);
   const router = useRouter();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
+  // fetch a page
   const fetchNotifications = async (page: number, limit: number) => {
-    if (page === 1) setLoading(true);
+    setLoading(true);
     try {
       const res: NotificationsResponseData = await getNotifications(
         page,
@@ -55,7 +55,7 @@ const NotificationBox = () => {
       );
       const mapped = res.notifications.map((n: any) => ({
         id: n.id,
-        fromUserId: n.fromUser?.id ?? 0, // ← grab their userId
+        fromUserId: n.fromUser?.id ?? 0,
         userName: n.fromUser?.name || "Unknown",
         message: n.message,
         time: new Date(n.createdAt).toLocaleTimeString(),
@@ -66,7 +66,6 @@ const NotificationBox = () => {
       setPagination({
         page: res.page,
         limit: res.limit,
-        total: res.total,
         totalPages: res.totalPages,
       });
     } catch (err: any) {
@@ -76,12 +75,13 @@ const NotificationBox = () => {
     }
   };
 
+  // initial load on mount
   useEffect(() => {
     fetchNotifications(1, 10);
   }, []);
 
-  // only load page 1 once, the first time popover opens
-  const handlePopoverOpenChange = (open: boolean) => {
+  // when popover opens, optionally reload page 1 if empty
+  const handleOpenChange = (open: boolean) => {
     setPopoverOpen(open);
     if (open && notifications.length === 0) {
       fetchNotifications(1, 10);
@@ -89,13 +89,13 @@ const NotificationBox = () => {
   };
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const hasMore =
+    pagination !== null && pagination.page < pagination.totalPages;
 
   const handleMarkAllRead = async () => {
     try {
       await markAllNotificationsAsRead();
-      setNotifications((prev) =>
-        prev.map((notif) => ({ ...notif, read: true }))
-      );
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       message.success("All notifications marked as read");
     } catch (error: any) {
       message.error(error.message || "Failed to mark all as read");
@@ -116,15 +116,19 @@ const NotificationBox = () => {
     if (notif.ideaId) {
       router.push(`/idea/${notif.ideaId}`);
     } else {
-      message.info("No associated idea for this notification");
+      message.info("No associate Idea for this Notification!");
     }
   };
 
-  // Load more notifications when scrolled to bottom
-  const handleLoadMore = async () => {
-    console.log("I am here")
-    if (pagination && pagination.page < pagination.totalPages) {
-      await fetchNotifications(pagination.page + 1, pagination.limit);
+  // manual infinite-scroll via onScroll
+  const onScroll = (e: UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    if (
+      !loading &&
+      hasMore &&
+      el.scrollTop + el.clientHeight >= el.scrollHeight - 20
+    ) {
+      fetchNotifications((pagination?.page ?? 1) + 1, 10);
     }
   };
 
@@ -146,60 +150,10 @@ const NotificationBox = () => {
           Mark all read
         </button>
       </div>
-      <div id="scrollableDiv" className="min-h-40 max-h-80 overflow-y-auto">
-        {loading ? (
-          <div className="flex justify-center p-3 mt-10">
-            <div className="w-32 h-16">
-              <DotLottieReact
-                src="https://lottie.host/fce7f0b5-ed51-4cf5-b87c-c54e181f2423/Q5CUbjHeB0.lottie"
-                loop
-                autoplay
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                }}
-              />
-            </div>
-          </div>
-        ) : notifications.length > 0 ? (
-          
-          <InfiniteScroll
-            dataLength={notifications.length}
-            next={handleLoadMore}
-            hasMore={Boolean(pagination && notifications.length < pagination.total)}
-            loader={
-              <div className="flex justify-center p-3">
-                <div className="w-32 h-16">
-                  <DotLottieReact
-                    src="https://lottie.host/fce7f0b5-ed51-4cf5-b87c-c54e181f2423/Q5CUbjHeB0.lottie"
-                    loop
-                    autoplay
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                    }}
-                  />
-                </div>
-              </div>
-            }
-            endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
-            scrollableTarget="scrollableDiv"
-          >
-            <List
-              dataSource={notifications}
-              renderItem={(notif) => (
-                <Notification
-                  key={notif.id}
-                  notif={notif}
-                  onClick={() => handleNotificationClick(notif)}
-                />
-              )}
-            />
-          </InfiniteScroll>
-        ) : (
-          <div className="flex flex-col items-center justify-center p-4 mt-10">
+
+      <div ref={scrollRef} onScroll={onScroll} className="h-80 overflow-y-auto">
+        {notifications.length === 0 && !loading ? (
+          <div className="flex flex-col items-center justify-center p-4 mt-20">
             <Image
               src="/no_bell_alarm.svg"
               alt="No Notifications yet"
@@ -210,6 +164,34 @@ const NotificationBox = () => {
               No notifications yet.
             </div>
           </div>
+        ) : (
+          <List
+            dataSource={notifications}
+            renderItem={(notif) => (
+              <Notification
+                key={notif.id}
+                notif={notif}
+                onClick={() => {
+                  handleNotificationClick(notif);
+                }}
+              />
+            )}
+          />
+        )}
+
+        {loading && (
+          <div className="flex justify-center p-2">
+            <DotLottieReact
+              src="https://lottie.host/fce7f0b5-ed51-4cf5-b87c-c54e181f2423/Q5CUbjHeB0.lottie"
+              loop
+              autoplay
+              style={{ width: 48, height: 48 }}
+            />
+          </div>
+        )}
+
+        {!hasMore && !loading && notifications.length > 0 && (
+          <Divider plain>It is all, nothing more 🤐</Divider>
         )}
       </div>
     </div>
@@ -221,9 +203,8 @@ const NotificationBox = () => {
         content={notificationContent}
         trigger="click"
         open={popoverOpen}
-        onOpenChange={handlePopoverOpenChange}
+        onOpenChange={handleOpenChange}
         placement="bottomLeft"
-        autoAdjustOverflow
         arrow
       >
         <button className="bg-opacity-30 bg-gray-600 text-white rounded-full p-2">
@@ -232,6 +213,4 @@ const NotificationBox = () => {
       </AntPopover>
     </AntBadge>
   );
-};
-
-export default NotificationBox;
+}
