@@ -24,6 +24,7 @@ import { useResponsive } from "@/utils/responsive";
 import Tag from "@/components/atoms/Tag";
 import { useAuth } from "@/contexts/AuthContext";
 import { getIcon } from "@/components/atoms/Icon";
+import { getProfileImage } from "@/utils/getProfileImage";
 
 const DetailPage = () => {
   const params = useParams();
@@ -49,6 +50,7 @@ const DetailPage = () => {
   const [editedDescription, setEditedDescription] = useState<string>("");
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
   const [commentsCount, setCommentsCount] = useState<number>(0);
+  const [ideaUserId, setIdeaUserId] = useState<number | null>(null);
 
   const handleCommentsReload = () => {
     setCommentsCount((commentsCount) => commentsCount + 1);
@@ -64,6 +66,7 @@ const DetailPage = () => {
           setEditedTitle(response.data.title);
           setEditedDescription(response.data.description);
           setCommentsCount(response.data.comments.length);
+          setIdeaUserId(response.data.userId);
         }
       } catch (err) {
         console.error(err);
@@ -75,6 +78,8 @@ const DetailPage = () => {
 
     fetchIdea();
   }, [params.id]);
+
+  const { url: ownerProfileUrl } = getProfileImage(ideaUserId!);
 
   // pull out non‑media files
   const mediaExt = [
@@ -102,7 +107,7 @@ const DetailPage = () => {
       setLoadingPreviews(true);
       if (!idea?.files?.length) {
         if (mounted) setPreviews([]);
-        setLoadingPreviews(false)
+        setLoadingPreviews(false);
         return;
       }
       try {
@@ -260,7 +265,7 @@ const DetailPage = () => {
               avatarSrc={
                 userId !== idea.userId && idea.user.name === "Anonymous"
                   ? "anonymous"
-                  : null
+                  : ownerProfileUrl
               }
             />
             {userId === idea.userId && idea.user.name === "Anonymous" && (

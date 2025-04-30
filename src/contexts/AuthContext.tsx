@@ -56,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     Cookies.set("refreshToken", newRefreshToken);
     try {
       const decoded: JwtPayload = jwtDecode(newAccessToken);
+      
       setUserId(decoded.userId);
     } catch (error) {
       console.error("Failed to decode token after login:", error);

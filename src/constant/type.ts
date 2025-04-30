@@ -206,9 +206,9 @@ export interface LikeIdeaResponse {
 export interface GetAllIdeasParams {
   page?: number;
   limit?: number;
+  sortBy?: string;
   departmentId?: string;
   categoryId?: string;
-  // sortBy?: "latest" | "popular" | "viewed";
   status?: string;
   userId?: number;
 }

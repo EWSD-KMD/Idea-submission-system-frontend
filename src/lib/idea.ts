@@ -19,6 +19,7 @@ const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 export async function getAllIdeas({
   page = 1,
   limit = 5,
+  sortBy,
   departmentId,
   categoryId,
   status = "SHOW",
@@ -33,7 +34,9 @@ export async function getAllIdeas({
   if (userId) {
     baseParams.userId = userId.toString();
   }
-
+  if (sortBy && sortBy !== "latest") {
+    baseParams.sortBy = sortBy;
+  }
   if (departmentId && departmentId !== "allDept") {
     baseParams.departmentId = departmentId;
   }
@@ -48,6 +51,7 @@ export async function getAllIdeas({
 
   try {
     const url = `/ideas?${queryParams.toString()}`;
+    console.log("url",url)
     const response = await get<IdeasResponse>(url);
     return response;
   } catch (error: unknown) {
@@ -94,7 +98,10 @@ export async function updateIdea(
 ): Promise<IdeaDetailResponse> {
   try {
     const url = `/ideas/${ideaId}`;
-    const response = await put<UpdateIdeaRequest, IdeaDetailResponse>(url, ideaData);
+    const response = await put<UpdateIdeaRequest, IdeaDetailResponse>(
+      url,
+      ideaData
+    );
     return response;
   } catch (error: unknown) {
     if (isErrorWithMessage(error)) {
@@ -177,7 +184,9 @@ export async function downloadFile(fileId: string): Promise<Blob> {
     });
     if (!response.ok) {
       // Try to parse error message from response.
-      const errorData = await response.json().catch(() => ({ message: response.statusText }));
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: response.statusText }));
       throw new Error(errorData.message || "Failed to download file");
     }
     // Convert response to a Blob.
@@ -209,7 +218,7 @@ export async function LikeIdea(ideaId: number): Promise<LikeIdeaResponse> {
     const response = await post<null, LikeIdeaResponse>(url, null);
     return response;
   } catch (error: unknown) {
-    console.log("error:",error)
+    console.log("error:", error);
     if (isErrorWithMessage(error)) {
       throw new Error(error.message);
     }

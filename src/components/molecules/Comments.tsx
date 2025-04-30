@@ -1,16 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Input, message } from "antd";
-import Button from "../atoms/Button";
-import AvatarWithNameAndDept from "./AvatarWithNameAndDept";
+import { message } from "antd";
 import { updateComment, deleteComment } from "@/lib/comment";
 import { CommentData, CommentUpdateResponse } from "@/constant/type";
 import { useAuth } from "@/contexts/AuthContext";
-import EllipsisDropDownCmt from "./EllipsisDropDownCmt";
 import { useUser } from "@/contexts/UserContext";
-import Tag from "../atoms/Tag";
-import { getIcon } from "../atoms/Icon";
+import Comment from "./Comment";
 
 interface CommentsProps {
   comments: CommentData[];
@@ -98,83 +94,19 @@ const Comments: React.FC<CommentsProps> = ({ comments: initialComments }) => {
   return (
     <div className="flex flex-col w-full">
       {comments.map((comment: CommentData) => (
-        <div
+        <Comment
           key={comment.id}
-          className={`flex flex-col gap-2 transition-all duration-200 ease-in-out ${
-            comment.isDeleting
-              ? "opacity-0 translate-y-[-10px]"
-              : "opacity-100 translate-y-0 mb-4"
-          }`}
-          aria-label={`Comment by ${comment.user.name}`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AvatarWithNameAndDept
-                name={comment.user.id === userId ? userName : comment.user.name}
-                department={comment.idea.department.name}
-                category={comment.idea.category.name}
-                time={new Date(comment.createdAt).toLocaleTimeString()}
-                avatarSrc={""}
-                size={40}
-              />
-            </div>
-            <div className="flex">
-              {comment.user.id === userId && comment.anonymous && (
-                <div>
-                  {/* full text on sm+ */}
-                  <Tag
-                    label="Commented as Anonymous"
-                    color="blue"
-                    className="hidden sm:inline-block text-body-sm mb-1 rounded-lg border-none"
-                  />
-                  {/* icon only on xs */}
-                  <span className="inline-block sm:hidden px-2">
-                    {getIcon("anonymous", 20)}
-                  </span>
-                </div>
-              )}
-              {userId === comment.user.id && (
-                <EllipsisDropDownCmt
-                  commentId={comment.id}
-                  onEdit={(id, text) => handleEdit(id, text)}
-                  onDelete={(id) => handleDelete(id)}
-                  initialText={comment.content}
-                />
-              )}
-            </div>
-          </div>
-          {editCommentId === comment.id ? (
-            <div className="flex flex-col rounded-lg border border-gray-300 ml-13">
-              <div className="flex flex-col w-full items-end">
-                <Input.TextArea
-                  value={editedText}
-                  onChange={(e) => setEditedText(e.target.value)}
-                  autoFocus
-                  autoSize
-                  className="w-full rounded-lg border-none focus:border-none focus:ring-0"
-                />
-                <div className="flex">
-                  <Button
-                    label="Save"
-                    onClick={() => handleSave(comment.id)}
-                    type="primary"
-                    rounded
-                    loading={loading}
-                    className="m-2"
-                  />
-                  <Button
-                    label="Cancel"
-                    onClick={handleCancel}
-                    rounded
-                    className="m-2"
-                  />
-                </div>
-              </div>
-            </div>
-          ) : (
-            <p className="text-sm ml-13">{comment.content}</p>
-          )}
-        </div>
+          comment={comment}
+          isEditing={editCommentId === comment.id}
+          editedText={editedText}
+          onEdit={handleEdit}
+          onSave={handleSave}
+          onCancel={handleCancel}
+          onDelete={handleDelete}
+          saving={loading}
+          currentUserId={userId}
+          currentUserName={userName}
+        />
       ))}
     </div>
   );
