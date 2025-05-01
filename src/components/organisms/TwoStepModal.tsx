@@ -31,7 +31,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
   const [fileList, setFileList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
-  const { userName, profileImageUrl } = useUser();
+  const { userName, profileImageUrl, departmentId } = useUser();
 
   const nextStep = () => setCurrentStep(currentStep + 1);
   const prevStep = () => setCurrentStep(currentStep - 1);
@@ -141,11 +141,12 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
           title,
           description: body,
           categoryId: selectedCategory.id,
-          departmentId: 1, // Adjust as needed
+          departmentId: departmentId,
           userId,
           anonymous: isAnonymous,
           files: fileList, // Your backend expects files with fileId and fileName (previewUrl is for client preview only)
         };
+        console.log("data:", data)
 
         await createIdea(data);
         message.success("Idea posted successfully!");

@@ -157,7 +157,7 @@ export interface CreateIdeaRequest {
   title: string;
   description: string;
   categoryId: number;
-  departmentId: number;
+  departmentId: number | null;
   userId: number;
   anonymous?: boolean;
   files?: string[];

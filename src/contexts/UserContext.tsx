@@ -18,6 +18,7 @@ interface UserContextType {
   profileImageLoading: boolean;
   lastLoginTime: string | null;
   departmentName: string | null;
+  departmentId: number| null;
   academicYear: number | null;
   academicYearStartDate: string | null;
   submissionDate: string | null;
@@ -37,6 +38,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [userName, setUserName] = useState<string | null>(null);
   const [lastLoginTime, setLastLoginTime] = useState<string | null>(null);
   const [departmentName, setDepartmentName] = useState<string | null>(null);
+  const [departmentId, setDepartmentId] = useState<number | null>(null);
 
   const [academicYear, setAcademicYear] = useState<number | null>(null);
   const [academicYearStartDate, setAcademicYearStartDate] = useState<
@@ -75,6 +77,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setUserName(name);
       setLastLoginTime(lastLoginTime);
       setDepartmentName(department?.name ?? null);
+      setDepartmentId(department?.id ?? null);
 
       // year
       const { year, startDate, closureDate, finalClosureDate } =
@@ -137,6 +140,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         profileImageLoading,
         lastLoginTime,
         departmentName,
+        departmentId,
         academicYear,
         academicYearStartDate,
         submissionDate,
