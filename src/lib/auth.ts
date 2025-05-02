@@ -43,6 +43,7 @@ export async function refreshAccessToken(
     headers: {
       "X-Refresh-Token": refreshToken,
     },
+    body: JSON.stringify({ refreshToken }),
   });
 
   if (!res.ok) {

@@ -99,9 +99,7 @@ export const fetchRequest = async <TResponse, TRequest = unknown>(
         }
       } catch (refreshError) {
         isRefreshing = false;
-        Cookies.remove("accessToken");
-        Cookies.remove("refreshToken");
-        window.location.href = "/login";
+
         throw new Error("Session expired. Please login again.");
       }
     }
