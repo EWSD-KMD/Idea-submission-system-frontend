@@ -1,6 +1,7 @@
 import { refreshAccessToken } from "@/lib/auth";
 import { useErrorStore } from "@/utils/errorStore";
 import Cookies from "js-cookie";
+import { Router } from "next/router";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -46,8 +47,6 @@ export const fetchRequest = async <TResponse, TRequest = unknown>(
 
   const executeRequest = async (token: string): Promise<TResponse> => {
     const response = await fetch(`${API_URL}${url}`, createConfig(token));
-    console.log("token", token);
-    console.log("response", response);
     if (!response.ok) {
       const errorData = await response
         .json()
@@ -65,28 +64,38 @@ export const fetchRequest = async <TResponse, TRequest = unknown>(
     return await executeRequest(accessToken);
   } catch (err) {
     const error = err as ErrorType;
+
     if (error.status === 401) {
-      if (error.status === 401 && error.message === "User is disabled.") {
+      // Handle "User is disabled" case
+      if (error.message === "User is disabled.") {
         useErrorStore.getState().setDisabledError(true);
         return new Promise<never>(() => {});
       }
-      console.log("", error);
-      let tokens = null;
+
       try {
         if (!isRefreshing) {
           isRefreshing = true;
-          tokens = await refreshAccessToken(refreshToken);
-        }
+          const tokens = await refreshAccessToken(refreshToken);
 
-        if (tokens) {
-          const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-            tokens;
-          isRefreshing = false;
-          console.log("newAccessToken", newAccessToken);
-          console.log("newRefreshToken :>> ", newRefreshToken);
-          Cookies.set("accessToken", newAccessToken);
-          Cookies.set("refreshToken", newRefreshToken);
-          return await executeRequest(newAccessToken);
+          if (tokens) {
+            const {
+              accessToken: newAccessToken,
+              refreshToken: newRefreshToken,
+            } = tokens;
+
+            // Check if the refresh token has changed
+            if (newRefreshToken !== refreshToken) {
+              Cookies.remove("accessToken");
+              Cookies.remove("refreshToken");
+              window.location.href = "/login";
+              throw new Error("Refresh token mismatch. User logged out.");
+            }
+
+            isRefreshing = false;
+            Cookies.set("accessToken", newAccessToken);
+            Cookies.set("refreshToken", newRefreshToken);
+            return await executeRequest(newAccessToken);
+          }
         }
       } catch (refreshError) {
         isRefreshing = false;
@@ -97,12 +106,8 @@ export const fetchRequest = async <TResponse, TRequest = unknown>(
       }
     }
 
-    if ((error as ErrorType).status) {
-      console.error(
-        `API error [${(error as ErrorType).status}]: ${
-          (error as ErrorType).message
-        }`
-      );
+    if (error.status) {
+      console.error(`API error [${error.status}]: ${error.message}`);
       throw error;
     }
 
