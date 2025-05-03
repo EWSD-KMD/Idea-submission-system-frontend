@@ -4,6 +4,7 @@ import {
   LoginResponse,
   ResetPasswordResponse,
 } from "@/constant/type";
+import Bowser from "bowser";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -11,6 +12,14 @@ export async function login(
   email: string,
   password: string
 ): Promise<{ accessToken: string; refreshToken: string }> {
+  const parse = Bowser.getParser(window.navigator.userAgent);
+  const userAgent = String(parse.getBrowserName()+"/"+parse.getBrowserVersion())
+  console.log("userAgent", userAgent);
+  let headers = new Headers({
+    "Accept"       : "application/json",
+    "Content-Type" : "application/json",
+    "User-Agent"   : userAgent
+});
   const data = {
     email,
     password,
@@ -18,7 +27,7 @@ export async function login(
   };
   const res = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "X-User-Agent": userAgent },
     body: JSON.stringify(data),
   });
 
