@@ -37,9 +37,6 @@ const LikeAndDislikeButton = ({
       message.error("Please log in to like.");
       return;
     }
-    if(isLiked){
-      return
-    }
     // Save previous state for potential rollback
     const prev = {
       likeCount,
@@ -71,9 +68,6 @@ const LikeAndDislikeButton = ({
     if (!userId) {
       message.error("Please log in to dislike.");
       return;
-    }
-    if(isDisliked){
-      return
     }
     // Save previous state
     const prev = {
