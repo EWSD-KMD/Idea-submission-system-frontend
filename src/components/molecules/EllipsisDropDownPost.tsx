@@ -6,6 +6,7 @@ import { getIcon } from "../atoms/Icon";
 import { MenuProps, Modal, message, Radio, Input, Divider } from "antd";
 import { deleteIdea, reportIdea as reportIdeaAPI } from "@/lib/idea"; // adjust the import path as needed
 import { useAuth } from "@/contexts/AuthContext";
+import { useUser } from "@/contexts/UserContext";
 
 const AntDropdown = dynamic(() => import("antd").then((mod) => mod.Dropdown), {
   ssr: false,
@@ -13,28 +14,50 @@ const AntDropdown = dynamic(() => import("antd").then((mod) => mod.Dropdown), {
 
 const getDropdownItems = (
   ideaId: number,
-  ideaUserId: number
+  ideaUserId: number,
+  status: string | undefined
 ): MenuProps["items"] => {
-
   const { userId } = useAuth();
   const isOwner = userId === ideaUserId;
+  const { isSubmissionClose } = useUser();
 
   if (isOwner) {
-    return [
-      {
-        key: `edit-${ideaId}`,
-        label: "Edit",
-        icon: getIcon("pencil"),
-      },
-      {
-        type: "divider",
-      },
-      {
-        key: `delete-${ideaId}`,
-        label: "Delete",
-        icon: getIcon("trash"),
-      },
-    ];
+    if (status === "HIDE") {
+      return [
+        {
+          key: `edit-${ideaId}`,
+          label: "Edit",
+          icon: getIcon("pencilDisabled"),
+          disabled: true,
+        },
+        {
+          type: "divider",
+        },
+        {
+          key: `delete-${ideaId}`,
+          label: "Delete",
+          icon: getIcon("trashDisabled"),
+          disabled: true,
+        },
+      ];
+    } else {
+      return [
+        {
+          key: `edit-${ideaId}`,
+          label: "Edit",
+          icon: isSubmissionClose ? getIcon("pencilDisabled") : getIcon("pencil"),
+          disabled: isSubmissionClose
+        },
+        {
+          type: "divider",
+        },
+        {
+          key: `delete-${ideaId}`,
+          label: "Delete",
+          icon: getIcon("trash"),
+        },
+      ];
+    }
   }
   return [
     {
@@ -49,12 +72,12 @@ const { confirm } = Modal;
 
 interface EllipsisDropDownPostProps {
   ideaId: number;
-  onEdit?: (
-  ) => void;
+  onEdit?: () => void;
   onDelete?: (ideaId: number) => void;
   ideaUserId: number;
   initialTitle: string;
   initialDescription: string;
+  status: string | undefined;
 }
 
 const EllipsisDropDownPost: React.FC<EllipsisDropDownPostProps> = ({
@@ -64,6 +87,7 @@ const EllipsisDropDownPost: React.FC<EllipsisDropDownPostProps> = ({
   ideaUserId,
   initialTitle,
   initialDescription,
+  status,
 }) => {
   const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const [reportReason, setReportReason] = useState("offensive");
@@ -157,7 +181,7 @@ const EllipsisDropDownPost: React.FC<EllipsisDropDownPostProps> = ({
     <>
       <AntDropdown
         menu={{
-          items: getDropdownItems(ideaId, ideaUserId),
+          items: getDropdownItems(ideaId, ideaUserId, status),
           onClick: handleMenuClick,
         }}
         placement="bottomRight"

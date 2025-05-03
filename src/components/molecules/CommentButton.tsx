@@ -7,15 +7,16 @@ import { useUser } from "@/contexts/UserContext";
 
 interface CommentButtonProps {
   commentCount: number;
+  status: string | undefined;
   onClick?: () => void;
 }
 
-const CommentButton = ({ commentCount, onClick }: CommentButtonProps) => {
+const CommentButton = ({ commentCount, status, onClick }: CommentButtonProps) => {
   const { isFinalClosure } = useUser();
 
   return (
     <div className="bg-[#E6EFFD] rounded-full inline-flex">
-      {isFinalClosure ? (
+      {isFinalClosure || status === "HIDE" ? (
         <Button
           label={formatCount(commentCount)}
           icon={getIcon("messageCircleMoreDisabled")}
