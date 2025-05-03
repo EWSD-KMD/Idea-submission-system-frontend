@@ -19,6 +19,7 @@ interface JwtPayload {
 interface AuthContextType {
   accessToken: string | null;
   refreshToken: string | null;
+  isFirstLogin: boolean;
   userId: number | null;
   loginUser: (email: string, password: string) => Promise<void>;
   logoutUser: () => Promise<void>;
@@ -30,14 +31,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
+  const [isFirstLogin, setIsFirstLogin] = useState<boolean>(false);
   const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     const storedAccessToken = Cookies.get("accessToken");
     const storedRefreshToken = Cookies.get("refreshToken");
+    const storedFirstLogin = Cookies.get("isFirstLogin") === "true";
+
     if (storedAccessToken && storedRefreshToken) {
       setAccessToken(storedAccessToken);
       setRefreshToken(storedRefreshToken);
+      setIsFirstLogin(storedFirstLogin);
       try {
         const decoded: JwtPayload = jwtDecode(storedAccessToken);
         setUserId(decoded.userId);
@@ -48,15 +53,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loginUser = async (email: string, password: string) => {
-    const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-      await login(email, password);
+    const {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+      firstTimeLogin: isFirstTimeLogin,
+    } = await login(email, password);
+
     setAccessToken(newAccessToken);
     setRefreshToken(newRefreshToken);
+    setIsFirstLogin(isFirstTimeLogin);
     Cookies.set("accessToken", newAccessToken);
     Cookies.set("refreshToken", newRefreshToken);
+    Cookies.set("isFirstLogin", String(isFirstTimeLogin));
+
     try {
       const decoded: JwtPayload = jwtDecode(newAccessToken);
-      
       setUserId(decoded.userId);
     } catch (error) {
       console.error("Failed to decode token after login:", error);
@@ -72,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUserId(null);
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
+    Cookies.remove("isFirstLogin");
     window.location.href = "/login";
   };
 
@@ -84,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         accessToken,
         refreshToken,
+        isFirstLogin,
         userId,
         loginUser,
         logoutUser,
