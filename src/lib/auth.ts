@@ -11,15 +11,9 @@ const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 export async function login(
   email: string,
   password: string
-): Promise<{ accessToken: string; refreshToken: string }> {
+): Promise<{ accessToken: string; refreshToken: string; firstTimeLogin: boolean }> {
   const parse = Bowser.getParser(window.navigator.userAgent);
   const userAgent = String(parse.getBrowserName()+"/"+parse.getBrowserVersion())
-  console.log("userAgent", userAgent);
-  let headers = new Headers({
-    "Accept"       : "application/json",
-    "Content-Type" : "application/json",
-    "User-Agent"   : userAgent
-});
   const data = {
     email,
     password,
@@ -40,8 +34,9 @@ export async function login(
     throw new Error(response.message || "Login failed");
   }
 
-  const { accessToken, refreshToken } = response.data;
-  return { accessToken, refreshToken };
+  const { accessToken, refreshToken, firstTimeLogin } = response.data;
+  console.log("api log", firstTimeLogin)
+  return { accessToken, refreshToken, firstTimeLogin };
 }
 
 export async function refreshAccessToken(
