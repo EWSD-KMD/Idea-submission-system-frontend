@@ -295,6 +295,7 @@ const PostCard: React.FC<PostCardProps> = ({
               ideaUserId={ideaUserId}
               initialTitle={title}
               initialDescription={description}
+              status={status}
               onDelete={onDelete}
               // onEdit callback now provides both title and description.
               onEdit={() => {
@@ -350,6 +351,7 @@ const PostCard: React.FC<PostCardProps> = ({
             />
             <CommentButton
               commentCount={commentsCount}
+              status={status}
               onClick={handleComment}
             />
           </div>

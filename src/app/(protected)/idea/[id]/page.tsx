@@ -288,6 +288,7 @@ const DetailPage = () => {
                 ideaUserId={idea.userId}
                 initialTitle={idea.title}
                 initialDescription={idea.description}
+                status={idea.status}
                 onDelete={() => router.push("/")}
                 onEdit={() => {
                   setIsEditing(true);
@@ -328,14 +329,14 @@ const DetailPage = () => {
                 isLiked={idea.likeInd}
                 isDisliked={idea.dislikeInd}
               />
-              <CommentButton commentCount={commentsCount} />
+              <CommentButton commentCount={commentsCount} status={idea.status}/>
             </div>
             <ViewCount viewCount={idea.views} />
           </div>
 
           <Divider />
           <div className="flex flex-col gap-3 px-2 sm:px-4">
-            <div className={`${isFinalClosure ? "hidden" : ""}`}>
+            <div className={`${isFinalClosure || idea.status === "HIDE" ? "hidden" : ""}`}>
               <CommentUpload
                 ideaId={idea.id}
                 isOpen={true}
