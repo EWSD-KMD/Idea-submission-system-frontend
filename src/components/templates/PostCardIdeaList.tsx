@@ -9,6 +9,7 @@ import { Idea } from "@/constant/type";
 import { useAuth } from "@/contexts/AuthContext";
 import Image from "../atoms/Image";
 import PostLoading from "../molecules/PostLoading";
+import Button from "../atoms/Button";
 
 interface PostCardIdeaListProps {
   departmentId?: string;
@@ -77,7 +78,7 @@ const PostCardIdeaList = ({
     } else {
       params.delete("sortBy");
     }
-    
+
     if (departmentId && departmentId !== "allDept") {
       params.set("departmentId", departmentId);
     } else {
@@ -115,7 +116,20 @@ const PostCardIdeaList = ({
   };
 
   if (loading) return <PostLoading />;
-  if (error) return <div>Error: {error}</div>;
+  if (error)
+    return (
+      <div className="min-h-screen flex flex-col items-center p-4">
+        <Image
+          src="/noidea.svg"
+          alt="Something went wrong"
+          className="w-40 h-40 opacity-75"
+          preview={false}
+        />
+
+        <h1 className="text-xl text-gray-500 pb-10">Oops! Something went wrong.</h1>
+        <Button label="Refresh" href="/" type="primary" />
+      </div>
+    );
   if (!ideas.length)
     return (
       <div className="flex flex-col items-center justify-center p-4 mt-40">
