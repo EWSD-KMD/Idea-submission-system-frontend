@@ -33,9 +33,9 @@ const HomeLayout = () => {
     isFinalClosure,
   } = useUser();
 
-  const { isFirstLogin } = useAuth();
+  const { isFirstLogin, setIsFirstLogin } = useAuth();
   console.log("isFirst", isFirstLogin);
-  const [showFirstLoginModal, setShowFirstLoginModal] = useState(true);
+  const [showFirstLoginModal, setShowFirstLoginModal] = useState(false);
 
   const [selectedFilters, setSelectedFilters] = useState({
     sorting: "latest",
@@ -62,9 +62,12 @@ const HomeLayout = () => {
     }
   }, [isFirstLogin]);
 
+  console.log("isFirstLogin :>> ", isFirstLogin);
+
   const handleCloseModal = () => {
     setShowFirstLoginModal(false);
-    Cookies.set("isFirstLogin", "false");
+    setIsFirstLogin(false);
+    Cookies.set("isFirstLogin", "false", { path: "/" });
   };
 
   return (
