@@ -38,10 +38,11 @@ const Avatar = ({
   // Get first letter and capitalize it
   const firstLetter = label ? label.charAt(0).toUpperCase() : "";
   const isAnonymous = src === "anonymous";
+  const isHide = src === "hide";
 
   return (
     <AntAvatar
-      src={isAnonymous ? undefined : src ?? undefined}
+      src={isAnonymous ? undefined : isHide ? undefined : src ?? undefined}
       alt={alt}
       size={size}
       style={avatarStyle}
@@ -49,7 +50,9 @@ const Avatar = ({
       {...props}
     >
       {isAnonymous
-        ? getIcon("anonymous") // render your anonymous SVG
+        ? getIcon("anonymous")
+        : isHide
+        ? getIcon("info") // render your anonymous SVG
         : src === null && (
             <span
               style={{ fontSize: size * 0.5, lineHeight: 1 }}

@@ -25,6 +25,7 @@ const AntPopover = dynamic(() => import("antd").then((mod) => mod.Popover), {
 
 interface NotificationItem {
   id: number;
+  type: "LIKE" | "DISLIKE" | "COMMENT" | "HIDE";
   fromUserId: number;
   userName: string;
   message: string;
@@ -55,6 +56,7 @@ export default function NotificationBox() {
       );
       const mapped = res.notifications.map((n: any) => ({
         id: n.id,
+        type: n.type,
         fromUserId: n.fromUser?.id ?? 0,
         userName: n.fromUser?.name || "Unknown",
         message: n.message,
