@@ -22,6 +22,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [currentStep, setCurrentStep] = useState<number>(0);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
@@ -31,6 +32,9 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
   const [loading, setLoading] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
   const { userName, profileImageUrl, departmentId } = useUser();
+
+  const nextStep = () => setCurrentStep(currentStep + 1);
+  const prevStep = () => setCurrentStep(currentStep - 1);
 
   const { userId } = useAuth();
   const { confirm } = Modal;
@@ -137,12 +141,11 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
           title,
           description: body,
           categoryId: selectedCategory.id,
-          departmentId: departmentId,
+          departmentId: departmentId, // Adjust as needed
           userId,
           anonymous: isAnonymous,
           files: fileList, // Your backend expects files with fileId and fileName (previewUrl is for client preview only)
         };
-        console.log("data:", data);
 
         await createIdea(data);
         message.success("Idea posted successfully!");
@@ -184,6 +187,7 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
     setBody("");
     setSelectedCategory(null);
     setFileList([]);
+    setCurrentStep(0);
     onCancel();
   };
 
@@ -196,171 +200,241 @@ const TwoStepModal = ({ visible, onCancel }: TwoStepModalProps) => {
         footer={null}
         title={null}
       >
-        <div className="flex flex-col">
-          <AnonymousDropdown
-            name={userName}
-            onAnonymousChange={handleAnonymousChange}
-            showName
-            photo={profileImageUrl}
-            size={40}
-          />
-          <Divider className="w-full my-3" />
-          <span className="text-body-xl font-bold mb-4">
-            What do you want to share?
-          </span>
-          <Input
-            placeholder="Title"
-            className="mb-4"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <TextArea
-            placeholder="Body"
-            style={{ height: "180px" }}
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-          />
-          {/* Display uploaded file previews */}
-          {fileList.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {fileList.map((file) => (
-                <div key={file.previewUrl} className="w-full">
-                  {isVideo(file) ? (
-                    <div className="relative w-full">
-                      {file.loading ? (
-                        <Skeleton.Image active className="w-full" />
-                      ) : (
-                        <video
-                          src={file.previewUrl}
-                          controls
-                          className="w-full object-cover rounded-lg"
-                        />
-                      )}
-                      {!file.loading && (
-                        <Button
-                          icon={getIcon("trashWhite")}
-                          type="text"
-                          rounded
-                          onClick={() => handleRemove(file)}
-                          className="absolute top-1 right-1 bg-black bg-opacity-50 border-none p-1"
-                        />
-                      )}
-                    </div>
-                  ) : isImageFile(file) ? (
-                    <div className="relative w-full">
-                      {file.loading ? (
-                        <Skeleton.Image active className="w-full" />
-                      ) : (
-                        <Image
-                          src={file.previewUrl}
-                          alt={file.fileName}
-                          className="w-full h-24 object-cover rounded-lg"
-                        />
-                      )}
-                      {!file.loading && (
-                        <Button
-                          icon={getIcon("trashWhite")}
-                          type="text"
-                          rounded
-                          onClick={() => handleRemove(file)}
-                          className="absolute top-1 right-1 bg-black bg-opacity-50 border-none p-1"
-                        />
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between p-2 bg-gray-100 rounded">
-                      {file.loading ? (
-                        <Skeleton.Input active block className="w-full" />
-                      ) : (
-                        <>
-                          <div className="flex items-center gap-2">
-                            <span>{getIcon("fileTextBlue")}</span>
-                            <span className="text-gray-700 text-sm">
-                              {file.fileName}
-                            </span>
-                          </div>
+        {currentStep === 0 ? (
+          <div className="flex flex-col">
+            <AnonymousDropdown
+              name={userName}
+              onAnonymousChange={handleAnonymousChange}
+              showName
+              photo={profileImageUrl}
+              size={40}
+            />
+            <Divider className="w-full my-3" />
+            <span className="text-body-xl font-bold mb-4">
+              What do you want to share?
+            </span>
+            <Input
+              placeholder="Title"
+              className="mb-4"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <TextArea
+              placeholder="Body"
+              style={{ height: "180px" }}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+            />
+            {/* Display uploaded file previews */}
+            {fileList.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {fileList.map((file) => (
+                  <div key={file.previewUrl} className="w-full">
+                    {isVideo(file) ? (
+                      <div className="relative w-full">
+                        {file.loading ? (
+                          <Skeleton.Image active className="w-full" />
+                        ) : (
+                          <video
+                            src={file.previewUrl}
+                            controls
+                            className="w-full object-cover rounded-lg"
+                          />
+                        )}
+                        {!file.loading && (
                           <Button
-                            icon={getIcon("trash")}
+                            icon={getIcon("trashWhite")}
                             type="text"
                             rounded
                             onClick={() => handleRemove(file)}
-                            className="bg-gray-100 border-none rounded-full p-1"
+                            className="absolute top-1 right-1 bg-black bg-opacity-50 border-none p-1"
                           />
-                        </>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-          <Divider className="w-full my-4" />
-          <div className="flex justify-between">
-            <div className="flex gap-2">
-              <Button
-                icon={getIcon("layoutList")}
-                label={
-                  selectedCategory ? selectedCategory.name : "Add Category"
-                }
-                rounded
-                responsive
-                className="text-primary"
-                onClick={() => setCategoryModalOpen(true)}
-              />
-              <Upload
-                customRequest={handleUpload}
-                onRemove={handleRemove}
-                fileList={fileList}
-                accept="image/*,video/*,application/pdf,.doc,.docx,.txt"
-                multiple={true}
-                showUploadList={false}
-                beforeUpload={(file) => {
-                  const isUnderSizeLimit = file.size / 1024 / 1024 < 5;
-                  if (!isUnderSizeLimit) {
-                    message.error("File must be smaller than 5MB!");
-                    return false;
-                  }
-                  return true;
-                }}
-              >
+                        )}
+                      </div>
+                    ) : isImageFile(file) ? (
+                      <div className="relative w-full">
+                        {file.loading ? (
+                          <Skeleton.Image active className="w-full" />
+                        ) : (
+                          <Image
+                            src={file.previewUrl}
+                            alt={file.fileName}
+                            className="w-full h-24 object-cover rounded-lg"
+                          />
+                        )}
+                        {!file.loading && (
+                          <Button
+                            icon={getIcon("trashWhite")}
+                            type="text"
+                            rounded
+                            onClick={() => handleRemove(file)}
+                            className="absolute top-1 right-1 bg-black bg-opacity-50 border-none p-1"
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between p-2 bg-gray-100 rounded">
+                        {file.loading ? (
+                          <Skeleton.Input active block className="w-full" />
+                        ) : (
+                          <>
+                            <div className="flex items-center gap-2">
+                              <span>{getIcon("fileTextBlue")}</span>
+                              <span className="text-gray-700 text-sm">
+                                {file.fileName}
+                              </span>
+                            </div>
+                            <Button
+                              icon={getIcon("trash")}
+                              type="text"
+                              rounded
+                              onClick={() => handleRemove(file)}
+                              className="bg-gray-100 border-none rounded-full p-1"
+                            />
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            <Divider className="w-full my-4" />
+            <div className="flex justify-between">
+              <div className="flex gap-2">
                 <Button
-                  icon={getIcon("wrapper", 20)}
-                  label="Upload Media"
+                  icon={getIcon("layoutList")}
+                  label={
+                    selectedCategory ? selectedCategory.name : "Add Category"
+                  }
                   rounded
                   responsive
                   className="text-primary"
-                  disabled={false}
+                  onClick={() => setCategoryModalOpen(true)}
                 />
-              </Upload>
-              <Upload
-                customRequest={handleUpload}
-                onRemove={handleRemove}
-                fileList={fileList}
-                accept="image/*,video/*,application/pdf,.doc,.docx,.txt"
-                multiple={true}
-                showUploadList={false}
-                beforeUpload={(file) => {
-                  const isUnderSizeLimit = file.size / 1024 / 1024 < 5;
-                  if (!isUnderSizeLimit) {
-                    message.error("File must be smaller than 5MB!");
-                    return false;
-                  }
-                  return true;
-                }}
-              >
-                <Button icon={getIcon("paperclip")} rounded disabled={false} />
-              </Upload>
+                <Upload
+                  customRequest={handleUpload}
+                  onRemove={handleRemove}
+                  fileList={fileList}
+                  accept="image/*,video/*,application/pdf,.doc,.docx,.txt"
+                  multiple={true}
+                  showUploadList={false}
+                  beforeUpload={(file) => {
+                    const isUnderSizeLimit = file.size / 1024 / 1024 < 5;
+                    if (!isUnderSizeLimit) {
+                      message.error("File must be smaller than 5MB!");
+                      return false;
+                    }
+                    return true;
+                  }}
+                >
+                  <Button
+                    icon={getIcon("wrapper", 20)}
+                    label="Upload Media"
+                    rounded
+                    responsive
+                    className="text-primary"
+                    disabled={false}
+                  />
+                </Upload>
+                <Upload
+                  customRequest={handleUpload}
+                  onRemove={handleRemove}
+                  fileList={fileList}
+                  accept="image/*,video/*,application/pdf,.doc,.docx,.txt"
+                  multiple={true}
+                  showUploadList={false}
+                  beforeUpload={(file) => {
+                    const isUnderSizeLimit = file.size / 1024 / 1024 < 5;
+                    if (!isUnderSizeLimit) {
+                      message.error("File must be smaller than 5MB!");
+                      return false;
+                    }
+                    return true;
+                  }}
+                >
+                  <Button
+                    icon={getIcon("paperclip")}
+                    rounded
+                    disabled={false}
+                  />
+                </Upload>
+              </div>
+              <Button
+                label="Post Idea"
+                rounded
+                type="primary"
+                onClick={nextStep}
+                disabled={!title || !body || !selectedCategory}
+              />
             </div>
-            <Button
-              label="Post Idea"
-              rounded
-              type="primary"
-              onClick={handleSubmitIdea}
-              loading
-              disabled={!title || !body || !selectedCategory}
-            />
           </div>
-        </div>
+        ) : (
+          <>
+            <div className="flex items-center">
+              <Button
+                icon={getIcon("chevronLeft")}
+                type="text"
+                onClick={prevStep}
+              />
+              <span className="text-body-xl font-bold">
+                Terms and Conditions
+              </span>
+            </div>
+            <Divider className="my-4" />
+            <span>
+              <div className="mt-4">
+                <ul
+                  style={{
+                    margin: 0,
+                    paddingLeft: "1.5em",
+                    listStyleType: "disc",
+                  }}
+                >
+                  <li>
+                    Only active students, staff, and faculty members with valid
+                    university credentials are allowed to access and use the
+                    system.
+                  </li>
+                  <li>
+                    All users must communicate respectfully. Offensive language,
+                    harassment, or discriminatory behavior in posts or comments
+                    is strictly prohibited.
+                  </li>
+                  <li>
+                    Ideas submitted must be your own and directly relevant to
+                    improving the university environment. Submissions containing
+                    plagiarism, spam, or inappropriate content will be removed.
+                  </li>
+                  <li>
+                    Users may post anonymously, but system administrators may
+                    review submission data for moderation or security purposes.
+                    Personal information is handled according to university
+                    privacy policies.
+                  </li>
+                  <li>
+                    All ideas are subject to review. By submitting, you grant
+                    the university permission to use, adapt, or implement the
+                    idea without obligation of compensation.
+                  </li>
+                </ul>
+              </div>
+            </span>
+            <Divider className="my-4" />
+            <div className="flex justify-end">
+              <div className="flex gap-2">
+                <Button label="Decline" onClick={resetForm} rounded />
+                <Button
+                  type="primary"
+                  label="Agree"
+                  onClick={handleSubmitIdea}
+                  loading={loading}
+                  rounded
+                />
+              </div>
+            </div>
+          </>
+        )}
       </Modal>
 
       <CategoryModal
