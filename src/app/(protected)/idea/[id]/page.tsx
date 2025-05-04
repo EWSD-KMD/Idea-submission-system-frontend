@@ -216,11 +216,7 @@ const DetailPage = () => {
     }
     return (
       <p className={`cursor-pointer ${isMobile ? "text-sm" : "text-base"}`}>
-        {getTruncatedText(editedDescription, isMobile, isTablet, {
-          mobileLength: 30,
-          tabletLength: 40,
-          desktopLength: 50,
-        })}
+        {editedDescription}
       </p>
     );
   };
