@@ -118,7 +118,7 @@ const Comment: React.FC<CommentProps> = ({
           </div>
         </div>
       ) : (
-        <p className="text-sm ml-13">{comment.content}</p>
+        <p className="text-sm ml-13 md:ml-15">{comment.content}</p>
       )}
     </div>
   );
