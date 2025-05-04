@@ -289,7 +289,7 @@ export interface DeleteCommentResponse {
 // #region Notifications Types
 export interface Notification {
   id: number;
-  type: "LIKE" | "DISLIKE" | "COMMENT";
+  type: "LIKE" | "DISLIKE" | "COMMENT" | "HIDE";
   message: string;
   isRead: boolean;
   createdAt: string;

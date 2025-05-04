@@ -5,6 +5,7 @@ import Avatar from "../atoms/Avatar";
 
 interface NotificationItem {
   id: number;
+  type: "LIKE" | "DISLIKE" | "COMMENT" | "HIDE";
   fromUserId: number; // ← carry the userId
   userName: string;
   message: string;
@@ -30,9 +31,19 @@ const Notification: React.FC<{
     >
       <div className="flex items-center gap-3 p-2 sm:p-3 cursor-pointer w-full min-h-[3rem]">
         <Avatar
-          src={notif.message.startsWith("Anonymous") ? "anonymous" : avatarUrl}
+          src={
+            notif.message.startsWith("Anonymous")
+              ? "anonymous"
+              : notif.type === "HIDE"
+              ? "hide"
+              : avatarUrl
+          }
           label={
-            notif.message.startsWith("Anonymous") ? "Anonymous" : notif.userName
+            notif.message.startsWith("Anonymous")
+              ? "Anonymous"
+              : notif.type === "HIDE"
+              ? ""
+              : notif.userName
           }
           size={40}
         />
@@ -43,6 +54,8 @@ const Notification: React.FC<{
                 <span className="font-semibold">Anonymous</span>
                 {notif.message.slice("Anonymous".length)}
               </>
+            ) : notif.type === "HIDE" ? (
+              <> {notif.message}</>
             ) : (
               <>
                 <span className="font-semibold">{notif.userName}</span>{" "}

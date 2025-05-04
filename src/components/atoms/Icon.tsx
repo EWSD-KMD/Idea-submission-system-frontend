@@ -34,6 +34,7 @@ import {
   downloadIcon,
   trashDisabledIcon,
   pencilDisabledIcon,
+  infoIcon,
 } from "../../assets/icons";
 import { ReactNode } from "react";
 import Image from "next/image";
@@ -72,7 +73,8 @@ export type IconName =
   | "messageCircleMoreDisabled"
   | "download"
   | "trashDisabled"
-  | "pencilDisabled";
+  | "pencilDisabled"
+  | "info";
 
 interface IconConfig {
   src: string;
@@ -135,6 +137,7 @@ const iconConfig: Record<IconName, IconConfig> = {
     alt: "pencil disabled icon",
     size: 20,
   },
+  info: { src: infoIcon, alt: "info icon", size: 20 },
 };
 
 const IconComponent = ({
