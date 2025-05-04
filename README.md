@@ -125,16 +125,19 @@ Ensure that you have the following installed on your machine:
 
 The project follows the **atomic design pattern** for components and is organized as follows:
 
-- `/components` - React components used throughout the app (atomic design pattern)
-  - `/atoms` - Smallest components (e.g., buttons, inputs, icons)
-  - `/molecules` - Combinations of atoms (e.g., form groups, card elements)
-  - `/organisms` - Complex components made up of molecules (e.g., navigation bar, footer)
-- `/pages` - Next.js pages (each file corresponds to a route)
-- `/public` - Static assets (images, fonts, etc.)
-- `/styles` - Global stylesheets
-- `/utils` - Utility functions and helper scripts
-- `/config` - Configuration files (database, API settings, etc.)
-- `/lib` - Helper libraries or third-party integrations
+- `/components` – All React UI components organized using Atomic Design.
+  - `/atoms` - SBasic, indivisible UI elements (e.g., buttons, inputs, icons).
+  - `/molecules` - Combinations of atoms that work together (e.g., form inputs with labels, tags with icons).
+  - `/organisms` - Complex components made from molecules (e.g., navigation bars, comment sections).
+  - `/templates` - Layouts composed of multiple organisms arranged in a page-like structure (e.g., HomeLayout).
+- `/pages` - Next.js pages; each file here maps to a route in the application.
+- `/public` - Static assets (images, fonts, icons, favicons) accessible at runtime.
+- `/styles` - Global styles, variables, or utility CSS (e.g., Tailwind config overrides).
+- `/config` - Configuration files (e.g., environment setup, API routes, database config).
+- `/constant` - Centralized static constants (e.g., enums, option arrays, status codes, Types).
+- `/contexts` - React context providers for managing global state (e.g., AuthContext, UserContext).
+- `/lib` - Helper libraries or third-party integrations(e.g., auth logics)
+- `/utils` - Generic utility/helper functions (e.g., timeago, formatCount).
 
 This structure promotes reusability and maintainability by organizing components into atomic units.
 
@@ -143,11 +146,3 @@ This structure promotes reusability and maintainability by organizing components
 Ensure the following variables are set in your `.env.local` file:
 
 - **NEXT_PUBLIC_API_URL:** Base URL for API endpoints.
-
-## Deployment
-
-### Deploying on Vercel
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
