@@ -4,12 +4,10 @@
 import React, { useEffect } from "react";
 import { Modal } from "antd";
 import { useErrorStore } from "@/utils/errorStore";
-import { useAuth } from "@/contexts/AuthContext";
 
 export function DisabledAccountModal() {
   const disabledError = useErrorStore((s) => s.disabledError);
   const setDisabledError = useErrorStore((s) => s.setDisabledError);
-  const { logoutUser } = useAuth();
 
   useEffect(() => {
     if (!disabledError) return;
@@ -47,7 +45,7 @@ export function DisabledAccountModal() {
       onOk() {
         // reset the flag and redirect to login
         setDisabledError(false);
-        logoutUser();
+        window.location.reload();
       },
       okButtonProps: { shape: "round" },
     });
