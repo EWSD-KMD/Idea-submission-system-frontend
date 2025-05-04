@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const PUBLIC_ROUTES = ["/login", "/forgot-password", "/users/forget-password"];
-const MAX_REDIRECTS = 3;
+const MAX_REDIRECTS = 10;
 
 export async function middleware(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
